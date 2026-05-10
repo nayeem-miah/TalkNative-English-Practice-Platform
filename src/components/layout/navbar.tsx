@@ -16,9 +16,9 @@ import {
 } from "@/components/ui/sheet"
 
 const navItems = [
-  { name: "Dashboard", href: "#" },
-  { name: "History", href: "#" },
-  { name: "Resources", href: "#" },
+  { name: "Dashboard", href: "/dashboard" },
+  { name: "History", href: "/history" },
+  { name: "Resources", href: "/resources" },
 ]
 
 export function Navbar() {
@@ -52,9 +52,9 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-3">
-             <ModeToggle />
-             <Button variant="ghost" className="text-sm font-semibold">Login</Button>
-             <Button className="h-9 px-5 text-sm font-semibold rounded-full">Practice Now</Button>
+            <ModeToggle />
+            <Button variant="ghost" className="text-sm font-semibold">Login</Button>
+            <Button className="h-9 px-5 text-sm font-semibold rounded-full">Practice Now</Button>
           </div>
 
           {/* Mobile Nav */}
