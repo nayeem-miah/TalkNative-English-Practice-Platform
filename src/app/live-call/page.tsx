@@ -35,10 +35,13 @@ export default function LiveCallPage() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
             {/* Top Header */}
-            <header className="z-10 flex items-center justify-between px-8 py-6">
-                <Link href="/" className="flex items-center gap-2">
-                    <span className="text-2xl font-heading font-bold tracking-tight">FluentFlow</span>
-                </Link>
+            <header className="z-50 flex items-center justify-between px-8 py-6 relative">
+                <div 
+                    onClick={() => router.push("/")} 
+                    className="flex items-center gap-2 group cursor-pointer"
+                >
+                    <span className="text-2xl font-heading font-bold tracking-tight transition-colors group-hover:text-primary dark:text-white">FluentFlow</span>
+                </div>
 
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full font-bold text-sm">
