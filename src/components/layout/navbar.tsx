@@ -7,7 +7,7 @@ import { motion } from "framer-motion"
 import { MessageSquare, Menu, X, Languages } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 import {
   Sheet,
@@ -24,7 +24,7 @@ const navItems = [
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false)
   const pathname = usePathname()
-  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password" || pathname === "/verify-user"
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password" || pathname === "/verify-user" || pathname === "/live-call" || pathname === "/feedback"
 
   if (isAuthPage) return null
 
@@ -56,8 +56,18 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-3">
             <ModeToggle />
-            <Button variant="ghost" className="text-sm font-semibold">Login</Button>
-            <Button className="h-9 px-5 text-sm font-semibold rounded-full">Practice Now</Button>
+            <Link
+              href="/login"
+              className={cn(buttonVariants({ variant: "ghost" }), "text-sm font-semibold")}
+            >
+              Login
+            </Link>
+            <Link
+              href="/live-call"
+              className={cn(buttonVariants(), "h-9 px-5 text-sm font-semibold rounded-full")}
+            >
+              Practice Now
+            </Link>
           </div>
 
           {/* Mobile Nav */}
@@ -81,8 +91,20 @@ export function Navbar() {
                     </Link>
                   ))}
                   <hr className="my-2 border-muted" />
-                  <Button variant="outline" className="w-full h-11">Login</Button>
-                  <Button className="w-full h-11 rounded-full">Practice Now</Button>
+                  <Link
+                    href="/login"
+                    onClick={() => setIsOpen(false)}
+                    className={cn(buttonVariants({ variant: "outline" }), "w-full h-11 font-bold text-base")}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/live-call"
+                    onClick={() => setIsOpen(false)}
+                    className={cn(buttonVariants(), "w-full h-11 rounded-full font-bold text-base shadow-lg shadow-primary/20")}
+                  >
+                    Practice Now
+                  </Link>
                 </nav>
               </SheetContent>
             </Sheet>

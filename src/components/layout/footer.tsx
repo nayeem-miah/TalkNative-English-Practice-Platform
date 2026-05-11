@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 
 export function Footer() {
   const pathname = usePathname()
-  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password" || pathname === "/verify-user"
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password" || pathname === "/verify-user" || pathname === "/live-call" || pathname === "/feedback"
 
   if (isAuthPage) return null
 

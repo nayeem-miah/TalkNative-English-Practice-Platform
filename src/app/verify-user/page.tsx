@@ -104,18 +104,6 @@ export default function VerifyUserPage() {
                         </Link>
                     </div>
                 </Card>
-
-                {/* Footer Tags */}
-                <div className="flex justify-center gap-8 items-center text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
-                    <div className="flex items-center gap-2">
-                        <ShieldCheck className="h-3 w-3 text-primary" />
-                        Secure 256-bit SSL
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Headphones className="h-3 w-3 text-primary" />
-                        24/7 Support
-                    </div>
-                </div>
             </div>
         </div>
     )
