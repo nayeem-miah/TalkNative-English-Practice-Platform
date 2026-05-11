@@ -45,12 +45,12 @@ export default function ResourcesPage() {
             <Card key={i} className="overflow-hidden border-none shadow-xl shadow-primary/5 group">
               <div className="aspect-video bg-muted relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                   <Button size="sm" className="w-full">Start Lesson</Button>
+                  <Button size="sm" className="w-full">Start Lesson</Button>
                 </div>
-                <img 
-                  src={`https://images.unsplash.com/photo-${i === 1 ? '1434030216411-0b793f4b4173' : i === 2 ? '1523240795612-9a054b0db644' : '1516321318423-f06f85e504b3'}?q=80&w=600&auto=format&fit=crop`} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                  alt="Lesson thumbnail" 
+                <img
+                  src={`https://images.unsplash.com/photo-${i === 1 ? '1434030216411-0b793f4b4173' : i === 2 ? '1523240795612-9a054b0db644' : '1516321318423-f06f85e504b3'}?q=80&w=600&auto=format&fit=crop`}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  alt="Lesson thumbnail"
                 />
                 <Badge className="absolute top-3 right-3 bg-white/90 text-black hover:bg-white flex gap-1 items-center">
                   <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" /> 4.9
@@ -71,21 +71,6 @@ export default function ResourcesPage() {
           ))}
         </div>
       </div>
-
-      {/* Newsletter / CTA */}
-      <Card className="bg-primary text-primary-foreground border-none rounded-[40px] overflow-hidden relative">
-        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
-        <CardContent className="p-12 md:p-20 flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-          <div className="space-y-4 max-w-xl text-center md:text-left">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold leading-tight">Get weekly learning tips in your inbox</h2>
-            <p className="text-primary-foreground/80">Join 10,000+ students receiving our best resources every Tuesday.</p>
-          </div>
-          <div className="flex w-full md:w-auto gap-2">
-            <input className="flex-1 md:w-64 rounded-full px-6 py-3 text-black focus:outline-none" placeholder="Enter your email" />
-            <Button variant="secondary" className="rounded-full px-8 h-12 font-bold">Subscribe</Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

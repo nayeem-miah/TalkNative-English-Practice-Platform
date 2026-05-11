@@ -25,6 +25,7 @@ const menuItems = [
   { name: "Moderation", icon: ShieldAlert, href: "/admin/moderation" },
   { name: "Analytics", icon: BarChart3, href: "/admin/analytics" },
   { name: "Users", icon: Users, href: "/admin/users" },
+  { name: "Resources", icon: FileText, href: "/admin/resources" },
   { name: "Reports", icon: FileText, href: "/admin/reports" },
 ]
 
