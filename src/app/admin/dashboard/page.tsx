@@ -4,162 +4,131 @@ import * as React from "react"
 import { 
   Users, 
   PhoneCall, 
-  CreditCard, 
-  TrendingUp,
-  Search,
-  MoreVertical,
+  ShieldCheck,
+  Server,
+  Bell,
   ArrowUpRight,
-  ShieldCheck
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 
-const stats = [
-  { name: "Total Users", value: "12,482", change: "+12%", icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
-  { name: "Live Calls", value: "142", change: "+5%", icon: PhoneCall, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-  { name: "Monthly Revenue", value: "$42,850", change: "+18%", icon: CreditCard, color: "text-[#006D5B]", bg: "bg-[#006D5B]/10" },
-  { name: "Success Rate", value: "98.2%", change: "+2%", icon: ShieldCheck, color: "text-orange-500", bg: "bg-orange-500/10" },
+const systemStats = [
+  { name: "Active Sessions", value: "1,284", status: "Live", icon: PhoneCall, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
+  { name: "Daily Signups", value: "452", change: "+12.5%", icon: Users, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10" },
+  { name: "Safety Health", value: "98.4%", target: "Target: 99%", icon: ShieldCheck, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-500/10" },
+  { name: "Server Load", value: "34%", status: "Optimal", icon: Server, color: "text-zinc-600 dark:text-zinc-400", bg: "bg-zinc-100 dark:bg-zinc-800" },
 ]
 
-const recentUsers = [
-  { name: "James Wilson", email: "james.w@example.com", plan: "Premium", status: "Active", joined: "2 hours ago", image: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=100&auto=format&fit=crop" },
-  { name: "Maria Garcia", email: "m.garcia@example.com", plan: "Basic", status: "Active", joined: "5 hours ago", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=100&auto=format&fit=crop" },
-  { name: "David Chen", email: "chen.david@example.com", plan: "Free", status: "Inactive", joined: "1 day ago", image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop" },
+const liveActivity = [
+  { id: 1, type: "New Match", title: "English & Spanish", description: "User_842 and User_119 started a call.", time: "2m ago", icon: PhoneCall, iconColor: "text-emerald-500", iconBg: "bg-emerald-50 dark:bg-emerald-500/10" },
+  { id: 2, type: "Report Filed", title: "Safety Alert", description: "Session #FF829 under AI review.", time: "14m ago", icon: ShieldCheck, iconColor: "text-destructive", iconBg: "bg-destructive/5 dark:bg-destructive/10" },
+  { id: 3, type: "Milestone", title: "C1 Assessment", description: "User_429 completed advanced test.", time: "45m ago", icon: ShieldCheck, iconColor: "text-blue-500", iconBg: "bg-blue-50 dark:bg-blue-500/10" },
 ]
 
 export default function AdminDashboardPage() {
   return (
-    <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 px-6 py-8 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto space-y-8">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-heading font-bold text-[#1a2b3b] dark:text-white">Admin Overview</h1>
-            <p className="text-muted-foreground font-medium">Monitoring platform performance and user activity.</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="relative w-64 hidden sm:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search users or calls..." className="pl-10 h-10 rounded-full border-muted/20 bg-white dark:bg-zinc-900 focus-visible:ring-primary/20" />
-            </div>
-            <Button className="rounded-full bg-[#006D5B] hover:bg-[#005a4b] text-white font-bold h-10 px-6 shadow-lg shadow-primary/20 transition-all active:scale-95">
-              Generate Report
-            </Button>
-          </div>
+    <div className="p-10 space-y-10 animate-in fade-in duration-500">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">System Overview</h1>
+          <p className="text-sm text-muted-foreground font-medium">Platform performance and activity metrics</p>
         </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
+             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+             <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">Operational</span>
+          </div>
+          <Button variant="outline" size="icon" className="h-10 w-10 rounded-lg border-border bg-background hover:bg-muted transition-colors">
+            <Bell className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </div>
+      </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => (
-            <Card key={stat.name} className="border-none shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden transition-colors border border-primary/5">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`h-12 w-12 rounded-2xl ${stat.bg} flex items-center justify-center ${stat.color}`}>
-                    <stat.icon className="h-6 w-6" />
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {systemStats.map((stat) => (
+          <Card key={stat.name} className="border-border bg-card shadow-none rounded-xl transition-all hover:border-primary/20">
+            <CardContent className="p-6 space-y-5">
+               <div className="flex items-center justify-between">
+                  <div className={`h-11 w-11 rounded-lg ${stat.bg} flex items-center justify-center ${stat.color}`}>
+                    <stat.icon className="h-5.5 w-5.5" />
                   </div>
-                  <Badge variant="outline" className="text-[10px] font-bold border-muted/20 bg-muted/5 text-emerald-600">
-                    {stat.change}
-                  </Badge>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{stat.name}</p>
-                  <p className="text-3xl font-bold text-[#1a2b3b] dark:text-white tracking-tight">{stat.value}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  {stat.change && (
+                    <div className="text-emerald-600 dark:text-emerald-400 font-bold text-xs flex items-center bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                      <ArrowUpRight className="h-3 w-3 mr-0.5" /> {stat.change}
+                    </div>
+                  )}
+               </div>
+               <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">{stat.name}</p>
+                  <p className="text-3xl font-bold text-foreground tracking-tighter">{stat.value}</p>
+               </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        {/* Tables Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Recent Users Table */}
-          <Card className="lg:col-span-8 border-none shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden transition-colors border border-primary/5">
-            <CardHeader className="flex flex-row items-center justify-between p-6 border-b border-muted/10">
-              <CardTitle className="text-xl font-heading font-bold text-[#1a2b3b] dark:text-white">Recent Users</CardTitle>
-              <Button variant="ghost" className="text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors">View All</Button>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="text-left border-b border-muted/10 bg-muted/5">
-                      <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">User</th>
-                      <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Plan</th>
-                      <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Status</th>
-                      <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Joined</th>
-                      <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-muted/5">
-                    {recentUsers.map((user) => (
-                      <tr key={user.email} className="group hover:bg-muted/5 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-10 w-10 rounded-xl border border-primary/5">
-                              <AvatarImage src={user.image} />
-                              <AvatarFallback>{user.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-bold text-[#1a2b3b] dark:text-white text-sm">{user.name}</p>
-                              <p className="text-xs text-muted-foreground font-medium">{user.email}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <Badge variant="outline" className={`rounded-full px-3 text-[10px] font-bold ${user.plan === 'Premium' ? 'border-primary/20 bg-primary/5 text-primary' : 'border-muted/20 text-muted-foreground'}`}>
-                            {user.plan}
-                          </Badge>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className={`h-1.5 w-1.5 rounded-full ${user.status === 'Active' ? 'bg-emerald-500' : 'bg-zinc-300'}`} />
-                            <span className="text-sm font-semibold text-[#1a2b3b] dark:text-white">{user.status}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground font-medium">{user.joined}</td>
-                        <td className="px-6 py-4 text-right">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Usage Analytics */}
+        <Card className="lg:col-span-8 border-border bg-card shadow-none rounded-xl overflow-hidden">
+           <CardHeader className="p-6 border-b border-border flex flex-row items-center justify-between">
+              <div className="space-y-1">
+                <CardTitle className="text-lg font-bold text-foreground">Usage Trends</CardTitle>
+                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest leading-none">Weekly Active Users Distribution</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="flex gap-1 bg-muted/50 p-1 rounded-lg border border-border">
+                 <Button variant="ghost" size="sm" className="h-7 px-3 rounded-md text-[10px] font-bold uppercase bg-background shadow-sm border border-border text-foreground">24h</Button>
+                 <Button variant="ghost" size="sm" className="h-7 px-3 rounded-md text-[10px] font-bold uppercase text-muted-foreground">7d</Button>
+              </div>
+           </CardHeader>
+           <CardContent className="p-10 h-[380px] flex items-end justify-center">
+              <div className="w-full h-full relative group">
+                 {/* Theme-aware Curve */}
+                 <svg viewBox="0 0 1000 300" className="w-full h-full text-muted/20 fill-none stroke-[2] stroke-primary drop-shadow-sm">
+                   <path d="M0,250 Q200,280 400,200 T800,100 T1000,50" />
+                 </svg>
+                 <div className="absolute inset-x-0 bottom-0 flex justify-between px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 pt-4 border-t border-border">
+                    <span>00:00</span>
+                    <span>06:00</span>
+                    <span>12:00</span>
+                    <span>18:00</span>
+                    <span>23:59</span>
+                 </div>
+              </div>
+           </CardContent>
+        </Card>
 
-          {/* Activity Section */}
-          <Card className="lg:col-span-4 border-none shadow-sm rounded-3xl bg-white dark:bg-zinc-900 overflow-hidden transition-colors border border-primary/5">
-            <CardHeader className="p-6 border-b border-muted/10">
-              <CardTitle className="text-xl font-heading font-bold text-[#1a2b3b] dark:text-white">Live Activity</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="flex gap-4 group cursor-pointer">
-                  <div className="h-10 w-10 rounded-xl bg-muted/5 flex-shrink-0 flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-all">
-                    <TrendingUp className="h-5 w-5" />
+        {/* Real-time Activity */}
+        <Card className="lg:col-span-4 border-border bg-card shadow-none rounded-xl overflow-hidden">
+           <CardHeader className="p-6 border-b border-border">
+              <CardTitle className="text-lg font-bold text-foreground">Live Activity</CardTitle>
+           </CardHeader>
+           <CardContent className="p-0">
+              <div className="divide-y divide-border">
+                {liveActivity.map((activity) => (
+                  <div key={activity.id} className="p-6 flex items-start gap-4 hover:bg-muted/30 transition-colors group cursor-default">
+                     <div className={`h-10 w-10 rounded-lg ${activity.iconBg} flex items-center justify-center ${activity.iconColor} flex-shrink-0 shadow-sm`}>
+                        <activity.icon className="h-5 w-5" />
+                     </div>
+                     <div className="space-y-1 flex-1">
+                        <div className="flex items-center justify-between">
+                           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest leading-none">{activity.type}</p>
+                           <p className="text-[9px] text-muted-foreground/60 font-bold uppercase">{activity.time}</p>
+                        </div>
+                        <h4 className="font-bold text-foreground text-sm group-hover:text-primary transition-colors">{activity.title}</h4>
+                        <p className="text-xs text-muted-foreground font-medium leading-relaxed">{activity.description}</p>
+                     </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-bold text-[#1a2b3b] dark:text-white leading-none pt-1">New subscription activated</p>
-                    <p className="text-xs text-muted-foreground font-medium">Premium Plan by Alex Johnson</p>
-                    <p className="text-[10px] font-bold text-[#006D5B] flex items-center gap-1 uppercase tracking-widest pt-1">
-                      Just now <ArrowUpRight className="h-3 w-3" />
-                    </p>
-                  </div>
-                </div>
-              ))}
-              <Button className="w-full h-12 rounded-2xl border-2 border-muted/20 font-bold text-[10px] uppercase tracking-widest hover:bg-muted/5 transition-all active:scale-95 mt-4" variant="outline">
-                View Full Logs
+                ))}
+              </div>
+           </CardContent>
+           <div className="p-6 border-t border-border text-center">
+              <Button variant="link" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors h-auto p-0">
+                 Access Full History Monitor
               </Button>
-            </CardContent>
-          </Card>
-        </div>
+           </div>
+        </Card>
       </div>
     </div>
   )
