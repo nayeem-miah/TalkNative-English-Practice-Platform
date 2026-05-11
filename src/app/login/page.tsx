@@ -1,11 +1,11 @@
 "use client"
 
-import * as React from "react"
-import Link from "next/link"
-import { Languages, Mail, Lock, Eye, EyeOff, Github } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Eye, EyeOff, Languages, Lock, Mail } from "lucide-react"
+import Link from "next/link"
+import * as React from "react"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -15,14 +15,14 @@ export default function LoginPage() {
       {/* Background Decorative Elements */}
       <div className="absolute top-[20%] left-[10%] opacity-20 dark:opacity-10 pointer-events-none animate-bounce-slow">
         <div className="relative h-40 w-40">
-           <div className="absolute inset-0 bg-primary/20 rounded-3xl rotate-12 blur-xl" />
-           <MessageCircle3D />
+          <div className="absolute inset-0 bg-primary/20 rounded-3xl rotate-12 blur-xl" />
+          <MessageCircle3D />
         </div>
       </div>
       <div className="absolute bottom-[10%] right-[10%] opacity-20 dark:opacity-10 pointer-events-none">
         <div className="relative h-48 w-48">
-           <div className="absolute inset-0 bg-accent/20 rounded-full blur-2xl" />
-           <Globe3D />
+          <div className="absolute inset-0 bg-accent/20 rounded-full blur-2xl" />
+          <Globe3D />
         </div>
       </div>
 
@@ -81,9 +81,9 @@ export default function LoginPage() {
                 <label className="text-sm font-bold text-foreground ml-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input 
-                    type="email" 
-                    placeholder="name@example.com" 
+                  <Input
+                    type="email"
+                    placeholder="name@example.com"
                     className="pl-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
                   />
                 </div>
@@ -96,12 +96,12 @@ export default function LoginPage() {
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
                     className="pl-11 pr-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
                   />
-                  <button 
+                  <button
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
@@ -117,24 +117,10 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link href="#" className="text-primary font-bold hover:underline">Join FluentFlow</Link>
+              <Link href="/register" className="text-primary font-bold hover:underline">Join FluentFlow</Link>
             </p>
           </CardContent>
         </Card>
-
-        {/* Footer Links */}
-        <div className="flex justify-center gap-6 text-xs font-medium text-muted-foreground pt-4">
-          <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
-          <span className="text-muted">•</span>
-          <Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link>
-          <span className="text-muted">•</span>
-          <Link href="#" className="hover:text-primary transition-colors">Support</Link>
-        </div>
-      </div>
-
-      {/* Copyright */}
-      <div className="mt-12 text-[10px] text-muted-foreground/60 uppercase tracking-widest text-center">
-        © {new Date().getFullYear()} FluentFlow. Empowering global voices through clear communication.
       </div>
     </div>
   )

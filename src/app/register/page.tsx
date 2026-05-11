@@ -15,14 +15,14 @@ export default function RegisterPage() {
       {/* Background Decorative Elements (Consistent with Login) */}
       <div className="absolute top-[15%] right-[5%] opacity-20 dark:opacity-10 pointer-events-none animate-pulse-slow">
         <div className="relative h-56 w-56">
-           <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl" />
-           <CircleDecoration />
+          <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl" />
+          <CircleDecoration />
         </div>
       </div>
       <div className="absolute bottom-[5%] left-[5%] opacity-20 dark:opacity-10 pointer-events-none">
         <div className="relative h-40 w-40">
-           <div className="absolute inset-0 bg-accent/20 rounded-3xl -rotate-12 blur-2xl" />
-           <SquareDecoration />
+          <div className="absolute inset-0 bg-accent/20 rounded-3xl -rotate-12 blur-2xl" />
+          <SquareDecoration />
         </div>
       </div>
 
@@ -50,9 +50,9 @@ export default function RegisterPage() {
                 <label className="text-sm font-bold text-foreground ml-1">Full Name</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input 
-                    type="text" 
-                    placeholder="Enter your full name" 
+                  <Input
+                    type="text"
+                    placeholder="Enter your full name"
                     className="pl-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
                   />
                 </div>
@@ -62,9 +62,9 @@ export default function RegisterPage() {
                 <label className="text-sm font-bold text-foreground ml-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input 
-                    type="email" 
-                    placeholder="name@example.com" 
+                  <Input
+                    type="email"
+                    placeholder="name@example.com"
                     className="pl-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
                   />
                 </div>
@@ -74,12 +74,12 @@ export default function RegisterPage() {
                 <label className="text-sm font-bold text-foreground ml-1">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="Min. 8 characters" 
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Min. 8 characters"
                     className="pl-11 pr-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
@@ -91,10 +91,10 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex items-start gap-2 ml-1">
-               <input type="checkbox" className="mt-1 h-4 w-4 rounded border-muted text-primary focus:ring-primary/20" id="terms" />
-               <label htmlFor="terms" className="text-xs text-muted-foreground leading-normal">
-                  I agree to the <Link href="#" className="text-primary font-bold hover:underline">Terms of Service</Link> and <Link href="#" className="text-primary font-bold hover:underline">Privacy Policy</Link>.
-               </label>
+              <input type="checkbox" className="mt-1 h-4 w-4 rounded border-muted text-primary focus:ring-primary/20" id="terms" />
+              <label htmlFor="terms" className="text-xs text-muted-foreground leading-normal">
+                I agree to the <Link href="#" className="text-primary font-bold hover:underline">Terms of Service</Link> and <Link href="#" className="text-primary font-bold hover:underline">Privacy Policy</Link>.
+              </label>
             </div>
 
             <Button className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20">
@@ -138,30 +138,6 @@ export default function RegisterPage() {
             </p>
           </CardContent>
         </Card>
-
-        {/* Trust Badges */}
-        <div className="flex justify-center items-center gap-8 text-[10px] font-bold text-muted-foreground uppercase tracking-widest pt-2">
-           <div className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-emerald-500" />
-              Secure Data Encryption
-           </div>
-           <div className="flex items-center gap-1.5">
-              <Globe className="h-4 w-4 text-primary" />
-              Global Community
-           </div>
-        </div>
-      </div>
-
-      {/* Footer Links (Consistent with Login) */}
-      <div className="mt-12 flex justify-center gap-6 text-xs font-medium text-muted-foreground/60">
-        <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
-        <Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link>
-        <Link href="#" className="hover:text-primary transition-colors">Support</Link>
-        <Link href="#" className="hover:text-primary transition-colors">Careers</Link>
-      </div>
-
-      <div className="mt-6 text-[10px] text-muted-foreground/40 uppercase tracking-widest text-center">
-        © {new Date().getFullYear()} FluentFlow. Empowering global voices.
       </div>
     </div>
   )

@@ -1,7 +1,15 @@
+"use client"
+
 import Link from "next/link"
 import { Languages } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 export function Footer() {
+  const pathname = usePathname()
+  const isAuthPage = pathname === "/login" || pathname === "/register"
+
+  if (isAuthPage) return null
+
   return (
     <footer className="bg-background border-t py-20">
       <div className="container px-4 md:px-8 mx-auto">
