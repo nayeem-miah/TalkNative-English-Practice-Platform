@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { LayoutWrapper } from "@/components/layout/layout-wrapper";
+import { ReduxProvider } from "@/components/providers/redux-provider";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +36,7 @@ export default function RootLayout({
           inter.variable,
           outfit.variable
         )}
+        suppressHydrationWarning
       >
         <ThemeProvider
           attribute="class"
@@ -41,9 +44,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
+          <ReduxProvider>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+            <Toaster position="top-center" richColors />
+          </ReduxProvider>
         </ThemeProvider>
       </body>
     </html>
