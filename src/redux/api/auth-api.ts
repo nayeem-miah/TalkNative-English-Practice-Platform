@@ -10,7 +10,33 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    verifyEmail: builder.mutation({
+      query: (data) => ({
+        url: "/auth/verify-email",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    resendOtp: builder.mutation({
+      query: (data) => ({
+        url: "/auth/resend-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    login: builder.mutation({
+      query: (data) => ({
+        url: "/auth/login",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useRegisterMutation } = authApi;
+export const { 
+  useRegisterMutation, 
+  useVerifyEmailMutation, 
+  useResendOtpMutation,
+  useLoginMutation
+} = authApi;

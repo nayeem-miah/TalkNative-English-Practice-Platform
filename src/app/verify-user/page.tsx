@@ -7,9 +7,20 @@ import { ShieldCheck, Headphones, Mail, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
 
+import { useVerifyEmailMutation, useResendOtpMutation } from "@/redux/api/auth-api"
+import { useSearchParams, useRouter } from "next/navigation"
+import { toast } from "sonner"
+
 export default function VerifyUserPage() {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const email = searchParams.get("email") || ""
+    
     const [otp, setOtp] = React.useState(["", "", "", "", "", ""])
-    const [timer, setTimer] = React.useState(148) // 02:28
+    const [timer, setTimer] = React.useState(120) // 02:00
+    
+    const [verifyEmail, { isLoading: isVerifying }] = useVerifyEmailMutation()
+    const [resendOtp, { isLoading: isResending }] = useResendOtpMutation()
 
     React.useEffect(() => {
         const interval = setInterval(() => {
@@ -36,6 +47,55 @@ export default function VerifyUserPage() {
         }
     }
 
+    const handlePaste = (e: React.ClipboardEvent) => {
+        e.preventDefault()
+        const pastedData = e.clipboardData.getData("text").slice(0, 6).split("")
+        if (pastedData.length === 0) return
+
+        const newOtp = [...otp]
+        pastedData.forEach((char, index) => {
+            if (index < 6) newOtp[index] = char
+        })
+        setOtp(newOtp)
+
+        // Focus the last filled input or the next empty one
+        const lastIndex = Math.min(pastedData.length, 5)
+        document.getElementById(`otp-${lastIndex}`)?.focus()
+    }
+
+    const handleVerify = async () => {
+        const code = otp.join("")
+        if (code.length < 6) {
+            return toast.error("Please enter the 6-digit code")
+        }
+
+        const toastId = toast.loading("Verifying your account...")
+        try {
+            const res = await verifyEmail({ email, code }).unwrap()
+            if (res?.success) {
+                toast.success("Account verified successfully!", { id: toastId })
+                router.push("/login")
+            }
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Verification failed", { id: toastId })
+        }
+    }
+
+    const handleResend = async () => {
+        if (timer > 0) return
+        
+        const toastId = toast.loading("Resending code...")
+        try {
+            const res = await resendOtp({ email }).unwrap()
+            if (res?.success) {
+                toast.success("Verification code resent!", { id: toastId })
+                setTimer(120) // Reset timer to 2 minutes
+            }
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to resend code", { id: toastId })
+        }
+    }
+
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12 overflow-hidden transition-colors duration-300">
             {/* Background Glows */}
@@ -58,7 +118,7 @@ export default function VerifyUserPage() {
                         <div className="space-y-3">
                             <CardTitle className="text-2xl sm:text-3xl font-heading font-bold">Check your email</CardTitle>
                             <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                                We've sent a 6-digit verification code to <span className="text-foreground font-bold italic">   com</span>.
+                                We've sent a 6-digit verification code to <span className="text-foreground font-bold italic">{email || "your email"}</span>.
                             </p>
                         </div>
 
@@ -71,14 +131,20 @@ export default function VerifyUserPage() {
                                     type="text"
                                     value={digit}
                                     onChange={(e) => handleOtpChange(idx, e.target.value)}
+                                    onPaste={handlePaste}
                                     className="w-10 h-14 sm:w-16 sm:h-20 text-center text-xl sm:text-2xl font-bold rounded-2xl border-none bg-muted dark:bg-zinc-800 text-foreground focus:ring-2 focus:ring-primary/40 transition-all"
                                     maxLength={1}
+                                    disabled={isVerifying}
                                 />
                             ))}
                         </div>
 
-                        <Button className="w-full h-14 sm:h-16 rounded-[25px] text-lg font-bold shadow-xl shadow-primary/20 gap-3 bg-primary hover:opacity-90 text-primary-foreground">
-                            Verify Account
+                        <Button 
+                            onClick={handleVerify}
+                            disabled={isVerifying}
+                            className="w-full h-14 sm:h-16 rounded-[25px] text-lg font-bold shadow-xl shadow-primary/20 gap-3 bg-primary hover:opacity-90 text-primary-foreground"
+                        >
+                            {isVerifying ? "Verifying..." : "Verify Account"}
                             <ShieldCheck className="h-5 w-5" />
                         </Button>
 
@@ -86,8 +152,12 @@ export default function VerifyUserPage() {
                         <div className="w-full flex items-center justify-between px-2">
                             <p className="text-[11px] font-bold text-muted-foreground leading-tight text-left">Didn't receive the<br />code?</p>
                             <div className="flex items-center gap-4">
-                                <button className="text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider">
-                                    Resend Code
+                                <button 
+                                    onClick={handleResend}
+                                    disabled={timer > 0 || isResending}
+                                    className="text-[11px] font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isResending ? "Sending..." : "Resend Code"}
                                 </button>
                                 <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-xl">
                                     {formatTime(timer)}

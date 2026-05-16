@@ -6,9 +6,66 @@ import { Input } from "@/components/ui/input"
 import { Eye, EyeOff, Languages, Lock, Mail } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
+import { useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = React.useState(false)
+  const [formData, setFormData] = React.useState({
+    email: "",
+    password: "",
+  })
+
+  const [login, { isLoading }] = useLoginMutation()
+  const [resendOtp] = useResendOtpMutation()
+  const router = useRouter()
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!formData.email || !formData.password) {
+      return toast.error("Please fill in all fields")
+    }
+
+    const toastId = toast.loading("Signing in...")
+
+    try {
+      const res = await login(formData).unwrap()
+      if (res?.success) {
+        toast.success("Logged in successfully!", { id: toastId })
+        // Set tokens in cookies/localStorage if not handled by RTK baseApi
+        // For now, redirect to dashboard
+        router.push("/")
+      }
+    } catch (err: any) {
+      const errorMessage = err?.data?.message || "Invalid email or password"
+      
+      // If user is not verified, redirect to verification page
+      if (errorMessage.toLowerCase().includes("verify") || errorMessage.toLowerCase().includes("verification")) {
+        toast.info("Account not verified. Sending OTP and redirecting...", { id: toastId })
+        
+        try {
+          // Call resend-otp before redirecting
+          await resendOtp({ email: formData.email }).unwrap()
+          router.push(`/verify-user?email=${formData.email}`)
+        } catch (otpErr: any) {
+          toast.error(otpErr?.data?.message || "Failed to send verification code", { id: toastId })
+          // Still redirect even if resend fails, as they might have a code already or can resend there
+          setTimeout(() => {
+            router.push(`/verify-user?email=${formData.email}`)
+          }, 2000)
+        }
+      } else {
+        toast.error(errorMessage, { id: toastId })
+      }
+    }
+  }
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-[#f8faff] dark:bg-zinc-950 px-4 py-12 overflow-hidden">
@@ -45,7 +102,7 @@ export default function LoginPage() {
             <CardDescription>Please enter your details to sign in.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <Button variant="outline" className="w-full h-12 gap-2 rounded-xl font-medium border-muted">
+            <Button variant="outline" className="w-full h-12 gap-2 rounded-xl font-medium border-muted" disabled={isLoading}>
               <svg className="h-5 w-5" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -76,15 +133,19 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-foreground ml-1">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
+                    name="email"
                     type="email"
                     placeholder="name@example.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     className="pl-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -92,28 +153,38 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
                   <label className="text-sm font-bold text-foreground">Password</label>
-                  <Link href="/forgot-password" className="text-xs font-bold text-primary hover:underline">Forgot Password?</Link>
+                  <Link href="/forgot-password" disabled={isLoading} className="text-xs font-bold text-primary hover:underline">Forgot Password?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleInputChange}
                     className="pl-11 pr-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
+                    disabled={isLoading}
                   />
                   <button
+                    type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
               </div>
 
-              <Button className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 mt-2">
-                Sign In
+              <Button 
+                type="submit" 
+                className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 mt-2"
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing In..." : "Sign In"}
               </Button>
-            </div>
+            </form>
 
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
@@ -125,7 +196,6 @@ export default function LoginPage() {
     </div>
   )
 }
-
 function MessageCircle3D() {
   return (
     <svg viewBox="0 0 200 200" className="w-full h-full text-primary/30 fill-current">

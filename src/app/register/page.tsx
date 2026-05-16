@@ -40,16 +40,16 @@ export default function RegisterPage() {
       const res = await register(formData).unwrap()
       if (res?.success) {
         toast.success("Account created successfully!", { id: toastId })
-        router.push("/login")
+        router.push(`/verify-user?email=${formData.email}`)
       }
     } catch (err: any) {
       const errorMessage = err?.data?.message || "Something went wrong during registration"
       
-      // If user already exists, redirect to login
+      // If user already exists, redirect to verification or login
       if (errorMessage.toLowerCase().includes("already exist")) {
-        toast.info("User already exists. Redirecting to login...", { id: toastId })
+        toast.info("User already exists. Redirecting to verification...", { id: toastId })
         setTimeout(() => {
-          router.push("/login")
+          router.push(`/verify-user?email=${formData.email}`)
         }, 1500)
       } else {
         toast.error(errorMessage, { id: toastId })
