@@ -9,6 +9,7 @@ import * as React from "react"
 import { useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -39,8 +40,7 @@ export default function LoginPage() {
       const res = await login(formData).unwrap()
       if (res?.success) {
         toast.success("Logged in successfully!", { id: toastId })
-        // Set tokens in cookies/localStorage if not handled by RTK baseApi
-        // For now, redirect to dashboard
+        // Redirect to dashboard
         router.push("/")
       }
     } catch (err: any) {
@@ -153,7 +153,15 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
                   <label className="text-sm font-bold text-foreground">Password</label>
-                  <Link href="/forgot-password" disabled={isLoading} className="text-xs font-bold text-primary hover:underline">Forgot Password?</Link>
+                  <Link 
+                    href="/forgot-password" 
+                    className={cn(
+                      "text-xs font-bold text-primary hover:underline",
+                      isLoading && "pointer-events-none opacity-50"
+                    )}
+                  >
+                    Forgot Password?
+                  </Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />

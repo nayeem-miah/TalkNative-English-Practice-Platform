@@ -1,4 +1,5 @@
 import { baseApi } from "./base-api";
+import { setCookie, removeCookie } from "@/utils/cookie";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -30,6 +31,40 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["User"],
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success && data?.data?.result?.accessToken) {
+            setCookie("accessToken", data.data.result.accessToken);
+            setCookie("refreshToken", data.data.result.refreshToken);
+          }
+        } catch (err) {
+          // Ignore error
+        }
+      },
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+      invalidatesTags: ["User"],
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          removeCookie("accessToken");
+          removeCookie("refreshToken");
+        } catch (err) {
+          // Even if API fails, we should clear tokens locally
+          removeCookie("accessToken");
+          removeCookie("refreshToken");
+        }
+      },
+    }),
+    getMe: builder.query({
+      query: () => "/users/me",
+      providesTags: ["User"],
     }),
   }),
 });
@@ -38,5 +73,7 @@ export const {
   useRegisterMutation, 
   useVerifyEmailMutation, 
   useResendOtpMutation,
-  useLoginMutation
+  useLoginMutation,
+  useLogoutMutation,
+  useGetMeQuery
 } = authApi;
