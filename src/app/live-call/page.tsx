@@ -16,9 +16,20 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useGetMeQuery } from "@/redux/api/auth-api"
 
 export default function LiveCallPage() {
     const router = useRouter()
+    const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined)
+    const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
+    const isLoggedIn = !!user && (userResponse?.success !== false)
+
+    React.useEffect(() => {
+        if (!isUserLoading && !isLoggedIn) {
+            router.push("/login?redirect=/live-call")
+        }
+    }, [isUserLoading, isLoggedIn, router])
+
     const [isMuted, setIsMuted] = React.useState(false)
     const [isVolumeOff, setIsVolumeOff] = React.useState(false)
     const [showCaptions, setShowCaptions] = React.useState(false)
@@ -27,6 +38,21 @@ export default function LiveCallPage() {
     const handleEndCall = () => {
         // Redirect to feedback page
         router.push("/feedback")
+    }
+
+    if (isUserLoading) {
+        return (
+            <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                    <p className="text-sm font-semibold text-muted-foreground animate-pulse">Loading live call...</p>
+                </div>
+            </div>
+        )
+    }
+
+    if (!isLoggedIn) {
+        return null
     }
 
     return (

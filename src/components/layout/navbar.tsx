@@ -15,17 +15,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, LayoutDashboard, LogOut, Settings } from "lucide-react"
+import { User, LayoutDashboard, LogOut, Settings, PhoneCall } from "lucide-react"
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
@@ -115,6 +115,12 @@ export function Navbar() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/5 focus:text-primary">
+                      <Link href="/live-call" className="flex items-center gap-3 w-full">
+                        <PhoneCall className="h-4 w-4" />
+                        <span className="font-semibold text-sm">Live Call</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/5 focus:text-primary">
                       <Link href="/profile" className="flex items-center gap-3 w-full">
                         <User className="h-4 w-4" />
                         <span className="font-semibold text-sm">Profile Settings</span>
@@ -122,8 +128,10 @@ export function Navbar() {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator className="bg-muted/50" />
+
+
                   <DropdownMenuGroup className="p-1">
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={handleLogout}
                       className="rounded-xl cursor-pointer py-2.5 text-destructive focus:bg-destructive/5 focus:text-destructive"
                     >
@@ -187,6 +195,14 @@ export function Navbar() {
                       >
                         <LayoutDashboard className="h-5 w-5 text-primary" />
                         <span className="font-bold">Dashboard</span>
+                      </Link>
+                      <Link
+                        href="/live-call"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted transition-colors"
+                      >
+                        <PhoneCall className="h-5 w-5 text-primary" />
+                        <span className="font-bold">Live Call</span>
                       </Link>
                       <Link
                         href="/profile"

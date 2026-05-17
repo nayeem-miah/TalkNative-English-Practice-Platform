@@ -7,7 +7,7 @@ import { Eye, EyeOff, Languages, Lock, Mail } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
 import { useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
@@ -21,6 +21,8 @@ export default function LoginPage() {
   const [login, { isLoading }] = useLoginMutation()
   const [resendOtp] = useResendOtpMutation()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams?.get("redirect") || "/"
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -40,8 +42,8 @@ export default function LoginPage() {
       const res = await login(formData).unwrap()
       if (res?.success) {
         toast.success("Logged in successfully!", { id: toastId })
-        // Redirect to dashboard
-        router.push("/")
+        // Redirect to requested redirect page or root
+        router.push(redirectTo)
       }
     } catch (err: any) {
       const errorMessage = err?.data?.message || "Invalid email or password"
