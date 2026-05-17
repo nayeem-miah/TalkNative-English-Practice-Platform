@@ -42,8 +42,20 @@ export default function UserDashboardPage() {
 
   // Calculate Statistics dynamically
   const totalSessions = calls.length
-  const totalMinutes = user?.totalMinutesSpent || 0
-  const practiceTimeHours = (totalMinutes / 60).toFixed(1)
+  // Sum up durations of all calls in the history (in seconds)
+  const totalSeconds = calls.reduce((acc: number, call: any) => {
+    if (call.duration) {
+      return acc + call.duration
+    }
+    if (call.startTime && call.endTime) {
+      const diffMs = new Date(call.endTime).getTime() - new Date(call.startTime).getTime()
+      return acc + Math.floor(diffMs / 1000)
+    }
+    return acc
+  }, 0)
+  
+  const totalMinutes = Math.floor(totalSeconds / 60)
+  const practiceTimeHours = (totalSeconds / 3600).toFixed(1)
 
   // Map call history into recent partners format
   const recentPartners = calls.slice(0, 3).map((call: any) => {
@@ -117,7 +129,7 @@ export default function UserDashboardPage() {
               </div>
               <div>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Practice Time</p>
-                <p className="text-2xl font-bold text-zinc-900 dark:text-white">{practiceTimeHours}h</p>
+                <p className="text-2xl font-bold text-zinc-900 dark:text-white">{totalSeconds}s ({totalMinutes}m / {practiceTimeHours}h)</p>
               </div>
             </CardContent>
           </Card>
