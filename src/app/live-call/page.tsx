@@ -19,7 +19,7 @@ import { useGetMeQuery } from "@/redux/api/auth-api"
 import { io, Socket } from "socket.io-client"
 import { toast } from "sonner"
 
-export default function LiveCallPage() {
+function LiveCallContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const autoStart = searchParams?.get("autoStart") === "true"
@@ -586,5 +586,20 @@ export default function LiveCallPage() {
                 }
             `}</style>
         </div>
+    )
+}
+
+export default function LiveCallPage() {
+    return (
+        <React.Suspense fallback={
+            <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="h-10 w-10 border-4 border-[#006D5B] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-zinc-600 dark:text-zinc-400 font-bold text-sm">Initializing Call Center...</p>
+                </div>
+            </div>
+        }>
+            <LiveCallContent />
+        </React.Suspense>
     )
 }

@@ -11,7 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
-export default function LoginPage() {
+function LoginContent() {
   const [showPassword, setShowPassword] = React.useState(false)
   const [formData, setFormData] = React.useState({
     email: "",
@@ -204,6 +204,21 @@ export default function LoginPage() {
         </Card>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 border-4 border-[#006D5B] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-zinc-600 dark:text-zinc-400 font-bold text-sm">Preparing Login Screen...</p>
+        </div>
+      </div>
+    }>
+      <LoginContent />
+    </React.Suspense>
   )
 }
 function MessageCircle3D() {
