@@ -19,48 +19,74 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-
-const recentPartners = [
-  {
-    name: "Elena Rodriguez",
-    language: "Spanish (Native)",
-    duration: "24m",
-    rating: 5,
-    status: "Native",
-    time: "Yesterday, 6:30 PM",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop"
-  },
-  {
-    name: "Liam Chen",
-    language: "Mandarin (Native)",
-    duration: "15m",
-    rating: 4,
-    status: "Fluent",
-    time: "2 days ago",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop"
-  },
-  {
-    name: "Sarah Miller",
-    language: "English (Native)",
-    duration: "42m",
-    rating: 5,
-    status: "Native",
-    time: "Oct 24, 2023",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&auto=format&fit=crop"
-  }
-]
+import { useGetMeQuery } from "@/redux/api/auth-api"
+import { useGetCallHistoryQuery } from "@/redux/api/call-api"
 
 export default function UserDashboardPage() {
+  const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined)
+  const { data: callHistoryResponse, isLoading: isHistoryLoading } = useGetCallHistoryQuery(undefined)
+
+  const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
+  const calls = callHistoryResponse?.data || []
+
+  if (isUserLoading || isHistoryLoading) {
+    return (
+      <div className="min-h-screen bg-[#f3f4f6] dark:bg-zinc-950 transition-colors duration-300 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-10 w-10 border-4 border-[#006D5B] border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-zinc-600 dark:text-zinc-400 font-bold text-sm">Loading your command center...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Calculate Statistics dynamically
+  const totalSessions = calls.length
+  const totalMinutes = user?.totalMinutesSpent || 0
+  const practiceTimeHours = (totalMinutes / 60).toFixed(1)
+
+  // Map call history into recent partners format
+  const recentPartners = calls.slice(0, 3).map((call: any) => {
+    const isCaller = call.callerId === user?.id
+    const partner = isCaller ? call.callee : call.caller
+    
+    // Calculate call duration
+    let durationStr = "0s"
+    if (call.startTime && call.endTime) {
+      const diffMs = new Date(call.endTime).getTime() - new Date(call.startTime).getTime()
+      const totalSec = Math.floor(diffMs / 1000)
+      if (totalSec >= 60) {
+        durationStr = `${Math.floor(totalSec / 60)}m`
+      } else {
+        durationStr = `${totalSec}s`
+      }
+    }
+
+    return {
+      id: call.id,
+      name: partner?.name || "Speaking Partner",
+      language: isCaller ? `${user?.learningLanguage || 'English'} (Practice)` : `${user?.nativeLanguage || 'Bengali'} (Native)`,
+      duration: durationStr,
+      rating: 5, // Fallback rating
+      time: new Date(call.startTime).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      }),
+      image: partner?.profilePicture || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop"
+    }
+  })
+
   return (
     <div className="min-h-screen bg-[#f3f4f6] dark:bg-zinc-950 transition-colors duration-300">
-      {/* Sub-header Navigation */}
-
-
       <div className="max-w-7xl mx-auto p-8 space-y-8">
         {/* Welcome Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl font-heading font-bold text-zinc-900 dark:text-white tracking-tight">Good Morning, Alex</h1>
+            <h1 className="text-3xl font-heading font-bold text-zinc-900 dark:text-white tracking-tight">
+              Good Morning, {user?.name || "Learner"}
+            </h1>
             <p className="text-muted-foreground font-medium">Welcome back to your language learning command center.</p>
           </div>
           <div className="flex items-center gap-4">
@@ -80,7 +106,7 @@ export default function UserDashboardPage() {
               </div>
               <div>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Sessions</p>
-                <p className="text-2xl font-bold text-zinc-900 dark:text-white">124</p>
+                <p className="text-2xl font-bold text-zinc-900 dark:text-white">{totalSessions}</p>
               </div>
             </CardContent>
           </Card>
@@ -91,7 +117,7 @@ export default function UserDashboardPage() {
               </div>
               <div>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Practice Time</p>
-                <p className="text-2xl font-bold text-zinc-900 dark:text-white">57.2h</p>
+                <p className="text-2xl font-bold text-zinc-900 dark:text-white">{practiceTimeHours}h</p>
               </div>
             </CardContent>
           </Card>
@@ -102,7 +128,7 @@ export default function UserDashboardPage() {
               </div>
               <div>
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Avg. Rating</p>
-                <p className="text-2xl font-bold text-zinc-900 dark:text-white">4.9</p>
+                <p className="text-2xl font-bold text-zinc-900 dark:text-white">5.0</p>
               </div>
             </CardContent>
           </Card>
@@ -153,44 +179,54 @@ export default function UserDashboardPage() {
                   Full History <ExternalLink className="h-3.5 w-3.5" />
                 </Link>
               </div>
-              <div className="grid grid-cols-1 gap-4">
-                {recentPartners.map((partner) => (
-                  <Card key={partner.name} className="border-none shadow-sm rounded-xl bg-white dark:bg-zinc-900 hover:shadow-md transition-all border border-zinc-100 dark:border-zinc-800 group">
-                    <CardContent className="p-5 flex items-center justify-between">
-                      <div className="flex items-center gap-5">
-                        <Avatar className="h-14 w-14 rounded-xl border-2 border-zinc-50 dark:border-zinc-800">
-                          <AvatarImage src={partner.image} className="object-cover" />
-                          <AvatarFallback>{partner.name[0]}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-bold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">{partner.name}</p>
-                          <p className="text-xs text-muted-foreground font-bold flex items-center gap-2 mt-1">
-                            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                            {partner.language}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-10">
-                        <div className="hidden sm:block text-right">
-                          <p className="text-base font-bold text-zinc-900 dark:text-white">{partner.duration}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-tighter">Session Length</p>
-                        </div>
-                        <div className="text-right">
-                          <div className="flex gap-0.5 mb-1 justify-end">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className={`h-3 w-3 ${i < partner.rating ? 'fill-orange-400 text-orange-400' : 'text-zinc-200 dark:text-zinc-800'}`} />
-                            ))}
+              
+              {recentPartners.length === 0 ? (
+                <Card className="border-none shadow-sm rounded-xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                  <CardContent className="p-8 text-center space-y-3">
+                    <Phone className="h-10 w-10 text-muted-foreground mx-auto opacity-45" />
+                    <p className="text-sm text-muted-foreground font-bold">No sessions practiced yet. Start your first session now!</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {recentPartners.map((partner: any) => (
+                    <Card key={partner.id} className="border-none shadow-sm rounded-xl bg-white dark:bg-zinc-900 hover:shadow-md transition-all border border-zinc-100 dark:border-zinc-800 group">
+                      <CardContent className="p-5 flex items-center justify-between">
+                        <div className="flex items-center gap-5">
+                          <Avatar className="h-14 w-14 rounded-xl border-2 border-zinc-50 dark:border-zinc-800">
+                            <AvatarImage src={partner.image} className="object-cover" />
+                            <AvatarFallback>{partner.name[0]}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-bold text-zinc-900 dark:text-white group-hover:text-primary transition-colors">{partner.name}</p>
+                            <p className="text-xs text-muted-foreground font-bold flex items-center gap-2 mt-1">
+                              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                              {partner.language}
+                            </p>
                           </div>
-                          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{partner.time}</p>
                         </div>
-                        <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 hover:bg-primary/5 hover:text-primary transition-colors">
-                          <ChevronRight className="h-5 w-5" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                        <div className="flex items-center gap-10">
+                          <div className="hidden sm:block text-right">
+                            <p className="text-base font-bold text-zinc-900 dark:text-white">{partner.duration}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase font-black tracking-tighter">Session Length</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex gap-0.5 mb-1 justify-end">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} className={`h-3 w-3 ${i < partner.rating ? 'fill-orange-400 text-orange-400' : 'text-zinc-200 dark:text-zinc-800'}`} />
+                              ))}
+                            </div>
+                            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{partner.time}</p>
+                          </div>
+                          <Button variant="ghost" size="icon" className="rounded-xl h-10 w-10 hover:bg-primary/5 hover:text-primary transition-colors">
+                            <ChevronRight className="h-5 w-5" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
