@@ -34,11 +34,16 @@ const navItems = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [mounted, setMounted] = React.useState(false)
   const pathname = usePathname()
   const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined)
   const [logout] = useLogoutMutation()
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
   const isLoggedIn = !!user && (userResponse?.success !== false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleLogout = async () => {
     try {
@@ -82,7 +87,7 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-3">
             <ModeToggle />
-            {isUserLoading ? (
+            {!mounted || isUserLoading ? (
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             ) : isLoggedIn ? (
               <DropdownMenu>
@@ -171,7 +176,7 @@ export function Navbar() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                 <nav className="flex flex-col gap-2 mt-10">
-                  {isUserLoading ? (
+                  {!mounted || isUserLoading ? (
                     <div className="flex justify-center p-8">
                       <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                     </div>
