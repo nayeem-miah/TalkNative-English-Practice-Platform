@@ -3,12 +3,51 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { CheckCircle2, Circle, Eye, EyeOff, Key, Languages, Lock, ShieldCheck } from "lucide-react"
+import { CheckCircle2, Circle, Eye, EyeOff, Key, Languages, Lock, Loader2 } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { useResetPasswordMutation } from "@/redux/api/auth-api"
+import { toast } from "sonner"
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
     const [showPassword, setShowPassword] = React.useState(false)
+    const [password, setPassword] = React.useState("")
+    const [confirmPassword, setConfirmPassword] = React.useState("")
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const token = searchParams.get("token")
+    
+    const [resetPassword, { isLoading }] = useResetPasswordMutation()
+
+    const requirements = {
+        length: password.length >= 6,
+        match: password === confirmPassword && password.length > 0,
+    }
+    
+    const isValid = requirements.length && requirements.match
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        
+        if (!token) {
+            toast.error("Invalid or missing reset token")
+            return
+        }
+        
+        if (!isValid) {
+            toast.error("Please enter at least 6 characters and ensure passwords match")
+            return
+        }
+
+        try {
+            const res = await resetPassword({ token, password }).unwrap()
+            toast.success(res?.message || "Password reset successful!")
+            router.push("/login")
+        } catch (error: any) {
+            toast.error(error?.data?.message || "Failed to reset password. Token might be expired.")
+        }
+    }
 
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-center bg-[#f8faff] dark:bg-zinc-950 px-4 py-12 overflow-hidden">
@@ -38,7 +77,7 @@ export default function ResetPasswordPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        <div className="space-y-4">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             {/* New Password */}
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-foreground ml-1">New Password</label>
@@ -46,10 +85,14 @@ export default function ResetPasswordPage() {
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                     <Input
                                         type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
                                         placeholder="••••••••"
                                         className="pl-11 pr-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
+                                        required
                                     />
                                     <button
+                                        type="button"
                                         onClick={() => setShowPassword(!showPassword)}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                     >
@@ -60,10 +103,8 @@ export default function ResetPasswordPage() {
 
                             {/* Password Requirements Grid */}
                             <div className="grid grid-cols-2 gap-y-2 px-1">
-                                <Requirement text="8+ characters" met={true} />
-                                <Requirement text="One uppercase" met={false} />
-                                <Requirement text="One number" met={false} />
-                                <Requirement text="One symbol" met={false} />
+                                <Requirement text="6+ characters" met={requirements.length} />
+                                <Requirement text="Passwords match" met={requirements.match} />
                             </div>
 
                             {/* Confirm Password */}
@@ -73,16 +114,26 @@ export default function ResetPasswordPage() {
                                     <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                     <Input
                                         type="password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
                                         placeholder="••••••••"
                                         className="pl-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
+                                        required
                                     />
                                 </div>
+                                {confirmPassword && password !== confirmPassword && (
+                                    <p className="text-xs text-red-500 ml-1">Passwords do not match</p>
+                                )}
                             </div>
 
-                            <Button className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 mt-4">
-                                Update Password
+                            <Button 
+                                type="submit"
+                                disabled={isLoading || !isValid}
+                                className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 mt-4"
+                            >
+                                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Update Password"}
                             </Button>
-                        </div>
+                        </form>
 
                         <div className="text-center">
                             <Link
@@ -111,5 +162,17 @@ function Requirement({ text, met }: { text: string; met: boolean }) {
                 {text}
             </span>
         </div>
+    )
+}
+
+export default function ResetPasswordPage() {
+    return (
+        <React.Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-[#f8faff] dark:bg-zinc-950">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <ResetPasswordForm />
+        </React.Suspense>
     )
 }
