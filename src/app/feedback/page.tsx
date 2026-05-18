@@ -206,15 +206,26 @@ function FeedbackContent() {
             </div>
 
             {/* Footer */}
-            {partnerId && (
+            <div className="flex items-center justify-between pt-4 border-t border-muted/20">
+              {partnerId ? (
+                <button 
+                  onClick={() => setIsReporting(true)}
+                  className="text-xs font-bold text-destructive/60 hover:text-destructive flex items-center gap-1.5 uppercase tracking-widest transition-colors cursor-pointer"
+                >
+                  <Flag className="h-3.5 w-3.5" />
+                  Report User
+                </button>
+              ) : (
+                <div />
+              )}
+              
               <button 
-                onClick={() => setIsReporting(true)}
-                className="text-xs font-bold text-destructive/60 hover:text-destructive flex items-center gap-2 mx-auto uppercase tracking-widest transition-colors cursor-pointer"
+                onClick={() => router.push("/dashboard")}
+                className="text-xs font-bold text-muted-foreground hover:text-[#006D5B] uppercase tracking-widest transition-colors cursor-pointer"
               >
-                <Flag className="h-3 w-3" />
-                Report User
+                Skip Feedback
               </button>
-            )}
+            </div>
           </div>
         ) : (
           /* Reporting Sub-Interface */
@@ -235,13 +246,13 @@ function FeedbackContent() {
               <select
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                className="w-full h-12 rounded-xl bg-[#f8faff] dark:bg-zinc-800/50 border-none p-3 text-sm font-semibold transition-colors focus-visible:ring-primary/20 dark:text-white"
+                className="w-full h-12 rounded-xl bg-white dark:bg-zinc-800 border border-muted/20 dark:border-zinc-700/50 p-3 text-sm font-semibold transition-colors focus-visible:ring-primary/20 text-zinc-900 dark:text-white"
               >
-                <option value="INAPPROPRIATE_BEHAVIOR">Inappropriate Behavior / Bullying</option>
-                <option value="OFFENSIVE_LANGUAGE">Offensive Language / Hate Speech</option>
-                <option value="SPAM_ADVERTISEMENT">Spam or Self-Promotion</option>
-                <option value="POOR_AUDIO_QUALITY">Silent / Intentional Disconnection</option>
-                <option value="OTHER">Other Issues</option>
+                <option value="INAPPROPRIATE_BEHAVIOR" className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white">Inappropriate Behavior / Bullying</option>
+                <option value="OFFENSIVE_LANGUAGE" className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white">Offensive Language / Hate Speech</option>
+                <option value="SPAM_ADVERTISEMENT" className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white">Spam or Self-Promotion</option>
+                <option value="POOR_AUDIO_QUALITY" className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white">Silent / Intentional Disconnection</option>
+                <option value="OTHER" className="bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white">Other Issues</option>
               </select>
             </div>
 
