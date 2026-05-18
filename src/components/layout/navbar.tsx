@@ -25,7 +25,7 @@ import {
   DropdownMenuGroup
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, LayoutDashboard, LogOut, Settings, PhoneCall } from "lucide-react"
+import { User, LayoutDashboard, LogOut, Settings, PhoneCall, BookOpen } from "lucide-react"
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
@@ -170,72 +170,129 @@ export function Navbar() {
                 <span className="sr-only">Toggle menu</span>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col gap-5 mt-10">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setIsOpen(false)}
-                      className="text-lg font-medium transition-colors hover:text-primary"
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                  <hr className="my-2 border-muted" />
+                <nav className="flex flex-col gap-2 mt-10">
                   {isUserLoading ? (
-                    <div className="flex justify-center p-4">
+                    <div className="flex justify-center p-8">
                       <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                     </div>
                   ) : isLoggedIn ? (
                     <>
+                      {/* User Profile Summary in Mobile Sidebar */}
+                      <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-2xl bg-muted/40 border border-border/40">
+                        <Avatar className="h-10 w-10 border border-primary/10">
+                          <AvatarImage src={user?.image} alt={user?.name || "User"} />
+                          <AvatarFallback className="bg-primary/5 text-primary font-bold">
+                            {user?.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-bold text-sm truncate">{user?.name}</span>
+                          <span className="text-xs text-muted-foreground truncate">{user?.email}</span>
+                        </div>
+                      </div>
+
                       <Link
                         href="/dashboard"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted transition-colors"
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
                       >
-                        <LayoutDashboard className="h-5 w-5 text-primary" />
-                        <span className="font-bold">Dashboard</span>
+                        <LayoutDashboard className="h-5 w-5" />
+                        <span>Dashboard</span>
                       </Link>
+                      
                       <Link
                         href="/live-call"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted transition-colors"
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/live-call" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
                       >
-                        <PhoneCall className="h-5 w-5 text-primary" />
-                        <span className="font-bold">Live Call</span>
+                        <PhoneCall className="h-5 w-5" />
+                        <span>Live Call</span>
                       </Link>
+
+                      <Link
+                        href="/resources"
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/resources" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <BookOpen className="h-5 w-5" />
+                        <span>Resources</span>
+                      </Link>
+
                       <Link
                         href="/profile"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-muted transition-colors"
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
                       >
-                        <User className="h-5 w-5 text-primary" />
-                        <span className="font-bold">Profile Settings</span>
+                        <User className="h-5 w-5" />
+                        <span>Profile Settings</span>
                       </Link>
+
+                      <hr className="my-3 border-muted/60" />
+
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/5 text-destructive transition-colors w-full text-left"
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/5 text-destructive transition-colors w-full text-left font-bold text-sm cursor-pointer"
                       >
                         <LogOut className="h-5 w-5" />
-                        <span className="font-bold">Log out</span>
+                        <span>Log out</span>
                       </button>
                     </>
                   ) : (
                     <>
                       <Link
-                        href="/login"
+                        href="/"
                         onClick={() => setIsOpen(false)}
-                        className={cn(buttonVariants({ variant: "outline" }), "w-full h-11 font-bold text-base")}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
                       >
-                        Login
+                        <Languages className="h-5 w-5" />
+                        <span>Home</span>
                       </Link>
+
                       <Link
-                        href="/live-call"
+                        href="/resources"
                         onClick={() => setIsOpen(false)}
-                        className={cn(buttonVariants(), "w-full h-11 rounded-full font-bold text-base shadow-lg shadow-primary/20")}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/resources" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
                       >
-                        Practice Now
+                        <BookOpen className="h-5 w-5" />
+                        <span>Resources</span>
                       </Link>
+
+                      <hr className="my-4 border-muted/60" />
+
+                      <div className="flex flex-col gap-3 mt-2">
+                        <Link
+                          href="/login"
+                          onClick={() => setIsOpen(false)}
+                          className={cn(buttonVariants({ variant: "outline" }), "w-full h-11 font-bold text-sm rounded-full")}
+                        >
+                          Login
+                        </Link>
+                        <Link
+                          href="/live-call"
+                          onClick={() => setIsOpen(false)}
+                          className={cn(buttonVariants(), "w-full h-11 rounded-full font-bold text-sm shadow-lg shadow-primary/20")}
+                        >
+                          Practice Now
+                        </Link>
+                      </div>
                     </>
                   )}
                 </nav>

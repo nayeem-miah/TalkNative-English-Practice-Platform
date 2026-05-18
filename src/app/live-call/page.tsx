@@ -41,15 +41,20 @@ function LiveCallContent() {
     const [isMuted, setIsMuted] = React.useState(false)
     const [isVolumeOff, setIsVolumeOff] = React.useState(false)
     const [callDuration, setCallDuration] = React.useState(0)
+    const [needsPlayRetry, setNeedsPlayRetry] = React.useState(false)
 
     // WebRTC & Socket Refs
     const socketRef = React.useRef<Socket | null>(null)
     const pcRef = React.useRef<RTCPeerConnection | null>(null)
     const localStreamRef = React.useRef<MediaStream | null>(null)
     const remoteStreamRef = React.useRef<MediaStream | null>(null)
+    // Use a stable ref object so socket closure always reads the latest element
     const remoteAudioRef = React.useRef<HTMLAudioElement | null>(null)
+    const remoteAudioStableRef = React.useRef<{ el: HTMLAudioElement | null }>({ el: null })
     const roomIdRef = React.useRef<string>("")
     const timerRef = React.useRef<NodeJS.Timeout | null>(null)
+    const pendingSignalsRef = React.useRef<any[]>([])
+    const queuedCandidatesRef = React.useRef<any[]>([])
 
     // Redirect to login if not authenticated
     React.useEffect(() => {
@@ -104,6 +109,8 @@ function LiveCallContent() {
         if (remoteAudioRef.current) {
             remoteAudioRef.current.srcObject = null
         }
+        pendingSignalsRef.current = []
+        queuedCandidatesRef.current = []
         roomIdRef.current = ""
         setPartner(null)
     }, [])
@@ -131,6 +138,49 @@ function LiveCallContent() {
             console.log("Socket disconnected!")
             setSocketConnected(false)
         })
+
+        // Helper to process signaling data
+        const processSignal = async (signal: any, pc: RTCPeerConnection) => {
+            try {
+                if (signal.sdp) {
+                    console.log("Received SDP signal:", signal.sdp)
+                    await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
+                    
+                    if (signal.sdp.type === "offer") {
+                        console.log("Creating answer...")
+                        const answer = await pc.createAnswer()
+                        await pc.setLocalDescription(answer)
+                        socket.emit("signal", {
+                            roomId: roomIdRef.current,
+                            signal: { sdp: pc.localDescription }
+                        })
+                    }
+
+                    // Process any queued ICE candidates that arrived before the Remote Description was set
+                    if (queuedCandidatesRef.current.length > 0) {
+                        console.log(`Processing ${queuedCandidatesRef.current.length} queued ICE candidates...`)
+                        for (const cand of queuedCandidatesRef.current) {
+                            try {
+                                await pc.addIceCandidate(new RTCIceCandidate(cand))
+                            } catch (candErr) {
+                                console.error("Error adding queued ICE candidate:", candErr)
+                            }
+                        }
+                        queuedCandidatesRef.current = []
+                    }
+                } else if (signal.candidate) {
+                    console.log("Received ICE candidate:", signal.candidate)
+                    if (!pc.remoteDescription || !pc.remoteDescription.type) {
+                        console.log("Remote description not set yet. Queueing ICE candidate.")
+                        queuedCandidatesRef.current.push(signal.candidate)
+                    } else {
+                        await pc.addIceCandidate(new RTCIceCandidate(signal.candidate))
+                    }
+                }
+            } catch (err) {
+                console.error("Signaling error:", err)
+            }
+        }
 
         // Match found handler
         socket.on("match_found", async (data: {
@@ -162,14 +212,49 @@ function LiveCallContent() {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
                 localStreamRef.current = stream
 
-                // Create Peer Connection
+                // Apply current mute state to the new local stream tracks
+                stream.getAudioTracks().forEach(track => {
+                    track.enabled = !isMuted
+                })
+
+                // Create Peer Connection with STUN + free TURN servers for production NAT traversal
                 const pc = new RTCPeerConnection({
                     iceServers: [
                         { urls: "stun:stun.l.google.com:19302" },
-                        { urls: "stun:stun1.l.google.com:19302" }
+                        { urls: "stun:stun1.l.google.com:19302" },
+                        // Free TURN servers (openrelay.metered.ca) — essential for production audio
+                        {
+                            urls: "turn:openrelay.metered.ca:80",
+                            username: "openrelayproject",
+                            credential: "openrelayproject"
+                        },
+                        {
+                            urls: "turn:openrelay.metered.ca:443",
+                            username: "openrelayproject",
+                            credential: "openrelayproject"
+                        },
+                        {
+                            urls: "turn:openrelay.metered.ca:443?transport=tcp",
+                            username: "openrelayproject",
+                            credential: "openrelayproject"
+                        }
                     ]
                 })
                 pcRef.current = pc
+
+                // Connection and ICE state monitoring for debugging live calls
+                pc.onconnectionstatechange = () => {
+                    console.log("📡 WebRTC Connection State Change:", pc.connectionState)
+                    if (pc.connectionState === "connected") {
+                        console.log("🏆 WebRTC PeerConnection successfully connected!")
+                    } else if (pc.connectionState === "failed" || pc.connectionState === "disconnected") {
+                        console.error("❌ WebRTC PeerConnection failed/disconnected!")
+                    }
+                }
+
+                pc.oniceconnectionstatechange = () => {
+                    console.log("📡 WebRTC ICE Connection State Change:", pc.iceConnectionState)
+                }
 
                 // Add local tracks to Peer Connection
                 stream.getTracks().forEach(track => {
@@ -178,10 +263,35 @@ function LiveCallContent() {
 
                 // Listen to remote tracks
                 pc.ontrack = (event) => {
-                    console.log("Remote track received:", event.streams[0])
-                    remoteStreamRef.current = event.streams[0]
-                    if (remoteAudioRef.current) {
-                        remoteAudioRef.current.srcObject = event.streams[0]
+                    console.log("🎵 Remote track received:", event.track.kind, event.streams)
+                    // Build remote stream from either streams[] or the track directly
+                    let remoteStream = event.streams && event.streams[0]
+                        ? event.streams[0]
+                        : new MediaStream([event.track])
+
+                    remoteStreamRef.current = remoteStream
+
+                    // Use the stable ref so this closure always gets the latest audio element
+                    const audioEl = remoteAudioStableRef.current.el
+                    if (audioEl) {
+                        audioEl.srcObject = remoteStream
+                        audioEl.muted = false
+                        audioEl.volume = 1.0
+
+                        const tryPlay = () => {
+                            audioEl.play()
+                                .then(() => {
+                                    console.log("🔊 Remote audio playback started successfully!")
+                                    setNeedsPlayRetry(false)
+                                })
+                                .catch(playErr => {
+                                    console.warn("⚠️ Autoplay blocked, showing retry button:", playErr)
+                                    setNeedsPlayRetry(true)
+                                })
+                        }
+                        tryPlay()
+                    } else {
+                        console.error("❌ remoteAudioEl is null when ontrack fired!")
                     }
                 }
 
@@ -193,6 +303,15 @@ function LiveCallContent() {
                             signal: { candidate: event.candidate }
                         })
                     }
+                }
+
+                // Process any buffered signals that arrived while getting userMedia permissions
+                if (pendingSignalsRef.current.length > 0) {
+                    console.log(`Processing ${pendingSignalsRef.current.length} buffered signals...`)
+                    for (const sig of pendingSignalsRef.current) {
+                        await processSignal(sig, pc)
+                    }
+                    pendingSignalsRef.current = []
                 }
 
                 // If this user is the initiator, create the offer
@@ -216,29 +335,12 @@ function LiveCallContent() {
         // WebRTC Signaling Relay Handler
         socket.on("signal", async (data: { from: string; signal: any }) => {
             const pc = pcRef.current
-            if (!pc) return
-
-            try {
-                if (data.signal.sdp) {
-                    console.log("Received SDP signal:", data.signal.sdp)
-                    await pc.setRemoteDescription(new RTCSessionDescription(data.signal.sdp))
-                    
-                    if (data.signal.sdp.type === "offer") {
-                        console.log("Creating answer...")
-                        const answer = await pc.createAnswer()
-                        await pc.setLocalDescription(answer)
-                        socket.emit("signal", {
-                            roomId: roomIdRef.current,
-                            signal: { sdp: pc.localDescription }
-                        })
-                    }
-                } else if (data.signal.candidate) {
-                    console.log("Received ICE candidate:")
-                    await pc.addIceCandidate(new RTCIceCandidate(data.signal.candidate))
-                }
-            } catch (err) {
-                console.error("Signaling error:", err)
+            if (!pc) {
+                console.log("PC not ready, buffering signal:", data.signal)
+                pendingSignalsRef.current.push(data.signal)
+                return
             }
+            await processSignal(data.signal, pc)
         })
 
         // Partner Left Handler
@@ -315,8 +417,13 @@ function LiveCallContent() {
     const handleToggleVolume = () => {
         const nextVolumeOff = !isVolumeOff
         setIsVolumeOff(nextVolumeOff)
-        if (remoteAudioRef.current) {
-            remoteAudioRef.current.muted = nextVolumeOff
+        const audioEl = remoteAudioStableRef.current.el
+        if (audioEl) {
+            audioEl.muted = nextVolumeOff
+            // If un-muting and stream is already set but paused, try to play again
+            if (!nextVolumeOff && audioEl.paused && audioEl.srcObject) {
+                audioEl.play().catch(console.error)
+            }
         }
         toast.info(nextVolumeOff ? "Sound muted" : "Sound unmuted")
     }
@@ -338,8 +445,38 @@ function LiveCallContent() {
 
     return (
         <div className="relative min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex flex-col transition-colors duration-300">
-            {/* Hidden audio element for remote stream */}
-            <audio ref={remoteAudioRef} autoPlay />
+            {/* Hidden audio element for remote stream — ref kept in stable object for socket closure access */}
+            <audio
+                ref={(el) => {
+                    remoteAudioRef.current = el
+                    remoteAudioStableRef.current.el = el
+                }}
+                autoPlay
+                playsInline
+                controls={false}
+                className="hidden"
+            />
+
+            {/* Autoplay retry banner — shown when browser blocks autoplay */}
+            {needsPlayRetry && callState === "CONNECTED" && (
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-yellow-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 font-bold text-sm">
+                    <Volume2 className="h-4 w-4" />
+                    Sound blocked by browser.
+                    <button
+                        className="underline"
+                        onClick={() => {
+                            const audioEl = remoteAudioStableRef.current.el
+                            if (audioEl) {
+                                audioEl.play()
+                                    .then(() => setNeedsPlayRetry(false))
+                                    .catch(console.error)
+                            }
+                        }}
+                    >
+                        Tap to enable sound
+                    </button>
+                </div>
+            )}
 
             {/* Soft Background Glows */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
@@ -531,12 +668,11 @@ function LiveCallContent() {
                                         <ArrowRight className="h-5 w-5" />
                                     </Button>
                                     <Button
-                                        variant="destructive"
-                                        size="icon"
                                         onClick={handleEndCallAndFeedback}
-                                        className="h-14 w-14 rounded-full shadow-lg shadow-destructive/20 transition-all active:scale-95 flex items-center justify-center"
+                                        className="h-14 px-6 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold gap-2 shadow-lg shadow-red-600/30 transition-all active:scale-95 flex items-center justify-center"
                                     >
-                                        <PhoneOff className="h-6 w-6 text-white" />
+                                        <PhoneOff className="h-5 w-5 text-white" />
+                                        End Call
                                     </Button>
                                 </>
                             )}

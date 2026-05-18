@@ -21,7 +21,7 @@ function FeedbackContent() {
   const partnerAvatar = searchParams?.get("partnerAvatar") || ""
   const durationSec = Number(searchParams?.get("duration") || 0)
 
-  const [rating, setRating] = React.useState(4)
+  const [rating, setRating] = React.useState(0)
   const [notes, setNotes] = React.useState("")
   
   // Reporting Modal States
@@ -44,6 +44,16 @@ function FeedbackContent() {
 
   // Handle saving feedback (notes and rating)
   const handleSubmitFeedback = async (action: "next" | "dashboard") => {
+    // If no feedback given (rating is 0 and notes are empty), skip everything and redirect
+    if (rating === 0 && !notes.trim()) {
+      if (action === "next") {
+        router.push("/live-call?autoStart=true")
+      } else {
+        router.push("/dashboard")
+      }
+      return
+    }
+
     // If the user typed any private notes, save them in localStorage
     if (notes.trim()) {
       try {
@@ -51,7 +61,7 @@ function FeedbackContent() {
         savedNotes.push({
           partnerName,
           date: new Date().toLocaleDateString(),
-          rating,
+          rating: rating || 5, // fallback if they wrote notes but no star rating
           notes: notes.trim()
         })
         localStorage.setItem("talknative_call_notes", JSON.stringify(savedNotes))
@@ -65,7 +75,7 @@ function FeedbackContent() {
       try {
         await createReview({
           revieweeId: partnerId,
-          rating,
+          rating: rating || 5, // fallback if they wrote notes but no star rating
           notes: notes.trim()
         }).unwrap()
       } catch (err) {
