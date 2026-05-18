@@ -18,7 +18,7 @@ export default function RegisterPage() {
     email: "",
     password: "",
   })
-  
+
   const [register, { isLoading }] = useRegisterMutation()
   const router = useRouter()
 
@@ -29,7 +29,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.name || !formData.email || !formData.password) {
       return toast.error("Please fill in all fields")
     }
@@ -44,7 +44,7 @@ export default function RegisterPage() {
       }
     } catch (err: any) {
       const errorMessage = err?.data?.message || "Something went wrong during registration"
-      
+
       // If user already exists, redirect to verification or login
       if (errorMessage.toLowerCase().includes("already exist")) {
         toast.info("User already exists. Redirecting to verification...", { id: toastId })
@@ -80,7 +80,7 @@ export default function RegisterPage() {
             <div className="rounded-lg bg-primary p-2 shadow-lg shadow-primary/20">
               <Languages className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-3xl font-heading font-bold tracking-tight">FluentFlow</span>
+            <Link href="/" className="text-xl font-heading font-bold tracking-tight">FluentFlow</Link>
           </div>
           <p className="text-muted-foreground text-sm font-medium">Join thousands of voices worldwide.</p>
         </div>
@@ -157,8 +157,8 @@ export default function RegisterPage() {
                 </label>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20"
                 disabled={isLoading}
               >

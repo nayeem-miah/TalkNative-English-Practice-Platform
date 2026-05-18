@@ -47,11 +47,11 @@ function LoginContent() {
       }
     } catch (err: any) {
       const errorMessage = err?.data?.message || "Invalid email or password"
-      
+
       // If user is not verified, redirect to verification page
       if (errorMessage.toLowerCase().includes("verify") || errorMessage.toLowerCase().includes("verification")) {
         toast.info("Account not verified. Sending OTP and redirecting...", { id: toastId })
-        
+
         try {
           // Call resend-otp before redirecting
           await resendOtp({ email: formData.email }).unwrap()
@@ -92,7 +92,7 @@ function LoginContent() {
             <div className="rounded-lg bg-primary p-2 shadow-lg shadow-primary/20">
               <Languages className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-3xl font-heading font-bold tracking-tight">FluentFlow</span>
+            <Link href="/" className="text-xl font-heading font-bold tracking-tight">FluentFlow</Link>
           </div>
           <p className="text-muted-foreground text-sm font-medium">Clearer communication, global connection.</p>
         </div>
@@ -155,8 +155,8 @@ function LoginContent() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
                   <label className="text-sm font-bold text-foreground">Password</label>
-                  <Link 
-                    href="/forgot-password" 
+                  <Link
+                    href="/forgot-password"
                     className={cn(
                       "text-xs font-bold text-primary hover:underline",
                       isLoading && "pointer-events-none opacity-50"
@@ -187,8 +187,8 @@ function LoginContent() {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 mt-2"
                 disabled={isLoading}
               >

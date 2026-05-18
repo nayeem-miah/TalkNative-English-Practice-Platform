@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, LayoutDashboard, LogOut, Settings, PhoneCall, BookOpen } from "lucide-react"
+import { removeCookie } from "@/utils/cookie"
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard" },
@@ -45,6 +46,21 @@ export function Navbar() {
     setMounted(true)
   }, [])
 
+  React.useEffect(() => {
+    // If the component is mounted, loading has finished, but the user is NOT logged in:
+    // Check if there's a stale/expired accessToken cookie left over.
+    // If there is, it causes middleware redirect loops (e.g. going to /login redirects back to /dashboard).
+    // Wiping the stale cookies breaks the loop and allows clean authentication.
+    if (mounted && !isUserLoading && !isLoggedIn) {
+      const hasCookie = typeof document !== "undefined" && document.cookie.includes("accessToken")
+      if (hasCookie) {
+        removeCookie("accessToken")
+        removeCookie("refreshToken")
+        window.location.href = "/login"
+      }
+    }
+  }, [mounted, isUserLoading, isLoggedIn])
+
   const handleLogout = async () => {
     try {
       await logout(undefined).unwrap()
@@ -53,6 +69,11 @@ export function Navbar() {
       // Even if API fails, onQueryStarted in auth-api handles local cleanup
       window.location.href = "/login"
     }
+  }
+
+  const handleMobileRedirect = (href: string) => {
+    setIsOpen(false)
+    window.location.href = href
   }
 
   const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password" || pathname === "/verify-user" || pathname === "/live-call" || pathname === "/feedback"
@@ -207,18 +228,17 @@ export function Navbar() {
                         <LayoutDashboard className="h-5 w-5" />
                         <span>Dashboard</span>
                       </Link>
-                      
-                      <Link
-                        href="/live-call"
-                        onClick={() => setIsOpen(false)}
+
+                      <button
+                        onClick={() => handleMobileRedirect("/live-call")}
                         className={cn(
-                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm w-full text-left cursor-pointer",
                           pathname === "/live-call" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <PhoneCall className="h-5 w-5" />
                         <span>Live Call</span>
-                      </Link>
+                      </button>
 
                       <Link
                         href="/resources"
@@ -283,20 +303,18 @@ export function Navbar() {
                       <hr className="my-4 border-muted/60" />
 
                       <div className="flex flex-col gap-3 mt-2">
-                        <Link
-                          href="/login"
-                          onClick={() => setIsOpen(false)}
-                          className={cn(buttonVariants({ variant: "outline" }), "w-full h-11 font-bold text-sm rounded-full")}
+                        <button
+                          onClick={() => handleMobileRedirect("/login")}
+                          className={cn(buttonVariants({ variant: "outline" }), "w-full h-11 font-bold text-sm rounded-full flex items-center justify-center cursor-pointer")}
                         >
                           Login
-                        </Link>
-                        <Link
-                          href="/live-call"
-                          onClick={() => setIsOpen(false)}
-                          className={cn(buttonVariants(), "w-full h-11 rounded-full font-bold text-sm shadow-lg shadow-primary/20")}
+                        </button>
+                        <button
+                          onClick={() => handleMobileRedirect("/live-call")}
+                          className={cn(buttonVariants(), "w-full h-11 rounded-full font-bold text-sm shadow-lg shadow-primary/20 flex items-center justify-center cursor-pointer")}
                         >
                           Practice Now
-                        </Link>
+                        </button>
                       </div>
                     </>
                   )}

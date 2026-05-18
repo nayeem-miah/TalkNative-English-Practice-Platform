@@ -1,15 +1,22 @@
 "use client"
 
+import * as React from "react"
 import { motion } from "framer-motion"
 import { Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 export function HeroContent() {
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <div className="flex flex-col items-start text-left space-y-8">
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
+        initial={mounted ? { opacity: 0, x: -20 } : false}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
       >
@@ -21,7 +28,7 @@ export function HeroContent() {
 
       <motion.h1
         className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold tracking-tight leading-[1.1]"
-        initial={{ opacity: 0, y: 20 }}
+        initial={mounted ? { opacity: 0, y: 20 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
@@ -31,7 +38,7 @@ export function HeroContent() {
 
       <motion.p
         className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed"
-        initial={{ opacity: 0, y: 20 }}
+        initial={mounted ? { opacity: 0, y: 20 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
@@ -41,7 +48,7 @@ export function HeroContent() {
 
       <motion.div
         className="flex flex-wrap items-center gap-4"
-        initial={{ opacity: 0, y: 20 }}
+        initial={mounted ? { opacity: 0, y: 20 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >

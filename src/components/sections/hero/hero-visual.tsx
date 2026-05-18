@@ -1,13 +1,20 @@
 "use client"
 
+import * as React from "react"
 import { motion } from "framer-motion"
 import { Video } from "lucide-react"
 
 export function HeroVisual() {
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <motion.div
       className="relative"
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={mounted ? { opacity: 0, scale: 0.9 } : false}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.7, delay: 0.4 }}
     >
