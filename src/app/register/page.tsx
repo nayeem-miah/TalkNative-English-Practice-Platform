@@ -1,11 +1,11 @@
 "use client"
 
-import * as React from "react"
-import Link from "next/link"
-import { Languages, Mail, Lock, User, Eye, EyeOff, ShieldCheck, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react"
+import Link from "next/link"
+import * as React from "react"
 
 import { useRegisterMutation } from "@/redux/api/auth-api"
 import { useRouter } from "next/navigation"
@@ -58,35 +58,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-[#f8faff] dark:bg-zinc-950 px-4 py-12 overflow-hidden">
-      {/* Background Decorative Elements (Consistent with Login) */}
-      <div className="absolute top-[15%] right-[5%] opacity-20 dark:opacity-10 pointer-events-none animate-pulse-slow">
-        <div className="relative h-56 w-56">
-          <div className="absolute inset-0 bg-primary/10 rounded-full blur-3xl" />
-          <CircleDecoration />
-        </div>
-      </div>
-      <div className="absolute bottom-[5%] left-[5%] opacity-20 dark:opacity-10 pointer-events-none">
-        <div className="relative h-40 w-40">
-          <div className="absolute inset-0 bg-accent/20 rounded-3xl -rotate-12 blur-2xl" />
-          <SquareDecoration />
-        </div>
-      </div>
-
-      <div className="z-10 w-full max-w-md space-y-8">
-        {/* Logo & Header */}
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="rounded-lg bg-primary p-2 shadow-lg shadow-primary/20">
-              <Languages className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <Link href="/" className="text-xl font-heading font-bold tracking-tight">FluentFlow</Link>
-          </div>
-          <p className="text-muted-foreground text-sm font-medium">Join thousands of voices worldwide.</p>
-        </div>
-
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-md space-y-8">
         {/* Register Card */}
-        <Card className="border-none shadow-2xl shadow-primary/5 rounded-3xl p-4">
+        <Card className="border border-border/60 bg-card shadow-sm rounded-3xl p-4">
           <CardHeader className="text-center space-y-1">
             <CardTitle className="text-2xl font-heading font-bold">Create your account</CardTitle>
             <CardDescription>Start your journey to fluency today.</CardDescription>

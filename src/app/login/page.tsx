@@ -3,13 +3,13 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Eye, EyeOff, Languages, Lock, Mail } from "lucide-react"
-import Link from "next/link"
-import * as React from "react"
-import { useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
-import { useRouter, useSearchParams } from "next/navigation"
-import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
+import { Eye, EyeOff, Lock, Mail } from "lucide-react"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import * as React from "react"
+import { toast } from "sonner"
 
 function LoginContent() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -47,9 +47,8 @@ function LoginContent() {
       }
     } catch (err: any) {
       const errorMessage = err?.data?.message || "Invalid email or password"
-
       // If user is not verified, redirect to verification page
-      if (errorMessage.toLowerCase().includes("verify") || errorMessage.toLowerCase().includes("verification")) {
+          if (errorMessage.toLowerCase().includes("verify") || errorMessage.toLowerCase().includes("verification")) {
         toast.info("Account not verified. Sending OTP and redirecting...", { id: toastId })
 
         try {
@@ -57,8 +56,7 @@ function LoginContent() {
           await resendOtp({ email: formData.email }).unwrap()
           router.push(`/verify-user?email=${formData.email}`)
         } catch (otpErr: any) {
-          toast.error(otpErr?.data?.message || "Failed to send verification code", { id: toastId })
-          // Still redirect even if resend fails, as they might have a code already or can resend there
+                 toast.error(otpErr?.data?.message || "Failed to send verification code", { id: toastId })
           setTimeout(() => {
             router.push(`/verify-user?email=${formData.email}`)
           }, 2000)
@@ -70,35 +68,15 @@ function LoginContent() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center bg-[#f8faff] dark:bg-zinc-950 px-4 py-12 overflow-hidden">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-[20%] left-[10%] opacity-20 dark:opacity-10 pointer-events-none animate-bounce-slow">
-        <div className="relative h-40 w-40">
-          <div className="absolute inset-0 bg-primary/20 rounded-3xl rotate-12 blur-xl" />
-          <MessageCircle3D />
-        </div>
-      </div>
-      <div className="absolute bottom-[10%] right-[10%] opacity-20 dark:opacity-10 pointer-events-none">
-        <div className="relative h-48 w-48">
-          <div className="absolute inset-0 bg-accent/20 rounded-full blur-2xl" />
-          <Globe3D />
-        </div>
-      </div>
-
-      <div className="z-10 w-full max-w-md space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+      <div className="w-full max-w-md space-y-8">
         {/* Logo & Header */}
         <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="rounded-lg bg-primary p-2 shadow-lg shadow-primary/20">
-              <Languages className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <Link href="/" className="text-xl font-heading font-bold tracking-tight">FluentFlow</Link>
-          </div>
-          <p className="text-muted-foreground text-sm font-medium">Clearer communication, global connection.</p>
+
         </div>
 
         {/* Login Card */}
-        <Card className="border-none shadow-2xl shadow-primary/5 rounded-3xl p-4">
+        <Card className="border border-border/60 bg-card shadow-sm rounded-3xl p-4">
           <CardHeader className="text-center space-y-1">
             <CardTitle className="text-2xl font-heading font-bold">Welcome back</CardTitle>
             <CardDescription>Please enter your details to sign in.</CardDescription>

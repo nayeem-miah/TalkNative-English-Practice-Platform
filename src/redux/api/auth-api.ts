@@ -1,5 +1,5 @@
+import { removeCookie, setCookie } from "@/utils/cookie";
 import { baseApi } from "./base-api";
-import { setCookie, removeCookie } from "@/utils/cookie";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -40,7 +40,6 @@ export const authApi = baseApi.injectEndpoints({
             setCookie("refreshToken", data.data.result.refreshToken);
           }
         } catch (err) {
-          // Ignore error
         }
       },
     }),
@@ -56,7 +55,6 @@ export const authApi = baseApi.injectEndpoints({
           removeCookie("accessToken");
           removeCookie("refreshToken");
         } catch (err) {
-          // Even if API fails, we should clear tokens locally
           removeCookie("accessToken");
           removeCookie("refreshToken");
         }
@@ -91,9 +89,9 @@ export const authApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { 
-  useRegisterMutation, 
-  useVerifyEmailMutation, 
+export const {
+  useRegisterMutation,
+  useVerifyEmailMutation,
   useResendOtpMutation,
   useLoginMutation,
   useLogoutMutation,
