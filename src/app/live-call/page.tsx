@@ -233,27 +233,32 @@ function LiveCallContent() {
                     track.enabled = !isMuted
                 })
 
-                // Create Peer Connection with STUN + free TURN servers for production NAT traversal
+                // Create Peer Connection with STUN + dedicated TURN servers for production NAT traversal
                 const pc = new RTCPeerConnection({
                     iceServers: [
-                        { urls: "stun:stun.l.google.com:19302" },
-                        { urls: "stun:stun1.l.google.com:19302" },
-                        // Free TURN servers (openrelay.metered.ca) — essential for production audio
                         {
-                            urls: "turn:openrelay.metered.ca:80",
-                            username: "openrelayproject",
-                            credential: "openrelayproject"
+                            urls: "stun:stun.relay.metered.ca:80",
                         },
                         {
-                            urls: "turn:openrelay.metered.ca:443",
-                            username: "openrelayproject",
-                            credential: "openrelayproject"
+                            urls: "turn:global.relay.metered.ca:80",
+                            username: "0cb58af1f828e9830bb583de",
+                            credential: "BlAtCezE2re9OwNv",
                         },
                         {
-                            urls: "turn:openrelay.metered.ca:443?transport=tcp",
-                            username: "openrelayproject",
-                            credential: "openrelayproject"
-                        }
+                            urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                            username: "0cb58af1f828e9830bb583de",
+                            credential: "BlAtCezE2re9OwNv",
+                        },
+                        {
+                            urls: "turn:global.relay.metered.ca:443",
+                            username: "0cb58af1f828e9830bb583de",
+                            credential: "BlAtCezE2re9OwNv",
+                        },
+                        {
+                            urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                            username: "0cb58af1f828e9830bb583de",
+                            credential: "BlAtCezE2re9OwNv",
+                        },
                     ]
                 })
 
