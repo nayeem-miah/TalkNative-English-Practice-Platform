@@ -86,6 +86,10 @@ export const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    getallUsrs: builder.query({
+      query: ({ page, limit }) => `/users/all?page=${page}&limit=${limit}`,
+      providesTags: ["User"],
+    })
   }),
 });
 
@@ -98,5 +102,6 @@ export const {
   useGetMeQuery,
   useUpdateProfileMutation,
   useForgotPasswordMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useGetallUsrsQuery
 } = authApi;
