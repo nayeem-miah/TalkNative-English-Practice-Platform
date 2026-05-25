@@ -57,7 +57,7 @@ export default function UserDashboardPage() {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="h-8 w-8 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin"></div>
+          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
           <p className="text-zinc-500 dark:text-zinc-400 font-medium text-sm">Preparing your dashboard...</p>
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function UserDashboardPage() {
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="h-8 w-8 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin"></div>
+          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
           <p className="text-zinc-500 dark:text-zinc-400 font-medium text-sm">Redirecting to login...</p>
         </div>
       </div>
@@ -149,7 +149,7 @@ export default function UserDashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm bg-white dark:bg-zinc-900/60 rounded-xl overflow-hidden">
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary">
                 <Phone className="h-4.5 w-4.5" />
               </div>
               <div className="space-y-0.5">
@@ -187,7 +187,7 @@ export default function UserDashboardPage() {
 
           <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm bg-white dark:bg-zinc-900/60 rounded-xl overflow-hidden">
             <CardContent className="p-5 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-lg bg-indigo-650/10 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-700 dark:text-indigo-400">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary">
                 <Award className="h-4.5 w-4.5" />
               </div>
               <div className="space-y-0.5">
@@ -204,23 +204,20 @@ export default function UserDashboardPage() {
           {/* Left Main Workspace */}
           <div className="lg:col-span-8 space-y-8">
             
-            {/* Elegant and humanized Call-To-Action practice card */}
-            <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-md rounded-2xl bg-gradient-to-br from-zinc-900 to-indigo-950 text-white p-8 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-300 pointer-events-none">
-                <Video className="h-40 w-40" />
-              </div>
-              <div className="relative z-10 space-y-6">
-                <div className="space-y-2">
-                  <span className="text-xs font-bold uppercase text-indigo-400 tracking-widest">Connect Instantly</span>
-                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Ready for a speaking practice?</h2>
-                  <p className="text-zinc-300 max-w-md text-sm font-medium leading-relaxed">
+            {/* Elegant, clean and formal Call-To-Action practice card */}
+            <Card className="border border-primary/20 dark:border-primary/10 shadow-sm rounded-xl bg-primary/5 dark:bg-primary/10/30 p-8 relative overflow-hidden">
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-2 max-w-xl">
+                  <span className="text-xs font-bold uppercase text-primary tracking-widest">Connect Instantly</span>
+                  <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Ready for a speaking practice?</h2>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
                     Practice English seamlessly with partners globally. Build speaking confidence in real-time conversations.
                   </p>
                 </div>
-                <div>
+                <div className="flex-shrink-0">
                   <Link href="/live-call">
-                    <Button className="h-12 px-6 rounded-xl bg-white text-zinc-950 hover:bg-zinc-100 font-bold text-sm gap-2 transition-all duration-200 active:scale-95 shadow-sm">
-                      <Video className="h-4.5 w-4.5" />
+                    <Button className="h-11 px-6 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm gap-2 shadow-sm transition-all duration-150">
+                      <Video className="h-4 w-4" />
                       Start Matching
                       <ArrowRight className="h-4 w-4" />
                     </Button>
@@ -236,7 +233,7 @@ export default function UserDashboardPage() {
                   <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Recent Interactions</h3>
                   <p className="text-xs text-zinc-400 font-medium">History of your latest 3 conversations</p>
                 </div>
-                <Link href="/history" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 hover:underline">
+                <Link href="/history" className="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
                   Full History <ExternalLink className="h-3 w-3" />
                 </Link>
               </div>
@@ -254,14 +251,14 @@ export default function UserDashboardPage() {
                     <Card key={partner.id} className="border border-zinc-200/60 dark:border-zinc-800/60 shadow-sm rounded-xl bg-white dark:bg-zinc-900/60 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors duration-250 group">
                       <CardContent className="p-4 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                          <Avatar className="h-12 w-12 rounded-full border border-zinc-100 dark:border-zinc-800">
                             <AvatarImage src={partner.image} className="object-cover" />
                             <AvatarFallback className="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold">
                               {partner.name[0]}
                             </AvatarFallback>
                           </Avatar>
                           <div className="space-y-0.5">
-                            <p className="font-bold text-zinc-800 dark:text-zinc-200 text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            <p className="font-bold text-zinc-800 dark:text-zinc-200 text-sm group-hover:text-primary transition-colors">
                               {partner.name}
                             </p>
                             <p className="text-[11px] text-zinc-400 font-semibold flex items-center gap-1.5">
@@ -311,10 +308,10 @@ export default function UserDashboardPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-semibold">
                     <span className="text-zinc-400">Weekly Target</span>
-                    <span className="text-indigo-600 dark:text-indigo-400 font-bold">85% achieved</span>
+                    <span className="text-primary font-bold">85% achieved</span>
                   </div>
                   <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                    <div className="h-full w-[85%] bg-indigo-600 dark:bg-indigo-400 rounded-full" />
+                    <div className="h-full w-[85%] bg-primary rounded-full" />
                   </div>
                 </div>
 
@@ -328,7 +325,7 @@ export default function UserDashboardPage() {
                       <p className="text-[10px] text-zinc-400 font-medium mt-0.5">5 target days completed</p>
                     </div>
                   </div>
-                  <Button className="w-full h-9 rounded-lg bg-zinc-900 text-white dark:bg-zinc-800 hover:bg-zinc-800 dark:hover:bg-zinc-700 font-bold text-[11px] uppercase tracking-wider" variant="outline">
+                  <Button className="w-full h-9 rounded-lg font-bold text-[11px] uppercase tracking-wider" variant="outline">
                     View Progress Profile
                   </Button>
                 </div>
@@ -340,11 +337,11 @@ export default function UserDashboardPage() {
               <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Recommended Resources</h3>
               <div className="space-y-3">
                 <div className="group cursor-pointer bg-white dark:bg-zinc-900/60 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 overflow-hidden shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors p-4 space-y-2">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary uppercase tracking-wider">
                     <BookOpen className="h-3 w-3" />
                     Speaking Guide
                   </div>
-                  <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug">
+                  <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 group-hover:text-primary leading-snug">
                     Mastering Daily Idioms: A Practical Guide for Advanced Learners
                   </p>
                 </div>

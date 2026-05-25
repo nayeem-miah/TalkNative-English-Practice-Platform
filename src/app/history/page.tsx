@@ -106,18 +106,18 @@ export default function CallHistoryPage() {
         {/* Navigation & Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <Link href="/dashboard" className="inline-flex items-center text-sm font-bold text-[#006D5B] dark:text-emerald-400 hover:underline gap-1.5 mb-2">
+            <Link href="/dashboard" className="inline-flex items-center text-sm font-bold text-primary hover:underline gap-1.5 mb-2">
               <ChevronLeft className="h-4 w-4" />
               Back to Dashboard
             </Link>
             <h1 className="text-3xl font-heading font-bold text-zinc-900 dark:text-white tracking-tight flex items-center gap-3">
-              <Clock className="h-8 w-8 text-[#006D5B]" />
+              <Clock className="h-8 w-8 text-primary" />
               Speaking History
             </h1>
             <p className="text-muted-foreground font-medium">Review your complete record of practice interactions.</p>
           </div>
           <Link href="/live-call">
-            <Button className="h-12 px-6 rounded-xl bg-[#006D5B] hover:bg-[#005a4b] text-white font-bold text-sm gap-2 transition-all active:scale-95 shadow-md shadow-primary/10">
+            <Button className="h-11 px-5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm gap-2 transition-all shadow-sm">
               <Video className="h-4 w-4" />
               Find Partner
             </Button>
@@ -136,7 +136,7 @@ export default function CallHistoryPage() {
                 </p>
               </div>
               <Link href="/live-call" className="inline-block pt-2">
-                <Button className="h-12 px-8 rounded-xl bg-[#006D5B] hover:bg-[#005a4b] text-white font-bold text-sm gap-2">
+                <Button className="h-11 px-6 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm gap-2 shadow-sm">
                   Start First Session
                 </Button>
               </Link>
@@ -149,9 +149,9 @@ export default function CallHistoryPage() {
                 <CardContent className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   {/* Left Column: Avatar & Profile */}
                   <div className="flex items-center gap-5">
-                    <Avatar className="h-16 w-16 rounded-2xl border-2 border-zinc-50 dark:border-zinc-800 flex-shrink-0">
+                    <Avatar className="h-16 w-16 rounded-full border-2 border-zinc-50 dark:border-zinc-800 flex-shrink-0">
                       <AvatarImage src={partner.image} className="object-cover" />
-                      <AvatarFallback className="text-lg font-bold bg-[#006D5B]/10 text-[#006D5B]">{partner.name[0]}</AvatarFallback>
+                      <AvatarFallback className="text-lg font-bold bg-primary/10 text-primary">{partner.name[0]}</AvatarFallback>
                     </Avatar>
                     <div className="space-y-1">
                       <p className="font-bold text-lg text-zinc-900 dark:text-white group-hover:text-primary transition-colors leading-tight">

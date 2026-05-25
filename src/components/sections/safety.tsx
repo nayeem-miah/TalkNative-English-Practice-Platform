@@ -20,43 +20,70 @@ const safetyFeatures = [
 
 export function Safety() {
   return (
-    <section className="py-24">
+    <section className="py-24 bg-background">
       <div className="container px-4 md:px-8 mx-auto">
-        <div className="bg-zinc-950 rounded-[40px] overflow-hidden grid grid-cols-1 lg:grid-cols-2 shadow-2xl">
-          <div className="p-12 md:p-20 space-y-12">
+        <div className="bg-card text-card-foreground rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 border border-border/80 shadow-md">
+          <div className="p-8 md:p-16 space-y-12">
             <div className="space-y-4">
-              <h2 className="text-3xl md:text-5xl font-heading font-bold text-white leading-tight">
+              <span className="text-xs font-bold uppercase tracking-wider text-primary">Security First</span>
+              <h2 className="text-3xl md:text-4xl font-heading font-semibold text-foreground leading-tight tracking-tight">
                 Platform Safety
               </h2>
-              <p className="text-zinc-400 text-lg max-w-md">
+              <p className="text-muted-foreground text-sm max-w-md">
                 We prioritize a respectful, harassment-free environment so you can focus on learning without worry.
               </p>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6">
               {safetyFeatures.map((feature, index) => (
-                <div key={index} className="flex items-start gap-5">
-                  <div className="mt-1 h-10 w-10 shrink-0 rounded-lg bg-zinc-900 flex items-center justify-center border border-zinc-800">
-                    <feature.icon className="h-5 w-5 text-primary" />
+                <div key={index} className="flex items-start gap-4">
+                  <div className="mt-1 h-9 w-9 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+                    <feature.icon className="h-4 w-4" />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-white font-bold text-lg">{feature.title}</h4>
-                    <p className="text-zinc-500 text-sm">{feature.description}</p>
+                    <h4 className="text-foreground font-semibold text-base">{feature.title}</h4>
+                    <p className="text-muted-foreground text-xs leading-relaxed">{feature.description}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="relative hidden lg:block bg-zinc-900 border-l border-zinc-800">
-             <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative">
-                   <div className="absolute inset-0 bg-primary/40 blur-[100px] rounded-full" />
-                   <Shield className="h-48 w-48 text-primary relative z-10 drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+          <div className="relative hidden lg:block bg-muted/20 border-l border-border/80 overflow-hidden">
+             <div className="absolute inset-0 flex items-center justify-center p-8">
+                <div className="relative w-full max-w-sm rounded-xl border border-border/80 bg-background p-6 shadow-lg space-y-4">
+                  <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      <span className="text-xs font-bold text-foreground">Secure Connection</span>
+                    </div>
+                    <span className="text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded font-black tracking-wider uppercase">Active</span>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-muted-foreground">Session Protocol</span>
+                      <span className="font-semibold text-foreground">SRTP / TLS 1.3</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-muted-foreground">End-to-End Encryption</span>
+                      <span className="font-semibold text-foreground">256-bit AES</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-muted-foreground">Privacy Mode</span>
+                      <span className="font-semibold text-primary">Enabled</span>
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-border/50 flex items-center justify-center gap-2 text-xs font-bold text-primary">
+                    <Shield className="h-4 w-4 text-primary" />
+                    TalkNative SafeTunnel™
+                  </div>
                 </div>
              </div>
-             <div className="absolute inset-0 opacity-20" 
-                  style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #333 1px, transparent 0)', backgroundSize: '24px 24px' }} 
+             <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" 
+                  style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }} 
              />
           </div>
         </div>
