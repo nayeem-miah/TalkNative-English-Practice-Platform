@@ -522,33 +522,8 @@ function LiveCallContent() {
 
 
 
-            {/* Top Header */}
-            <header className="z-50 flex items-center justify-between px-8 py-6 relative">
-                <div 
-                    onClick={() => {
-                        handleLeaveCall()
-                        router.push("/")
-                    }} 
-                    className="flex items-center gap-2 group cursor-pointer"
-                >
-                    <span className="text-2xl font-heading font-bold tracking-tight transition-colors group-hover:text-primary dark:text-white">TalkNative</span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    {callState === "CONNECTED" && (
-                        <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full font-bold text-sm">
-                            <Clock className="h-4 w-4" />
-                            {formatTime(callDuration)}
-                        </div>
-                    )}
-                    <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive transition-colors">
-                        <Flag className="h-5 w-5" />
-                    </Button>
-                </div>
-            </header>
-
             {/* Main Content Area */}
-            <main className="z-10 flex-1 flex flex-col items-center justify-center -mt-10 px-4">
+            <main className="z-10 flex-1 flex flex-col items-center justify-center pt-8 pb-16 px-4">
                 
                 {/* 1. IDLE STATE: Not searching, ready to start */}
                 {callState === "IDLE" && (
@@ -618,9 +593,20 @@ function LiveCallContent() {
 
                 {/* 3. CONNECTED STATE: Audio Call Interface */}
                 {callState === "CONNECTED" && partner && (
-                    <div className="relative space-y-8 text-center max-w-sm w-full">
+                    <div className="relative space-y-6 text-center max-w-sm w-full">
+                        {/* Timer & Report Overlay */}
+                        <div className="flex items-center justify-between w-full bg-muted/40 dark:bg-zinc-900/50 border border-border/50 px-4 py-2 rounded-xl">
+                            <div className="flex items-center gap-2 text-primary font-bold text-sm">
+                                <Clock className="h-4 w-4 animate-pulse" />
+                                {formatTime(callDuration)}
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors rounded-lg">
+                                <Flag className="h-4.5 w-4.5" />
+                            </Button>
+                        </div>
+
                         {/* Partner Avatar */}
-                        <div className="relative mx-auto">
+                        <div className="relative mx-auto pt-2">
                             <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
                             <div className="relative h-48 w-48 rounded-full border border-border/80 shadow-md overflow-hidden mx-auto bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
                                 {partner.avatar ? (
