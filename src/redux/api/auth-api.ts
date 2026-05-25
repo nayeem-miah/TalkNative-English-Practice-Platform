@@ -1,4 +1,4 @@
-import { removeCookie, setCookie } from "@/utils/cookie";
+import { removeCookie } from "@/utils/cookie";
 import { baseApi } from "./base-api";
 
 export const authApi = baseApi.injectEndpoints({
@@ -35,12 +35,20 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          if (data?.success && data?.data?.result?.accessToken) {
-            setCookie("accessToken", data.data.result.accessToken);
-            setCookie("refreshToken", data.data.result.refreshToken);
+          const resData = data?.data || data;
+          const accessToken = resData?.result?.accessToken || resData?.accessToken || data?.accessToken;
+          const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || data?.refreshToken;
+
+          // Save to localStorage as fallback for base-api prepareHeaders
+          // (backend sets httpOnly cookie which JS cannot read,
+          //  and also sets accessToken_js which JS CAN read)
+          if (accessToken && typeof window !== "undefined") {
+            try { localStorage.setItem("accessToken", accessToken); } catch (e) {}
           }
-        } catch (err) {
-        }
+          if (refreshToken && typeof window !== "undefined") {
+            try { localStorage.setItem("refreshToken", refreshToken); } catch (e) {}
+          }
+        } catch (err) {}
       },
     }),
     logout: builder.mutation({
@@ -52,11 +60,16 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled }) {
         try {
           await queryFulfilled;
-          removeCookie("accessToken");
-          removeCookie("refreshToken");
-        } catch (err) {
-          removeCookie("accessToken");
-          removeCookie("refreshToken");
+        } catch (err) {}
+        // Always clear all token storage regardless of API result
+        removeCookie("accessToken");
+        removeCookie("refreshToken");
+        removeCookie("accessToken_js");
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+          } catch (e) {}
         }
       },
     }),
@@ -87,7 +100,7 @@ export const authApi = baseApi.injectEndpoints({
       }),
     }),
     getallUsrs: builder.query({
-      query: ({ page, limit }) => `/users/all?page=${page}&limit=${limit}`,
+      query: ({ page, limit }) => `/users?page=${page}&limit=${limit}`,
       providesTags: ["User"],
     })
   }),

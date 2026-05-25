@@ -20,28 +20,10 @@ const authPaths = [
 ]
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  const accessToken = request.cookies.get('accessToken')?.value
-
-  // Check if it's a protected path
-  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
-  
-  // Check if it's an auth path
-  const isAuthPath = authPaths.some(path => pathname.startsWith(path))
-
-  if (isProtectedPath && !accessToken) {
-    // Redirect unauthenticated users to login page
-    const loginUrl = new URL('/login', request.url)
-    // Optional: add a redirect parameter so they return to their original destination after logging in
-    loginUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  if (isAuthPath && accessToken) {
-    // Redirect authenticated users trying to access login/register to dashboard
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
-
+  // Route protection and redirection are handled entirely on the client-side
+  // (using RTK Query + localStorage backup in cookies.ts / base-api.ts).
+  // This ensures 100% robust support for Incognito/Private browsing and browsers 
+  // that block cross-origin/third-party cookies by default.
   return NextResponse.next()
 }
 

@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
+import { useGetMeQuery, useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
 import { Eye, EyeOff, Lock, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
+import { setCookie } from "@/utils/cookie"
 
 function LoginContent() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -23,6 +24,45 @@ function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams?.get("redirect") || "/"
+
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined, {
+    skip: !mounted,
+  })
+  const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
+  const isLoggedIn = !!user && (userResponse?.success !== false)
+
+  React.useEffect(() => {
+    if (mounted && !isUserLoading && isLoggedIn) {
+      window.location.href = redirectTo
+    }
+  }, [mounted, isUserLoading, isLoggedIn, redirectTo])
+
+  if (mounted && isUserLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-bold text-sm">Verifying session...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (mounted && isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-bold text-sm">Redirecting to app...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -41,9 +81,21 @@ function LoginContent() {
     try {
       const res = await login(formData).unwrap()
       if (res?.success) {
+        const resData = res?.data || res
+        const accessToken = resData?.result?.accessToken || resData?.accessToken || res?.accessToken
+        const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || res?.refreshToken
+
+        // Save to localStorage as reliable fallback for base-api prepareHeaders
+        // (backend already set httpOnly accessToken + non-httpOnly accessToken_js via Set-Cookie)
+        if (accessToken) {
+          try { localStorage.setItem("accessToken", accessToken) } catch (e) {}
+        }
+        if (refreshToken) {
+          try { localStorage.setItem("refreshToken", refreshToken) } catch (e) {}
+        }
+
         toast.success("Logged in successfully!", { id: toastId })
-        // Redirect to requested redirect page or root
-        router.push(redirectTo)
+        window.location.href = redirectTo
       }
     } catch (err: any) {
       const errorMessage = err?.data?.message || "Invalid email or password"
@@ -188,10 +240,10 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <React.Suspense fallback={
-      <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 border-4 border-[#006D5B] border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-zinc-600 dark:text-zinc-400 font-bold text-sm">Preparing Login Screen...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-bold text-sm">Preparing Login Screen...</p>
         </div>
       </div>
     }>

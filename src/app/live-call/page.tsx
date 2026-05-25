@@ -24,7 +24,9 @@ function LiveCallContent() {
     const searchParams = useSearchParams()
     const autoStart = searchParams?.get("autoStart") === "true"
 
-    const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined)
+    const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined, {
+        skip: typeof window === "undefined",
+    })
     const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
     const isLoggedIn = !!user && (userResponse?.success !== false)
 
@@ -470,7 +472,7 @@ function LiveCallContent() {
 
     if (isUserLoading) {
         return (
-            <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
                     <p className="text-sm font-semibold text-muted-foreground animate-pulse">Loading live call...</p>
@@ -484,7 +486,7 @@ function LiveCallContent() {
     }
 
     return (
-        <div className="relative min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex flex-col transition-colors duration-300">
+        <div className="min-h-screen bg-background flex flex-col">
             {/* Hidden audio element for remote stream — ref kept in stable object for socket closure access */}
             <audio
                 ref={(el) => {
@@ -518,8 +520,7 @@ function LiveCallContent() {
                 </div>
             )}
 
-            {/* Soft Background Glows */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+
 
             {/* Top Header */}
             <header className="z-50 flex items-center justify-between px-8 py-6 relative">
@@ -530,7 +531,7 @@ function LiveCallContent() {
                     }} 
                     className="flex items-center gap-2 group cursor-pointer"
                 >
-                    <span className="text-2xl font-heading font-bold tracking-tight transition-colors group-hover:text-primary dark:text-white">FluentFlow</span>
+                    <span className="text-2xl font-heading font-bold tracking-tight transition-colors group-hover:text-primary dark:text-white">TalkNative</span>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -583,7 +584,7 @@ function LiveCallContent() {
                             <div className="absolute inset-8 rounded-full bg-primary/20 animate-ping opacity-25" style={{ animationDuration: "1s" }} />
                             
                             {/* Center Profile */}
-                            <div className="relative w-28 h-28 rounded-full border-4 border-white dark:border-zinc-800 shadow-2xl overflow-hidden bg-primary/10 flex items-center justify-center">
+                            <div className="relative w-28 h-28 rounded-full border border-border/80 shadow-md overflow-hidden bg-primary/5 flex items-center justify-center">
                                 {user?.profilePicture ? (
                                     <img
                                         src={user.profilePicture}
@@ -621,7 +622,7 @@ function LiveCallContent() {
                         {/* Partner Avatar */}
                         <div className="relative mx-auto">
                             <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
-                            <div className="relative h-48 w-48 rounded-full border-4 border-white dark:border-zinc-800 shadow-2xl overflow-hidden mx-auto bg-slate-200 dark:bg-zinc-800 flex items-center justify-center">
+                            <div className="relative h-48 w-48 rounded-full border border-border/80 shadow-md overflow-hidden mx-auto bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
                                 {partner.avatar ? (
                                     <img
                                         src={partner.avatar}
@@ -768,9 +769,9 @@ function LiveCallContent() {
 export default function LiveCallPage() {
     return (
         <React.Suspense fallback={
-            <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="h-10 w-10 border-4 border-[#006D5B] border-t-transparent rounded-full animate-spin"></div>
+                    <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                     <p className="text-zinc-600 dark:text-zinc-400 font-bold text-sm">Initializing Call Center...</p>
                 </div>
             </div>

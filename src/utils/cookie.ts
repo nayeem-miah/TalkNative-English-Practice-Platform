@@ -47,15 +47,23 @@ export const getCookie = (name: string) => {
 
 export const removeCookie = (name: string) => {
   if (typeof document === "undefined") return;
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;`;
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Secure;`;
   
-  if (typeof window !== "undefined") {
-    try {
-      localStorage.removeItem(name);
-    } catch (e) {
-      // Ignore
-    }
+  const namesToClear = [name];
+  if (name === "accessToken") {
+    namesToClear.push("accessToken_js");
   }
+
+  namesToClear.forEach((n) => {
+    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;`;
+    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Secure;`;
+    
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem(n);
+      } catch (e) {
+        // Ignore
+      }
+    }
+  });
 };

@@ -7,7 +7,7 @@ import { Eye, EyeOff, Lock, Mail, User } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
 
-import { useRegisterMutation } from "@/redux/api/auth-api"
+import { useGetMeQuery, useRegisterMutation } from "@/redux/api/auth-api"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
@@ -21,6 +21,45 @@ export default function RegisterPage() {
 
   const [register, { isLoading }] = useRegisterMutation()
   const router = useRouter()
+
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined, {
+    skip: !mounted,
+  })
+  const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
+  const isLoggedIn = !!user && (userResponse?.success !== false)
+
+  React.useEffect(() => {
+    if (mounted && !isUserLoading && isLoggedIn) {
+      window.location.href = "/dashboard"
+    }
+  }, [mounted, isUserLoading, isLoggedIn])
+
+  if (mounted && isUserLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-bold text-sm">Verifying session...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (mounted && isLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-bold text-sm">Redirecting to app...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target

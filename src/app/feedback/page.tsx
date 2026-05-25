@@ -10,8 +10,14 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useGetMeQuery } from "@/redux/api/auth-api"
 import { useCreateReportMutation, useCreateReviewMutation } from "@/redux/api/call-api"
 import { toast } from "sonner"
+import { removeCookie } from "@/utils/cookie"
 
 function FeedbackContent() {
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const router = useRouter()
   const searchParams = useSearchParams()
   
@@ -29,11 +35,42 @@ function FeedbackContent() {
   const [reportReason, setReportReason] = React.useState("INAPPROPRIATE_BEHAVIOR")
   const [reportDesc, setReportDesc] = React.useState("")
 
-  const { data: userResponse } = useGetMeQuery(undefined)
+  const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined, { skip: !mounted })
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
+  const isLoggedIn = !!user && (userResponse?.success !== false)
 
   const [createReport, { isLoading: isReportingSubmitting }] = useCreateReportMutation()
   const [createReview] = useCreateReviewMutation()
+
+  React.useEffect(() => {
+    if (mounted && !isUserLoading && !isLoggedIn) {
+      removeCookie("accessToken")
+      removeCookie("refreshToken")
+      window.location.href = "/login?redirect=/feedback"
+    }
+  }, [mounted, isUserLoading, isLoggedIn])
+
+  if (!mounted || isUserLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-semibold text-sm">Loading feedback screen...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-semibold text-sm">Redirecting to login...</p>
+        </div>
+      </div>
+    )
+  }
 
   // Format seconds to MM:SS
   const formatDuration = (totalSeconds: number) => {
@@ -123,12 +160,17 @@ function FeedbackContent() {
   // Default avatar fallback
   const avatarSrc = partnerAvatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
 
-  return (
-    <div className="relative min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex flex-col items-center justify-center p-4 transition-colors duration-300">
-      {/* Soft Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    )
+  }
 
-      <Card className="z-10 w-full max-w-lg border-none shadow-2xl rounded-[40px] p-8 sm:p-12 text-center bg-white dark:bg-zinc-900 transition-colors">
+  return (
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      <Card className="z-10 w-full max-w-lg border border-border/60 bg-card shadow-sm rounded-3xl p-8 sm:p-12 text-center">
         {!isReporting ? (
           <div className="space-y-10">
             {/* Header Profile */}
@@ -234,7 +276,7 @@ function FeedbackContent() {
               <Flag className="h-12 w-12 text-destructive mx-auto animate-bounce" />
               <h2 className="text-2xl font-heading font-bold text-[#1a2b3b] dark:text-white">Report {partnerName}</h2>
               <p className="text-sm text-muted-foreground">
-                Help us keep FluentFlow safe and constructive. Please tell us what happened.
+                Help us keep TalkNative safe and constructive. Please tell us what happened.
               </p>
             </div>
 
@@ -303,8 +345,8 @@ function FeedbackContent() {
 export default function FeedbackPage() {
   return (
     <React.Suspense fallback={
-      <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 flex items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin" />
       </div>
     }>
       <FeedbackContent />

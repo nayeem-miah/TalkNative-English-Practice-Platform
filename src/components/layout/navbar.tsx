@@ -37,7 +37,9 @@ export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
   const pathname = usePathname()
-  const { data: userResponse, isLoading: isUserLoading, error: userError } = useGetMeQuery(undefined)
+  const { data: userResponse, isLoading: isUserLoading, error: userError } = useGetMeQuery(undefined, {
+    skip: !mounted,
+  })
   const [logout] = useLogoutMutation()
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
   const isLoggedIn = !!user && (userResponse?.success !== false)
@@ -120,7 +122,7 @@ export function Navbar() {
                   "relative h-10 w-10 rounded-full p-0 border border-border/50 hover:bg-muted/50 transition-colors"
                 )}>
                   <Avatar className="h-9 w-9 border border-primary/10">
-                    <AvatarImage src={user?.image} alt={user?.name || "User"} />
+                    <AvatarImage src={user?.profilePicture || user?.image} alt={user?.name || "User"} />
                     <AvatarFallback className="bg-primary/5 text-primary font-bold">
                       {user?.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
                     </AvatarFallback>
@@ -252,7 +254,7 @@ export function Navbar() {
                       {/* User Profile Summary in Mobile Sidebar */}
                       <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-2xl bg-muted/40 border border-border/40">
                         <Avatar className="h-10 w-10 border border-primary/10">
-                          <AvatarImage src={user?.image} alt={user?.name || "User"} />
+                          <AvatarImage src={user?.profilePicture || user?.image} alt={user?.name || "User"} />
                           <AvatarFallback className="bg-primary/5 text-primary font-bold">
                             {user?.name?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
                           </AvatarFallback>

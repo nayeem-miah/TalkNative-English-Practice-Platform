@@ -1,21 +1,25 @@
 "use client"
 
-import * as React from "react"
-import { motion } from "framer-motion"
-import { Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useGetMeQuery, useGetallUsrsQuery } from "@/redux/api/auth-api"
+import { motion } from "framer-motion"
+import { Users } from "lucide-react"
+import * as React from "react"
 
 export function HeroContent() {
   const [mounted, setMounted] = React.useState(false)
 
   // 1. Fetch dynamic total users count
-  const { data: allUsersResponse } = useGetallUsrsQuery({ page: 1, limit: 1 })
-  
-  // 2. Fetch logged-in user profile status
-  const { data: userResponse } = useGetMeQuery(undefined)
+  const { data: allUsersResponse } = useGetallUsrsQuery({ page: 1, limit: 1 }, {
+    skip: !mounted,
+  })
 
-  const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
+  // 2. Fetch logged-in user profile status
+  const { data: userResponse } = useGetMeQuery(undefined, {
+    skip: !mounted,
+  })
+
+  const   user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
   const isLoggedIn = !!user && (userResponse?.success !== false)
 
   // Derive dynamic learners count with fallback
@@ -56,7 +60,7 @@ export function HeroContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        Connect instantly with language learners worldwide for safe, 1-on-1 voice practice. 
+        Connect instantly with language learners worldwide for safe, 1-on-1 voice practice.
         Free, fast, and designed to build real speaking confidence.
       </motion.p>
 
@@ -68,16 +72,16 @@ export function HeroContent() {
       >
         {isLoggedIn ? (
           <>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="h-11 px-8 text-sm font-semibold rounded-full shadow-sm hover:opacity-95 active:scale-[0.98] transition-all"
               onClick={() => window.location.href = "/dashboard"}
             >
               Go to Dashboard
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
+            <Button
+              size="lg"
+              variant="outline"
               className="h-11 px-8 text-sm font-semibold rounded-full border border-border/80 hover:bg-muted/50 active:scale-[0.98] transition-all"
               onClick={() => window.location.href = "/live-call"}
             >
@@ -86,16 +90,16 @@ export function HeroContent() {
           </>
         ) : (
           <>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="h-11 px-8 text-sm font-semibold rounded-full shadow-sm hover:opacity-95 active:scale-[0.98] transition-all"
               onClick={() => window.location.href = "/live-call"}
             >
               Get Started
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
+            <Button
+              size="lg"
+              variant="outline"
               className="h-11 px-8 text-sm font-semibold rounded-full border border-border/80 hover:bg-muted/50 active:scale-[0.98] transition-all"
               onClick={() => window.location.href = "/login"}
             >

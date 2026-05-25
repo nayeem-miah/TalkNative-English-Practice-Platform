@@ -25,14 +25,29 @@ import {
 import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
+import { removeCookie } from "@/utils/cookie"
 
 export default function ProfilePage() {
-    const { data: userResponse, isLoading } = useGetMeQuery(undefined)
+    const [mounted, setMounted] = React.useState(false)
+    React.useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    const { data: userResponse, isLoading } = useGetMeQuery(undefined, { skip: !mounted })
     const [logout] = useLogoutMutation()
     const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation()
     const router = useRouter()
 
     const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
+    const isLoggedIn = !!user && (userResponse?.success !== false)
+
+    React.useEffect(() => {
+        if (mounted && !isLoading && !isLoggedIn) {
+            removeCookie("accessToken")
+            removeCookie("refreshToken")
+            window.location.href = "/login?redirect=/profile"
+        }
+    }, [mounted, isLoading, isLoggedIn])
 
     const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
     const [formData, setFormData] = React.useState({
@@ -103,28 +118,20 @@ export default function ProfilePage() {
         }
     }
 
-    if (isLoading) {
+    if (!mounted || isLoading) {
         return (
-            <div className="min-h-[80vh] flex flex-col items-center justify-center gap-4">
-                <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                <p className="text-muted-foreground font-semibold">Loading your profile...</p>
+            <div className="min-h-[80vh] flex flex-col items-center justify-center gap-4 bg-background">
+                <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                <p className="text-muted-foreground font-semibold text-sm">Loading your profile...</p>
             </div>
         )
     }
 
-    if (!user) {
+    if (!isLoggedIn) {
         return (
-            <div className="min-h-[80vh] flex flex-col items-center justify-center gap-6 max-w-md mx-auto text-center px-4">
-                <div className="h-20 w-20 bg-muted rounded-full flex items-center justify-center">
-                    <UserIcon className="h-10 w-10 text-muted-foreground" />
-                </div>
-                <div>
-                    <h2 className="text-2xl font-bold font-heading mb-2">Session Expired</h2>
-                    <p className="text-muted-foreground">Please log in again to view your profile and continue practicing.</p>
-                </div>
-                <Button size="lg" className="w-full rounded-xl" onClick={() => router.push("/login")}>
-                    Go to Login
-                </Button>
+            <div className="min-h-[80vh] flex flex-col items-center justify-center gap-4 bg-background">
+                <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                <p className="text-muted-foreground font-semibold text-sm">Redirecting to login...</p>
             </div>
         )
     }
@@ -136,7 +143,7 @@ export default function ProfilePage() {
     }) : "Recently"
 
     return (
-        <div className="min-h-screen bg-[#f8faff] dark:bg-zinc-950 pb-20">
+        <div className="min-h-screen bg-background pb-20">
             {/* Banner Section */}
             <div className="h-48 md:h-64 bg-gradient-to-r from-primary/20 via-primary/10 to-accent/20 relative">
                 <div className="absolute inset-0 bg-grid-white/[0.02] dark:bg-grid-white/[0.05]" />

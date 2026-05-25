@@ -17,20 +17,46 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from "next/link"
 import { useGetMeQuery } from "@/redux/api/auth-api"
 import { useGetCallHistoryQuery } from "@/redux/api/call-api"
+import { removeCookie } from "@/utils/cookie"
 
 export default function CallHistoryPage() {
-  const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined)
-  const { data: callHistoryResponse, isLoading: isHistoryLoading } = useGetCallHistoryQuery(undefined)
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined, { skip: !mounted })
+  const { data: callHistoryResponse, isLoading: isHistoryLoading } = useGetCallHistoryQuery(undefined, { skip: !mounted })
 
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
   const calls = callHistoryResponse?.data || []
+  const isLoggedIn = !!user && (userResponse?.success !== false)
 
-  if (isUserLoading || isHistoryLoading) {
+  React.useEffect(() => {
+    if (mounted && !isUserLoading && !isLoggedIn) {
+      removeCookie("accessToken")
+      removeCookie("refreshToken")
+      window.location.href = "/login?redirect=/history"
+    }
+  }, [mounted, isUserLoading, isLoggedIn])
+
+  if (!mounted || isUserLoading || isHistoryLoading) {
     return (
-      <div className="min-h-screen bg-[#f3f4f6] dark:bg-zinc-950 transition-colors duration-300 flex items-center justify-center">
+      <div className="min-h-screen bg-background transition-colors duration-300 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="h-10 w-10 border-4 border-[#006D5B] border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-zinc-600 dark:text-zinc-400 font-bold text-sm">Retrieving speaking history...</p>
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-semibold text-sm">Retrieving speaking history...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-background transition-colors duration-300 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+          <p className="text-muted-foreground font-semibold text-sm">Redirecting to login...</p>
         </div>
       </div>
     )
@@ -74,7 +100,7 @@ export default function CallHistoryPage() {
   })
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] dark:bg-zinc-950 transition-colors duration-300">
+    <div className="min-h-screen bg-background transition-colors duration-300">
       <div className="max-w-4xl mx-auto p-8 space-y-8">
         
         {/* Navigation & Header */}
