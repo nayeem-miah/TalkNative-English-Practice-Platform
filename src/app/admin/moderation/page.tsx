@@ -32,7 +32,7 @@ const recentReports = [
 
 export default function ModerationPage() {
   return (
-    <div className="p-10 space-y-10 animate-in fade-in duration-500">
+    <div className="p-4 sm:p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Moderation Reports</h1>

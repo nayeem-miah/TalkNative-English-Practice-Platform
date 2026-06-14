@@ -29,14 +29,14 @@ const userStats = [
 ]
 
 const usersList = [
-  { id: 1, name: "Elena Rodriguez", email: "elena.r@fluentflow.com", joined: "Oct 12, 2023", level: "B2 Upper", sessions: "142h", status: "Active", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" },
+  { id: 1, name: "Elena Rodriguez", email: "elena.r@talknative.com", joined: "Oct 12, 2023", level: "B2 Upper", sessions: "142h", status: "Active", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=100&auto=format&fit=crop" },
   { id: 2, name: "Marcus Chen", email: "m.chen@provider.net", joined: "Jan 05, 2024", level: "C1 Advanced", sessions: "89h", status: "Warned", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop" },
-  { id: 3, name: "Sarah Jenkins", email: "sarah.j@fluentflow.com", joined: "Mar 22, 2024", level: "A1 Beginner", sessions: "12h", status: "Suspended", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&auto=format&fit=crop" },
+  { id: 3, name: "Sarah Jenkins", email: "sarah.j@talknative.com", joined: "Mar 22, 2024", level: "A1 Beginner", sessions: "12h", status: "Suspended", image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=100&auto=format&fit=crop" },
 ]
 
 export default function UsersPage() {
   return (
-    <div className="p-10 space-y-10 animate-in fade-in duration-500">
+    <div className="p-4 sm:p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">User Management</h1>

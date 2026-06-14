@@ -37,12 +37,16 @@ export default function UserDashboardPage() {
   const isLoggedIn = !!user && (userResponse?.success !== false)
 
   React.useEffect(() => {
-    if (mounted && !isUserLoading && !isLoggedIn) {
-      removeCookie("accessToken")
-      removeCookie("refreshToken")
-      window.location.href = "/login?redirect=/dashboard"
+    if (mounted && !isUserLoading) {
+      if (!isLoggedIn) {
+        removeCookie("accessToken")
+        removeCookie("refreshToken")
+        window.location.href = "/login?redirect=/dashboard"
+      } else if (user?.role?.toUpperCase() === "ADMIN") {
+        window.location.href = "/admin/dashboard"
+      }
     }
-  }, [mounted, isUserLoading, isLoggedIn])
+  }, [mounted, isUserLoading, isLoggedIn, user])
 
   // Dynamic local-time greeting
   const greeting = React.useMemo(() => {

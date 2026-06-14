@@ -104,7 +104,7 @@ function VerifyUserContent() {
             <div className="z-10 w-full max-w-md space-y-8">
                 {/* Logo Section */}
                 <div className="text-center space-y-1">
-                    <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">FluentFlow</h1>
+                    <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">TalkNative</h1>
                     <p className="text-[10px] font-bold text-primary tracking-[0.3em] uppercase opacity-80">Secure Verification</p>
                 </div>
 

@@ -287,7 +287,7 @@ function LoginContent() {
 
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link href="/register" className="text-primary font-bold hover:underline">Join FluentFlow</Link>
+              <Link href="/register" className="text-primary font-bold hover:underline">Join TalkNative</Link>
             </p>
           </CardContent>
         </Card>

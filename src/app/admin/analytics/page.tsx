@@ -22,7 +22,7 @@ const analyticsStats = [
 
 export default function AnalyticsPage() {
   return (
-    <div className="p-10 space-y-10 animate-in fade-in duration-500">
+    <div className="p-4 sm:p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Analytics Dashboard</h1>
@@ -71,7 +71,7 @@ export default function AnalyticsPage() {
                 <Download className="h-3.5 w-3.5 text-muted-foreground" /> Export Data
               </Button>
            </CardHeader>
-           <CardContent className="p-10 h-[380px] flex items-end justify-between relative px-12 gap-4">
+           <CardContent className="p-4 sm:p-6 lg:p-10 h-[380px] flex items-end justify-between relative px-4 sm:px-12 gap-4">
               {[40, 70, 55, 90, 65, 85, 50].map((h, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
                    <div className="w-full bg-muted/30 border border-border rounded-lg transition-all group-hover:bg-primary/20 group-hover:border-primary/40 group-hover:shadow-lg group-hover:shadow-primary/5 relative cursor-pointer" style={{ height: `${h * 2.5}px` }}>

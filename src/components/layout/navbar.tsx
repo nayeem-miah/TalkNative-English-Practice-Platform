@@ -140,9 +140,11 @@ export function Navbar() {
                   <DropdownMenuSeparator className="bg-muted/50" />
                   <DropdownMenuGroup className="p-1">
                     <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/5 focus:text-primary">
-                      <Link href="/dashboard" className="flex items-center gap-3 w-full">
+                      <Link href={user?.role?.toUpperCase() === "ADMIN" ? "/admin/dashboard" : "/dashboard"} className="flex items-center gap-3 w-full">
                         <LayoutDashboard className="h-4 w-4" />
-                        <span className="font-semibold text-sm">Dashboard</span>
+                        <span className="font-semibold text-sm">
+                          {user?.role?.toUpperCase() === "ADMIN" ? "Admin Dashboard" : "Dashboard"}
+                        </span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="rounded-xl cursor-pointer py-2.5 focus:bg-primary/5 focus:text-primary">
@@ -278,15 +280,15 @@ export function Navbar() {
                       </Link>
 
                       <Link
-                        href="/dashboard"
+                        href={user?.role?.toUpperCase() === "ADMIN" ? "/admin/dashboard" : "/dashboard"}
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/dashboard" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          (pathname === "/dashboard" || pathname === "/admin/dashboard") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <LayoutDashboard className="h-5 w-5" />
-                        <span>Dashboard</span>
+                        <span>{user?.role?.toUpperCase() === "ADMIN" ? "Admin Dashboard" : "Dashboard"}</span>
                       </Link>
 
                       <button

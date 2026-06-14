@@ -27,7 +27,7 @@ const liveActivity = [
 
 export default function AdminDashboardPage() {
   return (
-    <div className="p-10 space-y-10 animate-in fade-in duration-500">
+    <div className="p-4 sm:p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -82,7 +82,7 @@ export default function AdminDashboardPage() {
                  <Button variant="ghost" size="sm" className="h-7 px-3 rounded-md text-[10px] font-bold uppercase text-muted-foreground">7d</Button>
               </div>
            </CardHeader>
-           <CardContent className="p-10 h-[380px] flex items-end justify-center">
+            <CardContent className="p-4 sm:p-6 lg:p-10 h-[380px] flex items-end justify-center">
               <div className="w-full h-full relative group">
                  {/* Theme-aware Curve */}
                  <svg viewBox="0 0 1000 300" className="w-full h-full text-muted/20 fill-none stroke-[2] stroke-primary drop-shadow-sm">

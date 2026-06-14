@@ -18,9 +18,9 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "FluentFlow | Master English with AI-Powered Conversations",
+  title: "TalkNative | Master English with AI-Powered Conversations",
   description: "Practice your English speaking skills with real-time AI feedback and immersive native-like conversations.",
-  keywords: ["English learning", "AI speaking practice", "ESL", "Language learning app", "TalkNative", "FluentFlow"],
+  keywords: ["English learning", "AI speaking practice", "ESL", "Language learning app", "TalkNative"],
 };
 
 export default function RootLayout({

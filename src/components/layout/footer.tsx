@@ -19,7 +19,7 @@ export function Footer() {
               <div className="rounded-lg bg-primary p-1.5 shadow-sm shadow-primary/20">
                 <Languages className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-2xl font-heading font-bold tracking-tight">FluentFlow</span>
+              <span className="text-2xl font-heading font-bold tracking-tight">TalkNative</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
               Empowering global voices through conversational AI and human connection. 
@@ -55,7 +55,7 @@ export function Footer() {
           </div>
         </div>
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} FluentFlow Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} TalkNative Inc. All rights reserved.</p>
           <div className="flex gap-8">
              <Link href="#" className="hover:text-primary transition-colors">Twitter</Link>
              <Link href="#" className="hover:text-primary transition-colors">LinkedIn</Link>

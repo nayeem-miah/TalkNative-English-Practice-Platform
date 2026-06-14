@@ -24,7 +24,7 @@ const availableReports = [
 
 export default function ReportsPage() {
   return (
-    <div className="p-10 space-y-10 animate-in fade-in duration-500">
+    <div className="p-4 sm:p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">System Reports</h1>
@@ -44,7 +44,7 @@ export default function ReportsPage() {
            { title: "Technical", icon: FileCode, color: "text-zinc-600 dark:text-zinc-400", bg: "bg-zinc-100 dark:bg-zinc-800" },
          ].map((cat) => (
            <Card key={cat.title} className="border-border bg-card shadow-none rounded-2xl transition-all hover:border-primary/20 cursor-pointer group">
-              <CardContent className="p-10 flex flex-col items-center text-center space-y-5">
+              <CardContent className="p-4 sm:p-6 lg:p-10 flex flex-col items-center text-center space-y-5">
                  <div className={`h-16 w-16 rounded-2xl ${cat.bg} flex items-center justify-center ${cat.color} group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-sm`}>
                     <cat.icon className="h-8 w-8" />
                  </div>
