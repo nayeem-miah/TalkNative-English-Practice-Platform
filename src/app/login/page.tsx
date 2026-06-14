@@ -119,6 +119,35 @@ function LoginContent() {
     }
   }
 
+  const handleDemoLogin = async (email: string) => {
+    const credentials = { email, password: "123456" }
+    setFormData(credentials)
+
+    const toastId = toast.loading("Signing in with demo account...")
+
+    try {
+      const res = await login(credentials).unwrap()
+      if (res?.success) {
+        const resData = res?.data || res
+        const accessToken = resData?.result?.accessToken || resData?.accessToken || res?.accessToken
+        const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || res?.refreshToken
+
+        if (accessToken) {
+          try { localStorage.setItem("accessToken", accessToken) } catch (e) {}
+        }
+        if (refreshToken) {
+          try { localStorage.setItem("refreshToken", refreshToken) } catch (e) {}
+        }
+
+        toast.success("Logged in successfully!", { id: toastId })
+        window.location.href = redirectTo
+      }
+    } catch (err: any) {
+      const errorMessage = err?.data?.message || "Invalid email or password"
+      toast.error(errorMessage, { id: toastId })
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md space-y-8">
@@ -225,6 +254,36 @@ function LoginContent() {
                 {isLoading ? "Signing In..." : "Sign In"}
               </Button>
             </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-muted" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-4 text-muted-foreground font-semibold">Demo Login</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleDemoLogin("nayeem5113a@gmail.com")}
+                className="h-11 rounded-xl text-xs font-bold border border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
+                disabled={isLoading}
+              >
+                👤 Normal User
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleDemoLogin("admin@gmail.com")}
+                className="h-11 rounded-xl text-xs font-bold border border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
+                disabled={isLoading}
+              >
+                🛡️ Admin User
+              </Button>
+            </div>
 
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
