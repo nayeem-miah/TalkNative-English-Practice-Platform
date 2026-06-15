@@ -3,38 +3,39 @@
 import { ModeToggle } from "@/components/mode-toggle"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
+import { removeCookie } from "@/utils/cookie"
 import {
   BarChart3,
+  Book,
   ChevronLeft,
   ChevronRight,
   FileText,
   Languages,
   LayoutDashboard,
   LogOut,
+  MoreHorizontal,
   ShieldAlert,
-  Users,
-  MoreHorizontal
+  Users
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
-import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
-import { removeCookie } from "@/utils/cookie"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 const menuItems = [
   { name: "Overview", icon: LayoutDashboard, href: "/admin/dashboard" },
   { name: "Moderation", icon: ShieldAlert, href: "/admin/moderation" },
   { name: "Analytics", icon: BarChart3, href: "/admin/analytics" },
   { name: "Users", icon: Users, href: "/admin/users" },
+  { name: "Course", icon: Book, href: "/admin/course" },
   { name: "Resources", icon: FileText, href: "/admin/resources" },
   { name: "Reports", icon: FileText, href: "/admin/reports" },
 ]
