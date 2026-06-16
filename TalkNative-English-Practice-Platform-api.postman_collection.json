@@ -1,0 +1,3215 @@
+{
+  "info": {
+    "_postman_id": "31a44612-0fdd-4852-ae18-48013ee107af",
+    "name": "TalkNative-English-Practice-Platform-api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46499415",
+    "_collection_link": "https://go.postman.co/collection/46499415-31a44612-0fdd-4852-ae18-48013ee107af?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "user",
+      "item": [
+        {
+          "name": "create",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n \"name\": \" nayeem\",\r\n  \"email\": \"nayeem5113a@gmail.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "create",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n \"name\": \"MedSupply user\",\r\n  \"email\": \"usernayeem@gmail.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "432"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1b0-lmrXTZnpwJexhplPNf6FPJJ5S6c\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 04:14:30 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"user created successfully\",\n    \"data\": {\n        \"id\": \"696dafa621f09e4db117790a\",\n        \"name\": \"MedSupply user\",\n        \"password\": \"$2b$10$yL7InWlxuS4C48mh5hHvQOka1yFPjPi/eyqwVbzrLRpnHyGuOPMkO\",\n        \"email\": \"usernayeem@gmail.com\",\n        \"role\": \"USER\",\n        \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\",\n        \"createdAt\": \"2026-01-19T04:14:30.705Z\",\n        \"updatedAt\": \"2026-01-19T04:14:30.705Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "get all users",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTcwNzQzZDhiY2M1ZTMyNjcxYzVjYTgiLCJlbWFpbCI6InNoYWZpcXVsLmlzbGFtMjUwMjE5OThAZ21haWwuY29tIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzY5MDgwNTIyLCJleHAiOjE3Njk2ODUzMjJ9.pwvEudjb3eC1fxVi-JlA0U1ZqshzACPzM5_L5uQ7kJI",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "get all users",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "615"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"267-UwO5yDlhWL/U8Mth5d6VA+cP1Sw\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 04:40:27 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"users retrieved successfully\",\n    \"data\": {\n        \"meta\": {\n            \"page\": 1,\n            \"limit\": 10,\n            \"total\": 2,\n            \"totalPage\": 1\n        },\n        \"data\": [\n            {\n                \"id\": \"696db1f95fc659fcad8042ab\",\n                \"name\": \"Admin\",\n                \"email\": \"admin@gmail.com\",\n                \"role\": \"ADMIN\",\n                \"profilePicture\": null,\n                \"createdAt\": \"2026-01-19T04:24:25.388Z\",\n                \"updatedAt\": \"2026-01-19T04:24:25.388Z\"\n            },\n            {\n                \"id\": \"696dafa621f09e4db117790a\",\n                \"name\": \"MedSupply user\",\n                \"email\": \"usernayeem@gmail.com\",\n                \"role\": \"USER\",\n                \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\",\n                \"createdAt\": \"2026-01-19T04:14:30.705Z\",\n                \"updatedAt\": \"2026-01-19T04:14:30.705Z\"\n            }\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "get me",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "get me",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "me"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "352"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"160-fC37H+83AmXy6cnEVIGlfcIQFIU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 04:43:19 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Current user retrieved successfully\",\n    \"data\": {\n        \"id\": \"696db1f95fc659fcad8042ab\",\n        \"name\": \"Admin\",\n        \"password\": \"$2b$10$G983ge8zCQhVa4JZFU70NeztLLPNT.QG8MFg6DrClCtKlgYlU8f8O\",\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"ADMIN\",\n        \"profilePicture\": null,\n        \"createdAt\": \"2026-01-19T04:24:25.388Z\",\n        \"updatedAt\": \"2026-01-19T04:24:25.388Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "get single user by id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/:userId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                ":userId"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "69d9dc8ea2e2270e8027eecc"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "get single user by id",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/696dafa621f09e4db117790a",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "696dafa621f09e4db117790a"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "278"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"116-k8ZFrv+hs6RYhw3+PAx7sZESftI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 04:46:09 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Current user retrieved successfully\",\n    \"data\": {\n        \"id\": \"696db1f95fc659fcad8042ab\",\n        \"name\": \"Admin\",\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"ADMIN\",\n        \"profilePicture\": null,\n        \"createdAt\": \"2026-01-19T04:24:25.388Z\",\n        \"updatedAt\": \"2026-01-19T04:24:25.388Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "update profile",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "uuid": "d982ed64-5a89-4ce9-99b8-a2d80e55580f",
+                  "src": "/C:/Users/Rakibul Hasan/Pictures/Screenshots/Screenshot 2026-01-23 083143.png",
+                  "disabled": true
+                },
+                {
+                  "key": "data",
+                  "value": "{\n    \"name\": \"Nayeem Miah\",\n\"phone\" : \"01345678903\",\n    \"oldPassword\": \"123456\",\n    \"newPassword\": \"123456\"\n\n}",
+                  "type": "text",
+                  "uuid": "97b4b970-c46c-4e3c-b4fc-2b53b4041d0f"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/update-profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "update-profile"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "update profile",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "uuid": "d982ed64-5a89-4ce9-99b8-a2d80e55580f",
+                      "src": [
+                        "/C:/Users/Nayeem/Pictures/Screenshots/Screenshot 2026-01-21 113228.png"
+                      ]
+                    },
+                    {
+                      "key": "data",
+                      "value": "{\n    \"name\": \"Nayeem Miah\",\n\"phone\" : \"01345678903\",\n    \"oldPassword\": \"1234567\",\n    \"newPassword\": \"123456\"\n\n}",
+                      "type": "text",
+                      "uuid": "97b4b970-c46c-4e3c-b4fc-2b53b4041d0f"
+                    }
+                  ],
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:5000/api/v1/users/update-profile",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "5000",
+                  "path": [
+                    "api",
+                    "v1",
+                    "users",
+                    "update-profile"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "466"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1d2-bJfwAA51P0jnNS/JrCuUzgd17eI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 23 Jan 2026 02:46:27 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 201,\n    \"success\": true,\n    \"message\": \"User profile updated successfully\",\n    \"data\": {\n        \"id\": \"696ef154d3e6e8179d4e9632\",\n        \"name\": \"Nayeem Miah\",\n        \"password\": \"$2b$10$srnPVTju0C3CUW6/quG64OtuDG.ykNCwBcZgL16h5nUZWK80kRmIi\",\n        \"email\": \"nayeem5113a@gmail.com\",\n        \"role\": \"USER\",\n        \"profilePicture\": \"https://res.cloudinary.com/dgk8lgdzb/image/upload/v1769136386/uploads/av221r3paqdvgydfpyg0.png\",\n        \"phone\": null,\n        \"createdAt\": \"2026-01-20T03:07:00.407Z\",\n        \"updatedAt\": \"2026-01-23T02:46:26.958Z\"\n    }\n}"
+            },
+            {
+              "name": "update profile",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "uuid": "d982ed64-5a89-4ce9-99b8-a2d80e55580f",
+                      "src": [
+                        "/C:/Users/Rakibul Hasan/Pictures/Screenshots/Screenshot 2026-01-23 083143.png"
+                      ]
+                    },
+                    {
+                      "key": "data",
+                      "value": "{\n    \"name\": \"Nayeem Miah\",\n\"phone\" : \"01345678903\",\n    \"oldPassword\": \"1234567\",\n    \"newPassword\": \"123456\"\n\n}",
+                      "type": "text",
+                      "uuid": "97b4b970-c46c-4e3c-b4fc-2b53b4041d0f"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/update-profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "update-profile"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "378"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"17a-KmhuxjFzk1aJ5W/XtERoLdVPoaU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sat, 24 Jan 2026 10:54:22 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 201,\n    \"success\": true,\n    \"message\": \"User profile updated successfully\",\n    \"data\": {\n        \"id\": \"696db9cb25c3196630a968a9\",\n        \"name\": \"Nayeem Miah\",\n        \"password\": \"$2b$10$rdLoaE8IIz1P1ug75NSmLuHOnh.cKgcE1Ka2Vfebh58TLd2vSf0qC\",\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"ADMIN\",\n        \"profilePicture\": null,\n        \"phone\": \"01345678903\",\n        \"createdAt\": \"2026-01-19T04:57:47.522Z\",\n        \"updatedAt\": \"2026-01-24T10:54:22.591Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "69d9dc8ea2e2270e8027eecc"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "delete",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/696dafa621f09e4db117790a",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "696dafa621f09e4db117790a"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "429"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1ad-04nRuCm56wqmnll2Mr/8eBQv7CM\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 04:58:09 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"User deleted successfully\",\n    \"data\": {\n        \"id\": \"696dafa621f09e4db117790a\",\n        \"name\": \"Nayeem Miah\",\n        \"password\": \"$2b$10$HQxOEH0vxQDVBcPRF8F3YucBVT4o2XwppDnQp39GM9t4J7aKn5X6C\",\n        \"email\": \"usernayeem@gmail.com\",\n        \"role\": \"USER\",\n        \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\",\n        \"createdAt\": \"2026-01-19T04:14:30.705Z\",\n        \"updatedAt\": \"2026-01-19T04:53:48.340Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "update user role",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"role\": \"ADMIN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/role/:userId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "role",
+                ":userId"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": ":userId"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "update user role",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"role\": \"ADMIN\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/role/6970743d8bcc5e32671c5ca8",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "role",
+                    "6970743d8bcc5e32671c5ca8"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "444"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1bc-yBbWZwGZK02rVAqSpJS534QXCmk\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 22 Jan 2026 08:26:49 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 201,\n    \"success\": true,\n    \"message\": \"User role updated successfully\",\n    \"data\": {\n        \"id\": \"6970743d8bcc5e32671c5ca8\",\n        \"name\": \"shafiqul\",\n        \"password\": \"$2b$10$kt07BQgyie2KWpK9hQQwEusDOUysE4KSl1vNL5OsJuJCQmBzOI/1i\",\n        \"email\": \"shafiqul.islam25021998@gmail.com\",\n        \"role\": \"ADMIN\",\n        \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\",\n        \"createdAt\": \"2026-01-21T06:37:49.725Z\",\n        \"updatedAt\": \"2026-01-22T08:26:49.478Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n      \"email\": \"nayeem5113a@gmail.com\",  // user\r\n    //   \"email\": \"admin@gmail.com\",\r\n      \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n//   \"email\": \"nayeem2@gmail.com\",\r\n//   \"password\": \"Nayeem123$\"\r\n  \"email\": \"admin@gmail.com\",\r\n  \"password\": \"123456\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTZkYjFmOTVmYzY1OWZjYWQ4MDQyYWIiLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2ODc5NzMwOCwiZXhwIjoxNzY5NDAyMTA4fQ.tESjdoOSfAwXSqT-tIt7vzVvcDACA7D64d8h61kVI-Q; Max-Age=3600; Path=/; Expires=Mon, 19 Jan 2026 05:35:08 GMT; HttpOnly; Secure; SameSite=None"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTZkYjFmOTVmYzY1OWZjYWQ4MDQyYWIiLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2ODc5NzMwOCwiZXhwIjoxNzcxMzg5MzA4fQ.XwYCMOO1j-bIxa65DoiiGCNd7_JdZ3Hwpq3NbX6trtI; Max-Age=7776000; Path=/; Expires=Sun, 19 Apr 2026 04:35:08 GMT; HttpOnly; Secure; SameSite=None"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "590"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"24e-6BTFvbCotgs5RR+NJkO5QHc+LJE\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 19 Jan 2026 04:35:08 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"statusCode\": 201,\n    \"success\": true,\n    \"message\": \"User loggedin successfully!\",\n    \"data\": {\n        \"result\": {\n            \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTZkYjFmOTVmYzY1OWZjYWQ4MDQyYWIiLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2ODc5NzMwOCwiZXhwIjoxNzY5NDAyMTA4fQ.tESjdoOSfAwXSqT-tIt7vzVvcDACA7D64d8h61kVI-Q\",\n            \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTZkYjFmOTVmYzY1OWZjYWQ4MDQyYWIiLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc2ODc5NzMwOCwiZXhwIjoxNzcxMzg5MzA4fQ.XwYCMOO1j-bIxa65DoiiGCNd7_JdZ3Hwpq3NbX6trtI\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "forget-password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"nayeem5113a@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "forget-password",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"nayeem5113a@gmail.com\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/forgot-password",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "forgot-password"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "99"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"63-Wfa+RkghTuCCW9D1/PmXhLFB6EE\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 20 Jan 2026 03:37:20 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Check your email for reset password link!\",\n    \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NmVmMTU0ZDNlNmU4MTc5ZDRlOTYzMiIsImVtYWlsIjoibmF5ZWVtNTExM2FAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Njg4ODAyMzcsImV4cCI6MTc2ODg4MDUzN30.B5kyoN3i-vqQv7r5qY3Zz9mIxgHj0XFvFohjnpAIm_c",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"password\": \"123456\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDlkYzhlYTJlMjI3MGU4MDI3ZWVjYyIsImVtYWlsIjoibmF5ZWVtNTExM2FAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NzU4ODY2NzcsImV4cCI6MTc3NTg4Njk3N30.P0i7oUZ7FWjcVZc7dKb5cUGPs6P_amw25wN0O2QoK_c",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZDlkYzhlYTJlMjI3MGU4MDI3ZWVjYyIsImVtYWlsIjoibmF5ZWVtNTExM2FAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NzU4ODY2NzcsImV4cCI6MTc3NTg4Njk3N30.P0i7oUZ7FWjcVZc7dKb5cUGPs6P_amw25wN0O2QoK_c"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "reset-password",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NmVmMTU0ZDNlNmU4MTc5ZDRlOTYzMiIsImVtYWlsIjoibmF5ZWVtNTExM2FAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Njg4ODAyMzcsImV4cCI6MTc2ODg4MDUzN30.B5kyoN3i-vqQv7r5qY3Zz9mIxgHj0XFvFohjnpAIm_c",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"password\": \"123456\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NmVmMTU0ZDNlNmU4MTc5ZDRlOTYzMiIsImVtYWlsIjoibmF5ZWVtNTExM2FAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Njg4ODAyMzcsImV4cCI6MTc2ODg4MDUzN30.B5kyoN3i-vqQv7r5qY3Zz9mIxgHj0XFvFohjnpAIm_c",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "reset-password"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NmVmMTU0ZDNlNmU4MTc5ZDRlOTYzMiIsImVtYWlsIjoibmF5ZWVtNTExM2FAZ21haWwuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3Njg4ODAyMzcsImV4cCI6MTc2ODg4MDUzN30.B5kyoN3i-vqQv7r5qY3Zz9mIxgHj0XFvFohjnpAIm_c"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "86"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"56-I2vLRQnYGz2ESFxa3OB4rYH3HM8\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 20 Jan 2026 03:38:37 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Password reset successfully!\",\n    \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Verify Otp",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"nayeem5113a@gmail.com\",\r\n    \"code\":\"297543\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify-email",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "verify-email"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Verify Otp",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"nayeem5113a@gmail.com\",\r\n    \"code\":\"297543\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/verify-email",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "verify-email"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "123"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"7b-PlqvF9llZlkawaxb7AhSkx0+ATU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 14 May 2026 16:40:08 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Email verified successfully!\",\n    \"data\": {\n        \"message\": \"Email verified successfully\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "resend otp",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"nayeem5113a@gmail.com\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/resend-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "resend-otp"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "resend otp",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"email\": \"nayeem5113a@gmail.com\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/resend-otp",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "resend-otp"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "113"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"71-wyOd+AzfG7Vp75wPCZlKHsFyf5s\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 14 May 2026 16:39:10 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"OTP resent successfully!\",\n    \"data\": {\n        \"message\": \"OTP sent successfully\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Calls",
+      "item": [
+        {
+          "name": "Get Call History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/calls/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "calls",
+                "history"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reporterId\": \"USER_ID_HERE\",\n    \"reportedId\": \"PARTNER_ID_HERE\",\n    \"callId\": \"CALL_ID_HERE\",\n    \"reason\": \"Inappropriate behavior\",\n    \"description\": \"The user was being rude.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calls/report",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "calls",
+                "report"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "review and report",
+      "item": [
+        {
+          "name": "2. Create Review & Rating",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<YOUR_ACCESS_TOKEN>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"revieweeId\": \"6a09b419edbd7adb81538340\",\n  \"rating\": 5,\n  \"notes\": \"Had an amazing session! The partner native pronunciation was very helpful.\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/call/review",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "call",
+                "review"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Submit Partner Report",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<YOUR_ACCESS_TOKEN>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportedId\": \"6a09b419edbd7adb81538340\",\n  \"reason\": \"INAPPROPRIATE_BEHAVIOR\",\n  \"description\": \"User was shouting and using offensive language.\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/call/report",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "call",
+                "report"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Get Call History",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<YOUR_ACCESS_TOKEN>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/call/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "call",
+                "history"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Get All Reviews (Admin Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ADMIN_ACCESS_TOKEN>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/call/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "call",
+                "reviews"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "7. Get All Reviews (Admin Only)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/call/reviews",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "call",
+                    "reviews"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "642"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"282-KRq4pI++It4yBB0FGXJiSzIZmKo\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 17 May 2026 14:54:23 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Reviews retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"6a09d1ddf01c328b12717fc6\",\n            \"reviewerId\": \"6a09b419edbd7adb81538340\",\n            \"revieweeId\": \"6a09c4fd1ea6bea5d52ac6f2\",\n            \"rating\": 4,\n            \"notes\": \"\",\n            \"createdAt\": \"2026-05-17T14:34:05.172Z\",\n            \"reviewer\": {\n                \"id\": \"6a09b419edbd7adb81538340\",\n                \"name\": \"nayeem\",\n                \"email\": \"nayeem5113a@gmail.com\",\n                \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\"\n            },\n            \"reviewee\": {\n                \"id\": \"6a09c4fd1ea6bea5d52ac6f2\",\n                \"name\": \"dev\",\n                \"email\": \"dev.nayeem01@gmail.com\",\n                \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\"\n            }\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "8. Get Single Review by ID (Admin Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ADMIN_ACCESS_TOKEN>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/call/reviews/:REVIEW_ID_HERE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "call",
+                "reviews",
+                ":REVIEW_ID_HERE"
+              ],
+              "variable": [
+                {
+                  "key": "REVIEW_ID_HERE",
+                  "value": "6a09d1ddf01c328b12717fc6"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/call/reviews/:REVIEW_ID_HERE",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "call",
+                    "reviews",
+                    ":REVIEW_ID_HERE"
+                  ],
+                  "variable": [
+                    {
+                      "key": "REVIEW_ID_HERE",
+                      "value": "6a09d1ddf01c328b12717fc6"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "647"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"287-XSMVrTHV+YUfbzpPOlolMdVjrE4\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 17 May 2026 14:54:57 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Review details retrieved successfully\",\n    \"data\": {\n        \"id\": \"6a09d1ddf01c328b12717fc6\",\n        \"reviewerId\": \"6a09b419edbd7adb81538340\",\n        \"revieweeId\": \"6a09c4fd1ea6bea5d52ac6f2\",\n        \"rating\": 4,\n        \"notes\": \"\",\n        \"createdAt\": \"2026-05-17T14:34:05.172Z\",\n        \"reviewer\": {\n            \"id\": \"6a09b419edbd7adb81538340\",\n            \"name\": \"nayeem\",\n            \"email\": \"nayeem5113a@gmail.com\",\n            \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\"\n        },\n        \"reviewee\": {\n            \"id\": \"6a09c4fd1ea6bea5d52ac6f2\",\n            \"name\": \"dev\",\n            \"email\": \"dev.nayeem01@gmail.com\",\n            \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "9. Suspend / Unsuspend User (Admin Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ADMIN_ACCESS_TOKEN>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SUSPENDED\",\n  \"reason\": \"Violated community guidelines by inappropriate behavior during voice call.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/call/users/:USER_ID_TO_BLOCK_HERE/suspend",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "call",
+                "users",
+                ":USER_ID_TO_BLOCK_HERE",
+                "suspend"
+              ],
+              "variable": [
+                {
+                  "key": "USER_ID_TO_BLOCK_HERE",
+                  "value": "6a09b419edbd7adb81538340"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Single Report by ID (Admin Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ADMIN_ACCESS_TOKEN>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/call/reports/:REPORT_ID_HERE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "call",
+                "reports",
+                ":REPORT_ID_HERE"
+              ],
+              "variable": [
+                {
+                  "key": "REPORT_ID_HERE",
+                  "value": "6a09d1fff01c328b12717fc7"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/call/reports/:REPORT_ID_HERE",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "call",
+                    "reports",
+                    ":REPORT_ID_HERE"
+                  ],
+                  "variable": [
+                    {
+                      "key": "REPORT_ID_HERE",
+                      "value": "6a09d1fff01c328b12717fc7"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "711"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"2c7-ABzmfaer49gtDc5G2ODYPuS/OJo\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 17 May 2026 14:56:51 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Report details retrieved successfully\",\n    \"data\": {\n        \"id\": \"6a09d1fff01c328b12717fc7\",\n        \"reporterId\": \"6a09b419edbd7adb81538340\",\n        \"reportedId\": \"6a09c4fd1ea6bea5d52ac6f2\",\n        \"callId\": null,\n        \"reason\": \"SPAM_ADVERTISEMENT\",\n        \"description\": \"this guess is very hungry\",\n        \"createdAt\": \"2026-05-17T14:34:39.767Z\",\n        \"reporter\": {\n            \"id\": \"6a09b419edbd7adb81538340\",\n            \"name\": \"nayeem\",\n            \"email\": \"nayeem5113a@gmail.com\",\n            \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\"\n        },\n        \"reported\": {\n            \"id\": \"6a09c4fd1ea6bea5d52ac6f2\",\n            \"name\": \"dev\",\n            \"email\": \"dev.nayeem01@gmail.com\",\n            \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "5. Get All Reports (Admin Only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ADMIN_ACCESS_TOKEN>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/call/reports",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "call",
+                "reports"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/call/reports",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "call",
+                    "reports"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "706"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"2c2-aeyu2Bt2sEZV3SLBYnzoebPVHuU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 17 May 2026 14:56:00 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Reports retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"6a09d1fff01c328b12717fc7\",\n            \"reporterId\": \"6a09b419edbd7adb81538340\",\n            \"reportedId\": \"6a09c4fd1ea6bea5d52ac6f2\",\n            \"callId\": null,\n            \"reason\": \"SPAM_ADVERTISEMENT\",\n            \"description\": \"this guess is very hungry\",\n            \"createdAt\": \"2026-05-17T14:34:39.767Z\",\n            \"reporter\": {\n                \"id\": \"6a09b419edbd7adb81538340\",\n                \"name\": \"nayeem\",\n                \"email\": \"nayeem5113a@gmail.com\",\n                \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\"\n            },\n            \"reported\": {\n                \"id\": \"6a09c4fd1ea6bea5d52ac6f2\",\n                \"name\": \"dev\",\n                \"email\": \"dev.nayeem01@gmail.com\",\n                \"profilePicture\": \"https://i.ibb.co.com/q2gwGfV/356306451-54b19ada-d53e-4ee9-8882-9dfed1bf1396.jpg\"\n            }\n        }\n    ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "Get All Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "level",
+                  "value": "BEGINNER",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "Basic computer",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/courses",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "courses"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": true
+                    },
+                    {
+                      "key": "level",
+                      "value": "BEGINNER",
+                      "disabled": true
+                    },
+                    {
+                      "key": "searchTerm",
+                      "value": "Basic computer",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "964"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"3c4-+jSj1uu4Jc1J3fhO9EPoCz2lPic\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:29:03 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Courses retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"6a2e2dacc59a771a74f4f3ad\",\n            \"title\": \"Spoken English Pro\",\n            \"description\": \"Master the art of spoken English in 30 days.\",\n            \"thumbnail\": \"https://res.cloudinary.com/dgk8lgdzb/image/upload/v1781411237/course%20thambile-1781411239938-217811822.png\",\n            \"level\": \"BEGINNER\",\n            \"price\": 29.99,\n            \"type\": \"PAID\",\n            \"isPublished\": true,\n            \"createdAt\": \"2026-06-14T04:27:24.226Z\",\n            \"updatedAt\": \"2026-06-14T04:27:24.226Z\",\n            \"_count\": {\n                \"lessons\": 0\n            }\n        },\n        {\n            \"id\": \"6a2e2d74c59a771a74f4f3ac\",\n            \"title\": \"Spoken English Pro\",\n            \"description\": \"Master the art of spoken English in 30 days.\",\n            \"thumbnail\": \"https://res.cloudinary.com/dgk8lgdzb/image/upload/v1781411181/course%20thambile-1781411184250-903973851.png\",\n            \"level\": \"BEGINNER\",\n            \"price\": 29.99,\n            \"type\": \"PAID\",\n            \"isPublished\": true,\n            \"createdAt\": \"2026-06-14T04:26:28.656Z\",\n            \"updatedAt\": \"2026-06-14T04:26:28.656Z\",\n            \"_count\": {\n                \"lessons\": 0\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 2,\n        \"totalPage\": 1\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Course",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Course (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Spoken English Pro",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Master the art of spoken English in 30 days.",
+                  "type": "text"
+                },
+                {
+                  "key": "level",
+                  "value": "BEGINNER",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "29.99",
+                  "type": "text"
+                },
+                {
+                  "key": "type",
+                  "value": "PAID",
+                  "type": "text"
+                },
+                {
+                  "key": "isPublished",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "description": "Thumbnail image file",
+                  "type": "file",
+                  "src": "/C:/Users/Md nayeem/Downloads/course thambile.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminAccessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Spoken English Pro",
+                      "type": "text"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Master the art of spoken English in 30 days.",
+                      "type": "text"
+                    },
+                    {
+                      "key": "level",
+                      "value": "BEGINNER",
+                      "type": "text"
+                    },
+                    {
+                      "key": "price",
+                      "value": "29.99",
+                      "type": "text"
+                    },
+                    {
+                      "key": "type",
+                      "value": "PAID",
+                      "type": "text"
+                    },
+                    {
+                      "key": "isPublished",
+                      "value": "true",
+                      "type": "text"
+                    },
+                    {
+                      "key": "file",
+                      "description": "Thumbnail image file",
+                      "type": "file",
+                      "src": "/C:/Users/Md nayeem/Downloads/course thambile.png"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/courses",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "courses"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "470"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1d6-llGAh0uiW/HRVyUgM4gc028n7kw\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:27:24 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 201,\n    \"success\": true,\n    \"message\": \"Course created successfully\",\n    \"data\": {\n        \"id\": \"6a2e2dacc59a771a74f4f3ad\",\n        \"title\": \"Spoken English Pro\",\n        \"description\": \"Master the art of spoken English in 30 days.\",\n        \"thumbnail\": \"https://res.cloudinary.com/dgk8lgdzb/image/upload/v1781411237/course%20thambile-1781411239938-217811822.png\",\n        \"level\": \"BEGINNER\",\n        \"price\": 29.99,\n        \"type\": \"PAID\",\n        \"isPublished\": true,\n        \"createdAt\": \"2026-06-14T04:27:24.226Z\",\n        \"updatedAt\": \"2026-06-14T04:27:24.226Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Course (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Spoken English Masterclass",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "39.99",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminAccessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "title",
+                      "value": "Spoken English Masterclass",
+                      "type": "text"
+                    },
+                    {
+                      "key": "price",
+                      "value": "39.99",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/courses/{{courseId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "courses",
+                    "{{courseId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "478"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1de-U5BsWZzDy1Je2YzGr+E9I0yIQnU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:29:39 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Course updated successfully\",\n    \"data\": {\n        \"id\": \"6a2e2dacc59a771a74f4f3ad\",\n        \"title\": \"Spoken English Masterclass\",\n        \"description\": \"Master the art of spoken English in 30 days.\",\n        \"thumbnail\": \"https://res.cloudinary.com/dgk8lgdzb/image/upload/v1781411237/course%20thambile-1781411239938-217811822.png\",\n        \"level\": \"BEGINNER\",\n        \"price\": 39.99,\n        \"type\": \"PAID\",\n        \"isPublished\": true,\n        \"createdAt\": \"2026-06-14T04:27:24.226Z\",\n        \"updatedAt\": \"2026-06-14T04:29:39.212Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Course (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/courses/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminAccessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/courses/{{courseId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "courses",
+                    "{{courseId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "478"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1de-mXM75z3QoP/fcMg3pPlXLL4PgHw\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:29:58 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Course deleted successfully\",\n    \"data\": {\n        \"id\": \"6a2e2dacc59a771a74f4f3ad\",\n        \"title\": \"Spoken English Masterclass\",\n        \"description\": \"Master the art of spoken English in 30 days.\",\n        \"thumbnail\": \"https://res.cloudinary.com/dgk8lgdzb/image/upload/v1781411237/course%20thambile-1781411239938-217811822.png\",\n        \"level\": \"BEGINNER\",\n        \"price\": 39.99,\n        \"type\": \"PAID\",\n        \"isPublished\": true,\n        \"createdAt\": \"2026-06-14T04:27:24.226Z\",\n        \"updatedAt\": \"2026-06-14T04:29:39.212Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lessons",
+      "item": [
+        {
+          "name": "Create Lesson (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{courseId}}\",\n  \"title\": \"Lesson 1: Introduction to English Sounds\",\n  \"content\": \"In this lesson, we will cover the core phonetic sounds.\",\n  \"videoUrl\": \"https://youtube.com/example-video\",\n  \"duration\": 15,\n  \"order\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lessons",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lessons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Lessons by Course",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/course/{{courseId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lessons",
+                "course",
+                "{{courseId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Single Lesson",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/{{lessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lessons",
+                "{{lessonId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/lessons/{{lessonId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "lessons",
+                    "{{lessonId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "828"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"33c-r/LAjOwAXPUNgeFkgxu/v/K1fvU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:38:24 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Class details retrieved successfully\",\n    \"data\": {\n        \"id\": \"6a2e2ee128f2238b8ad4e2e2\",\n        \"courseId\": \"6a2e2d74c59a771a74f4f3ac\",\n        \"title\": \"Lesson 1: Introduction to English Sounds\",\n        \"content\": \"In this lesson, we will cover the core phonetic sounds.\",\n        \"videoUrl\": \"https://youtube.com/example-video\",\n        \"duration\": 15,\n        \"order\": 1,\n        \"createdAt\": \"2026-06-14T04:32:33.346Z\",\n        \"updatedAt\": \"2026-06-14T04:32:33.346Z\",\n        \"course\": {\n            \"id\": \"6a2e2d74c59a771a74f4f3ac\",\n            \"title\": \"Spoken English Pro\",\n            \"description\": \"Master the art of spoken English in 30 days.\",\n            \"thumbnail\": \"https://res.cloudinary.com/dgk8lgdzb/image/upload/v1781411181/course%20thambile-1781411184250-903973851.png\",\n            \"level\": \"BEGINNER\",\n            \"price\": 29.99,\n            \"type\": \"PAID\",\n            \"isPublished\": true,\n            \"createdAt\": \"2026-06-14T04:26:28.656Z\",\n            \"updatedAt\": \"2026-06-14T04:26:28.656Z\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Lesson (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lesson 1: Introduction to English Sounds (Updated)\",\n  \"duration\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lessons/{{lessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lessons",
+                "{{lessonId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminAccessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Lesson 1: Introduction to English Sounds (Updated)\",\n  \"duration\": 20\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/lessons/{{lessonId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "lessons",
+                    "{{lessonId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "429"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1ad-O1dKpTSrLAHyP31fn5y7ywsDEKI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:41:36 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Class updated successfully\",\n    \"data\": {\n        \"id\": \"6a2e2ee128f2238b8ad4e2e2\",\n        \"courseId\": \"6a2e2d74c59a771a74f4f3ac\",\n        \"title\": \"Lesson 1: Introduction to English Sounds (Updated)\",\n        \"content\": \"In this lesson, we will cover the core phonetic sounds.\",\n        \"videoUrl\": \"https://youtube.com/example-video\",\n        \"duration\": 20,\n        \"order\": 1,\n        \"createdAt\": \"2026-06-14T04:32:33.346Z\",\n        \"updatedAt\": \"2026-06-14T04:41:36.643Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Lesson (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lessons/{{lessonId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "lessons",
+                "{{lessonId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminAccessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/lessons/{{lessonId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "lessons",
+                    "{{lessonId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "429"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1ad-TMUXC6ey6cz6VWI3WCZjahszzyg\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:41:56 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Class deleted successfully\",\n    \"data\": {\n        \"id\": \"6a2e2ee128f2238b8ad4e2e2\",\n        \"courseId\": \"6a2e2d74c59a771a74f4f3ac\",\n        \"title\": \"Lesson 1: Introduction to English Sounds (Updated)\",\n        \"content\": \"In this lesson, we will cover the core phonetic sounds.\",\n        \"videoUrl\": \"https://youtube.com/example-video\",\n        \"duration\": 20,\n        \"order\": 1,\n        \"createdAt\": \"2026-06-14T04:32:33.346Z\",\n        \"updatedAt\": \"2026-06-14T04:41:36.643Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "Enroll in Free Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{courseId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/enroll-free",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "enroll-free"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Stripe Checkout Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{courseId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/create-checkout-session",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "create-checkout-session"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "201",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"courseId\": \"{{courseId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/enrollments/create-checkout-session",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "enrollments",
+                    "create-checkout-session"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "582"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"246-A8v0MWTFD4euiuAZl+8IIbE39vI\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:54:28 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Checkout session created successfully\",\n    \"data\": {\n        \"checkoutUrl\": \"https://checkout.stripe.com/c/pay/cs_test_a15Fb4WBkVROGNGIEdzokn4paeJVaVfPlo52357ybsoQlaXTd4lgV0vlUX#fidnandhYHdWcXxpYCc%2FJ2FgY2RwaXEnKSdicGRmZGhqaWBTZHdsZGtxJz8nZmprcXdqaScpJ2R1bE5gfCc%2FJ3VuWnFgdnFaMDRVTmgxU1dwd2pjTH93Z0Y8NFFQZHVgQX9CSz1DcTN9fHRJQzNRfXJxZ1E1NXFiPTFsNUYxMX9UTEZ1MHxpV0lKSHYxXGdma3JESHFIX2poa1FObUY9S0Y1NU5ja053QDRIJyknY3dqaFZgd3Ngdyc%2FcXdwYCknZ2RmbmJ3anBrYUZqaWp3Jz8nJmNjY2NjYycpJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get My Enrolled Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/enrollments/my-courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "enrollments",
+                "my-courses"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/enrollments/my-courses",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "enrollments",
+                    "my-courses"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "507"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1fb-aVjNu5DjceZ8/l9nvSeiihqtLfA\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Sun, 14 Jun 2026 04:56:37 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"statusCode\": 200,\n    \"success\": true,\n    \"message\": \"Enrolled courses retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"6a2e2d74c59a771a74f4f3ac\",\n            \"title\": \"Spoken English Pro\",\n            \"description\": \"Master the art of spoken English in 30 days.\",\n            \"thumbnail\": \"https://res.cloudinary.com/dgk8lgdzb/image/upload/v1781411181/course%20thambile-1781411184250-903973851.png\",\n            \"level\": \"BEGINNER\",\n            \"price\": 29.99,\n            \"type\": \"PAID\",\n            \"isPublished\": true,\n            \"createdAt\": \"2026-06-14T04:26:28.656Z\",\n            \"updatedAt\": \"2026-06-14T04:26:28.656Z\",\n            \"_count\": {\n                \"lessons\": 1\n            }\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Enrollments (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/enrollments?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "enrollments"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Stripe Webhook Event Receiver",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "stripe-signature",
+                "value": "t=123456,v1=xxxxxxxxxxxxx",
+                "description": "Required when testing with genuine Stripe signature check. In local mock, this can be bypassed if the signature validation middleware is disabled/mocked.",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_1OxXXX\",\n  \"object\": \"event\",\n  \"type\": \"checkout.session.completed\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"cs_test_xxx\",\n      \"object\": \"checkout.session\",\n      \"amount_total\": 2999,\n      \"currency\": \"usd\",\n      \"customer_email\": \"johndoe@example.com\",\n      \"payment_status\": \"paid\",\n      \"payment_intent\": \"pi_test_xxx\",\n      \"metadata\": {\n        \"paymentType\": \"COURSE_ENROLLMENT\",\n        \"userId\": \"65d1234567890abcdef12345\",\n        \"courseId\": \"65d9876543210fedcba54321\"\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    }
+  ]
+}

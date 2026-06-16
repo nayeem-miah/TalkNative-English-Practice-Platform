@@ -1,69 +1,153 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, CheckCircle2, Clock, Edit, GripVertical, PlayCircle, Plus, Trash2 } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { ArrowLeft, Clock, Edit, GripVertical, PlayCircle, Plus, Trash2 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 
-// Mock Data
-const mockCourse = {
-  id: "1",
-  title: "English for Beginners",
-  description: "Start your journey with basic grammar and vocabulary. This course is designed to give you a solid foundation in spoken and written English.",
-  isPublished: true,
-  price: 49,
-}
-
-const initialLessons = [
-  { id: "l1", title: "Introduction to English Alphabet", duration: "10:00", order: 1, isPublished: true },
-  { id: "l2", title: "Basic Greetings and Introductions", duration: "15:30", order: 2, isPublished: true },
-  { id: "l3", title: "Numbers and Counting", duration: "12:45", order: 3, isPublished: false },
-]
+import { useGetCourseByIdQuery } from "@/redux/api/course-api"
+import {
+  useCreateLessonMutation,
+  useDeleteLessonMutation,
+  useGetLessonsByCourseQuery,
+  useUpdateLessonMutation
+} from "@/redux/api/lesson-api"
+import { CourseUpdateModal } from "../components/course-update-modal"
 
 export default function CourseDetailsPage() {
   const params = useParams()
   const router = useRouter()
+  const courseId = params.id as string
 
-  const [lessons, setLessons] = useState(initialLessons)
-  const [isAddLessonModalOpen, setIsAddLessonModalOpen] = useState(false)
-  const [newLesson, setNewLesson] = useState({ title: "", duration: "", videoUrl: "" })
+  // API Queries and Mutations
+  const { data: courseResponse, isLoading: isCourseLoading, error: courseError } = useGetCourseByIdQuery(courseId)
+  const { data: lessonsResponse, isLoading: isLessonsLoading } = useGetLessonsByCourseQuery(courseId)
 
+  const [createLesson] = useCreateLessonMutation()
+  const [updateLesson] = useUpdateLessonMutation()
+  const [deleteLesson] = useDeleteLessonMutation()
+
+  const course = courseResponse?.data
+  const lessons = lessonsResponse?.data || []
+
+  // Modals & form state
   const [isEditCourseModalOpen, setIsEditCourseModalOpen] = useState(false)
-  const [editCourse, setEditCourse] = useState({
-    title: mockCourse.title,
-    description: mockCourse.description,
-    level: "BEGINNER",
-    price: mockCourse.price,
-    type: "PAID",
-    isPublished: mockCourse.isPublished ? "true" : "false",
-    file: null as File | null
+  const [isLessonModalOpen, setIsLessonModalOpen] = useState(false)
+  const [editingLesson, setEditingLesson] = useState<any | null>(null) // null = creating
+  const [lessonForm, setLessonForm] = useState({
+    title: "",
+    content: "",
+    videoUrl: "",
+    duration: 15,
+    order: 1
   })
 
-  const handleEditCourse = () => {
-    // UI Only: Just close the modal
-    setIsEditCourseModalOpen(false)
+  const handleOpenAddLesson = () => {
+    setEditingLesson(null)
+    setLessonForm({
+      title: "",
+      content: "",
+      videoUrl: "",
+      duration: 15,
+      order: lessons.length + 1
+    })
+    setIsLessonModalOpen(true)
   }
 
-  const handleAddLesson = () => {
-    const lesson = {
-      id: crypto.randomUUID(),
-      title: newLesson.title,
-      duration: newLesson.duration || "0:00",
-      order: lessons.length + 1,
-      isPublished: false
+  const handleOpenEditLesson = (lesson: any) => {
+    setEditingLesson(lesson)
+    setLessonForm({
+      title: lesson.title,
+      content: lesson.content || "",
+      videoUrl: lesson.videoUrl || "",
+      duration: lesson.duration || 0,
+      order: lesson.order || 1
+    })
+    setIsLessonModalOpen(true)
+  }
+
+  const handleSaveLesson = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!lessonForm.title.trim()) {
+      toast.error("Lesson title is required")
+      return
     }
-    setLessons([...lessons, lesson])
-    setIsAddLessonModalOpen(false)
-    setNewLesson({ title: "", duration: "", videoUrl: "" })
+    if (!lessonForm.content.trim()) {
+      toast.error("Lesson content / description is required")
+      return
+    }
+
+    try {
+      if (editingLesson) {
+        // Update lesson
+        await updateLesson({
+          id: editingLesson.id,
+          title: lessonForm.title,
+          content: lessonForm.content,
+          videoUrl: lessonForm.videoUrl,
+          duration: Number(lessonForm.duration) || 0,
+          order: Number(lessonForm.order) || 1
+        }).unwrap()
+        toast.success("Lesson updated successfully!")
+      } else {
+        // Create lesson
+        await createLesson({
+          courseId,
+          title: lessonForm.title,
+          content: lessonForm.content,
+          videoUrl: lessonForm.videoUrl,
+          duration: Number(lessonForm.duration) || 0,
+          order: Number(lessonForm.order) || 1
+        }).unwrap()
+        toast.success("Lesson created successfully!")
+      }
+      setIsLessonModalOpen(false)
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to save lesson.")
+    }
   }
 
-  const handleDeleteLesson = (id: string) => {
-    setLessons(lessons.filter(lesson => lesson.id !== id))
+  const handleDeleteLesson = async (id: string) => {
+    if (confirm("Are you sure you want to delete this lesson? This action cannot be undone.")) {
+      try {
+        await deleteLesson(id).unwrap()
+        toast.success("Lesson deleted successfully!")
+      } catch (err: any) {
+        toast.error(err?.data?.message || "Failed to delete lesson.")
+      }
+    }
+  }
+
+  // Sort lessons by their order
+  const sortedLessons = [...lessons].sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+
+  if (isCourseLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-16 min-h-[400px]">
+        <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+        <p className="text-muted-foreground font-semibold mt-4">Loading course details...</p>
+      </div>
+    )
+  }
+
+  if (courseError || !course) {
+    return (
+      <div className="p-8 text-center max-w-md mx-auto space-y-4 min-h-[400px] flex flex-col justify-center items-center">
+        <h2 className="text-2xl font-bold text-destructive">Course Not Found</h2>
+        <p className="text-muted-foreground">The course you are looking for does not exist or has been deleted.</p>
+        <Button onClick={() => router.push('/admin/course')} className="rounded-xl">
+          Back to Course List
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -80,91 +164,38 @@ export default function CourseDetailsPage() {
           </Button>
 
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">{mockCourse.title}</h1>
-              <Badge variant={mockCourse.isPublished ? "default" : "secondary"} className="rounded-full px-3">
-                {mockCourse.isPublished ? "Published" : "Draft"}
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">{course.title}</h1>
+              <Badge
+                className={cn(
+                  "rounded-full px-3 text-white border-none select-none font-bold text-[10px] tracking-wide uppercase",
+                  course.isPublished ? "bg-emerald-500 hover:bg-emerald-500" : "bg-amber-500 hover:bg-amber-500"
+                )}
+              >
+                {course.isPublished ? "Published" : "Draft"}
+              </Badge>
+              <Badge className="rounded-full px-3 border border-border bg-background text-foreground text-[10px] font-bold tracking-wide uppercase select-none">
+                {course.level}
               </Badge>
             </div>
-            <p className="text-muted-foreground max-w-3xl text-lg">{mockCourse.description}</p>
+            <p className="text-muted-foreground max-w-3xl text-base">{course.description}</p>
           </div>
         </div>
 
         <div className="flex gap-3">
-          <Dialog open={isEditCourseModalOpen} onOpenChange={setIsEditCourseModalOpen}>
-            <DialogTrigger render={<Button variant="outline" className="rounded-xl h-11 px-6 shadow-sm border-border/50" />}>
-              <Edit className="w-4 h-4 mr-2" /> Edit Course
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[550px] rounded-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-2xl">Edit Course</DialogTitle>
-                <DialogDescription className="text-base">
-                  Update course details including pricing, level, and thumbnail.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-5 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-title" className="text-sm font-semibold">Course Title</Label>
-                  <Input id="edit-title" value={editCourse.title} onChange={e => setEditCourse({...editCourse, title: e.target.value})} className="h-12 rounded-xl" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-desc" className="text-sm font-semibold">Description</Label>
-                  <Textarea id="edit-desc" value={editCourse.description} onChange={e => setEditCourse({...editCourse, description: e.target.value})} className="rounded-xl resize-none" rows={3} />
-                </div>
+          <Button
+            onClick={() => setIsEditCourseModalOpen(true)}
+            variant="outline"
+            className="rounded-xl h-11 px-6 shadow-sm border-border/50 font-semibold"
+          >
+            <Edit className="w-4 h-4 mr-2 text-muted-foreground" /> Edit Course
+          </Button>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-level" className="text-sm font-semibold">Level</Label>
-                    <select id="edit-level" value={editCourse.level} onChange={e => setEditCourse({...editCourse, level: e.target.value})} className="flex h-12 w-full items-center justify-between rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none focus:ring-2 focus:ring-primary">
-                      <option value="BEGINNER">BEGINNER</option>
-                      <option value="INTERMEDIATE">INTERMEDIATE</option>
-                      <option value="ADVANCED">ADVANCED</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-type" className="text-sm font-semibold">Type</Label>
-                    <select
-                      id="edit-type"
-                      value={editCourse.type}
-                      onChange={e => {
-                        const newType = e.target.value;
-                        setEditCourse({
-                          ...editCourse,
-                          type: newType,
-                          price: newType === "FREE" ? 0 : editCourse.price
-                        });
-                      }}
-                      className="flex h-12 w-full items-center justify-between rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none focus:ring-2 focus:ring-primary"
-                    >
-                      <option value="PAID">PAID</option>
-                      <option value="FREE">FREE</option>
-                    </select>
-                  </div>
-                </div>
-
-                {editCourse.type === "PAID" && (
-                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                    <Label htmlFor="edit-price" className="text-sm font-semibold">Price ($)</Label>
-                    <Input id="edit-price" type="number" min="0" value={editCourse.price} onChange={e => setEditCourse({...editCourse, price: parseFloat(e.target.value) || 0})} className="h-12 rounded-xl" />
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-file" className="text-sm font-semibold">Thumbnail Image</Label>
-                  <Input id="edit-file" type="file" accept="image/*" onChange={e => setEditCourse({...editCourse, file: e.target.files ? e.target.files[0] : null})} className="rounded-xl file:bg-primary/10 file:text-primary file:rounded-lg file:border-0 file:mr-4 file:px-4 file:py-2 hover:file:bg-primary/20 cursor-pointer h-auto py-2" />
-                </div>
-
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsEditCourseModalOpen(false)} className="rounded-xl h-11">
-                  Cancel
-                </Button>
-                <Button onClick={handleEditCourse} className="rounded-xl h-11 px-8">
-                  Save Changes
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <CourseUpdateModal
+            open={isEditCourseModalOpen}
+            onOpenChange={setIsEditCourseModalOpen}
+            course={course}
+          />
         </div>
       </div>
 
@@ -178,77 +209,33 @@ export default function CourseDetailsPage() {
             <p className="text-muted-foreground mt-1">Manage and organize the curriculum for this course.</p>
           </div>
 
-          <Dialog open={isAddLessonModalOpen} onOpenChange={setIsAddLessonModalOpen}>
-            <DialogTrigger render={<Button className="gap-2 shadow-lg hover:shadow-primary/25 transition-all text-base h-11 px-6 rounded-xl" />}>
-                <Plus className="w-5 h-5 mr-2" />
-                Add Lesson
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] rounded-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-2xl">Add New Lesson</DialogTitle>
-                <DialogDescription className="text-base">
-                  Create a new lesson module for this course.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-6 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title" className="text-sm font-semibold">Lesson Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g. Master Spoken English"
-                    value={newLesson.title}
-                    onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value })}
-                    className="h-12 rounded-xl"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="duration" className="text-sm font-semibold">Duration</Label>
-                    <Input
-                      id="duration"
-                      placeholder="e.g. 15:30"
-                      value={newLesson.duration}
-                      onChange={(e) => setNewLesson({ ...newLesson, duration: e.target.value })}
-                      className="h-12 rounded-xl"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="video" className="text-sm font-semibold">Video URL (Optional)</Label>
-                    <Input
-                      id="video"
-                      placeholder="https://..."
-                      value={newLesson.videoUrl}
-                      onChange={(e) => setNewLesson({ ...newLesson, videoUrl: e.target.value })}
-                      className="h-12 rounded-xl"
-                    />
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddLessonModalOpen(false)} className="rounded-xl h-11">
-                  Cancel
-                </Button>
-                <Button onClick={handleAddLesson} className="rounded-xl h-11 px-8">
-                  Add Lesson
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button
+            onClick={handleOpenAddLesson}
+            className="gap-2 shadow-lg hover:shadow-primary/25 transition-all text-base h-11 px-6 rounded-xl font-semibold"
+          >
+            <Plus className="w-5 h-5 mr-1" />
+            Add Lesson
+          </Button>
         </div>
 
         {/* Lesson List */}
         <div className="space-y-3">
-          {lessons.length === 0 ? (
+          {isLessonsLoading ? (
+            <div className="flex flex-col items-center justify-center p-16 border rounded-3xl bg-muted/5 border-border/40 min-h-[200px]">
+              <div className="h-7 w-7 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+              <p className="text-muted-foreground text-sm font-semibold mt-3">Loading lessons...</p>
+            </div>
+          ) : sortedLessons.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed rounded-3xl bg-muted/20 text-center">
               <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-4">
                 <PlayCircle className="w-8 h-8" />
               </div>
               <h3 className="text-xl font-bold mb-2">No lessons yet</h3>
               <p className="text-muted-foreground mb-6">Start building your course curriculum by adding the first lesson.</p>
-              <Button onClick={() => setIsAddLessonModalOpen(true)} className="rounded-xl">Add First Lesson</Button>
+              <Button onClick={handleOpenAddLesson} className="rounded-xl">Add First Lesson</Button>
             </div>
           ) : (
-            lessons.map((lesson, index) => (
+            sortedLessons.map((lesson: any, index: number) => (
               <div
                 key={lesson.id}
                 className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 bg-card border border-border/50 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200"
@@ -257,27 +244,39 @@ export default function CourseDetailsPage() {
                   <div className="cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing p-1">
                     <GripVertical className="w-5 h-5" />
                   </div>
-                  <div className="flex-shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-bold text-lg">
-                    {index + 1}
+                  <div className=" w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-bold text-lg">
+                    {lesson.order || index + 1}
                   </div>
                   <div>
                     <h4 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
                       {lesson.title}
                     </h4>
+                    {lesson.content && (
+                      <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5 max-w-xl">
+                        {lesson.content}
+                      </p>
+                    )}
                     <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {lesson.duration}</span>
-                      {lesson.isPublished ? (
-                        <span className="flex items-center gap-1 text-green-600 dark:text-green-400 font-medium"><CheckCircle2 className="w-4 h-4" /> Published</span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">Draft</span>
+                      <span className="flex items-center gap-1 font-medium">
+                        <Clock className="w-4 h-4 text-muted-foreground" /> {lesson.duration || 0} mins
+                      </span>
+                      {lesson.videoUrl && (
+                        <span className="text-primary/80 text-xs font-semibold bg-primary/5 px-2 py-0.5 rounded-md border border-primary/10">
+                          Video Lesson
+                        </span>
                       )}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 pl-12 sm:pl-0">
-                  <Button variant="outline" size="sm" className="h-9 rounded-lg border-border/50">
-                    <Edit className="w-4 h-4 mr-2" /> Edit
+                  <Button
+                    onClick={() => handleOpenEditLesson(lesson)}
+                    variant="outline"
+                    size="sm"
+                    className="h-9 rounded-lg border-border/50 font-semibold"
+                  >
+                    <Edit className="w-4 h-4 mr-2 text-muted-foreground" /> Edit
                   </Button>
                   <Button
                     variant="ghost"
@@ -293,6 +292,94 @@ export default function CourseDetailsPage() {
           )}
         </div>
       </div>
+
+      {/* Unified Lesson Dialog (Create / Edit) */}
+      <Dialog open={isLessonModalOpen} onOpenChange={setIsLessonModalOpen}>
+        <DialogContent className="sm:max-w-[500px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
+              {editingLesson ? "Edit Lesson" : "Add New Lesson"}
+            </DialogTitle>
+            <DialogDescription className="text-sm">
+              {editingLesson ? "Update this lesson module details below." : "Create a new lesson module for this course."}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSaveLesson} className="grid gap-5 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="lesson-title" className="text-sm font-semibold">Lesson Title *</Label>
+              <Input
+                id="lesson-title"
+                placeholder="e.g. Lesson 1: Introduction to English Sounds"
+                value={lessonForm.title}
+                onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
+                className="h-12 rounded-xl"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lesson-content" className="text-sm font-semibold">Content / Description *</Label>
+              <Textarea
+                id="lesson-content"
+                placeholder="In this lesson, we will cover the core phonetic sounds..."
+                value={lessonForm.content}
+                onChange={(e) => setLessonForm({ ...lessonForm, content: e.target.value })}
+                className="rounded-xl min-h-[100px]"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lesson-video" className="text-sm font-semibold">Video URL (Optional)</Label>
+              <Input
+                id="lesson-video"
+                placeholder="https://youtube.com/example-video"
+                value={lessonForm.videoUrl}
+                onChange={(e) => setLessonForm({ ...lessonForm, videoUrl: e.target.value })}
+                className="h-12 rounded-xl"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="lesson-duration" className="text-sm font-semibold">Duration (Minutes)</Label>
+                <Input
+                  id="lesson-duration"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 15"
+                  value={lessonForm.duration || ""}
+                  onChange={(e) => setLessonForm({ ...lessonForm, duration: parseInt(e.target.value) || 0 })}
+                  className="h-12 rounded-xl"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lesson-order" className="text-sm font-semibold">Sort Order</Label>
+                <Input
+                  id="lesson-order"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 1"
+                  value={lessonForm.order || ""}
+                  onChange={(e) => setLessonForm({ ...lessonForm, order: parseInt(e.target.value) || 1 })}
+                  className="h-12 rounded-xl"
+                  required
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="mt-4 gap-2 sm:gap-0">
+              <Button type="button" variant="outline" onClick={() => setIsLessonModalOpen(false)} className="rounded-xl h-11">
+                Cancel
+              </Button>
+              <Button type="submit" className="rounded-xl h-11 px-8 font-semibold shadow-lg hover:shadow-primary/10">
+                {editingLesson ? "Save Changes" : "Add Lesson"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
