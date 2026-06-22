@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
 import { Languages, Menu } from "lucide-react"
@@ -25,10 +26,11 @@ import {
 import { cn } from "@/lib/utils"
 import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
 import { removeCookie } from "@/utils/cookie"
-import { BookOpen, LayoutDashboard, LogOut, PhoneCall, User, Home, Users } from "lucide-react"
+import { BookOpen, Home, LayoutDashboard, LogOut, PhoneCall, User, Users } from "lucide-react"
 
 const navItems = [
   { name: "Home", href: "/" },
+  { name: "Courses", href: "/courses" },
   { name: "Resources", href: "/resources" },
   { name: "Community", href: "/community" },
 ]
