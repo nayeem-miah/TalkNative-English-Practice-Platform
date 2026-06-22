@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
-import * as React from "react"
+import { AdminSidebar } from "@/components/layout/admin-sidebar"
 import { useGetMeQuery } from "@/redux/api/auth-api"
 import { removeCookie } from "@/utils/cookie"
-import { AdminSidebar } from "@/components/layout/admin-sidebar"
 import { Menu } from "lucide-react"
+import * as React from "react"
 
 export default function AdminLayout({
   children,
@@ -86,11 +87,6 @@ export default function AdminLayout({
         <div className="flex-1 max-w-[1600px] w-full mx-auto">
           {children}
         </div>
-        <footer className="px-4 sm:px-6 lg:px-10 py-6 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50">
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-            © {new Date().getFullYear()} TalkNative Administrative Console • Version 1.0.3
-          </p>
-        </footer>
       </main>
     </div>
   )

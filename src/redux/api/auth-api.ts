@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { removeCookie } from "@/utils/cookie";
 import { baseApi } from "./base-api";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    register: builder.mutation({
+    register: builder.mutation<any, any>({
       query: (data) => ({
         url: "/users",
         method: "POST",
@@ -11,21 +12,21 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    verifyEmail: builder.mutation({
+    verifyEmail: builder.mutation<any, any>({
       query: (data) => ({
         url: "/auth/verify-email",
         method: "POST",
         body: data,
       }),
     }),
-    resendOtp: builder.mutation({
+    resendOtp: builder.mutation<any, any>({
       query: (data) => ({
         url: "/auth/resend-otp",
         method: "POST",
         body: data,
       }),
     }),
-    login: builder.mutation({
+    login: builder.mutation<any, any>({
       query: (data) => ({
         url: "/auth/login",
         method: "POST",
@@ -51,7 +52,7 @@ export const authApi = baseApi.injectEndpoints({
         } catch (err) {}
       },
     }),
-    logout: builder.mutation({
+    logout: builder.mutation<any, void>({
       query: () => ({
         url: "/auth/logout",
         method: "POST",
@@ -73,11 +74,11 @@ export const authApi = baseApi.injectEndpoints({
         }
       },
     }),
-    getMe: builder.query({
+    getMe: builder.query<any, void>({
       query: () => "/users/me",
       providesTags: ["User"],
     }),
-    updateProfile: builder.mutation({
+    updateProfile: builder.mutation<any, any>({
       query: (data) => ({
         url: "/users/update-profile",
         method: "PATCH",
@@ -85,23 +86,55 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    forgotPassword: builder.mutation({
+    forgotPassword: builder.mutation<any, any>({
       query: (data) => ({
         url: "/auth/forgot-password",
         method: "POST",
         body: data,
       }),
     }),
-    resetPassword: builder.mutation({
+    resetPassword: builder.mutation<any, any>({
       query: ({ token, ...data }) => ({
         url: `/auth/reset-password?token=${token}`,
         method: "POST",
         body: data,
       }),
     }),
-    getallUsrs: builder.query({
-      query: ({ page, limit }) => `/users?page=${page}&limit=${limit}`,
+    getallUsrs: builder.query<any, { page?: number; limit?: number; searchTerm?: string; status?: string }>({
+      query: (params) => {
+        const queryParams = new URLSearchParams();
+        if (params.page) queryParams.append("page", params.page.toString());
+        if (params.limit) queryParams.append("limit", params.limit.toString());
+        if (params.searchTerm) queryParams.append("searchTerm", params.searchTerm);
+        if (params.status && params.status !== "ALL") queryParams.append("status", params.status);
+        return {
+          url: `/users?${queryParams.toString()}`,
+          method: "GET",
+        };
+      },
       providesTags: ["User"],
+    }),
+
+    // ger user by id
+    getUserById: builder.query({
+      query: (id) => `/users/${id}`,
+      providesTags: ["User"],
+    }) ,
+    updateUserRole: builder.mutation<any, { userId: string; role: "ADMIN" | "USER" }>({
+      query: ({ userId, role }) => ({
+        url: `/users/role/${userId}`,
+        method: "PATCH",
+        body: { role },
+      }),
+      invalidatesTags: ["User"],
+    }),
+    updateUserStatus: builder.mutation<any, { userId: string; status: "ACTIVE" | "INACTIVE" | "SUSPENDED" }>({
+      query: ({ userId, status }) => ({
+        url: `/users/status/${userId}`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["User"],
     })
   }),
 });
@@ -116,5 +149,8 @@ export const {
   useUpdateProfileMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
-  useGetallUsrsQuery
+  useGetallUsrsQuery,
+  useGetUserByIdQuery,
+  useUpdateUserRoleMutation,
+  useUpdateUserStatusMutation
 } = authApi;
