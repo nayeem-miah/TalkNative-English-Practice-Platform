@@ -25,6 +25,22 @@ export const enrollmentApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Course"],
     }),
+    getAllEnrollments: builder.query<any, { page?: number; limit?: number; searchTerm?: string; paymentStatus?: string }>({
+      query: (params) => {
+        const queryParams = new URLSearchParams()
+        if (params.page) queryParams.append("page", params.page.toString())
+        if (params.limit) queryParams.append("limit", params.limit.toString())
+        if (params.searchTerm) queryParams.append("searchTerm", params.searchTerm)
+        if (params.paymentStatus && params.paymentStatus !== "ALL") {
+          queryParams.append("paymentStatus", params.paymentStatus)
+        }
+        return {
+          url: `/enrollments?${queryParams.toString()}`,
+          method: "GET",
+        }
+      },
+      providesTags: ["Course"],
+    }),
   }),
 });
 
@@ -32,4 +48,5 @@ export const {
   useEnrollFreeMutation,
   useCreateCheckoutSessionMutation,
   useGetMyCoursesQuery,
+  useGetAllEnrollmentsQuery,
 } = enrollmentApi;

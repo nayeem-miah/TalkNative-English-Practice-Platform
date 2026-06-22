@@ -1,0 +1,291 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"
+
+import * as React from "react"
+import { useGetAllEnrollmentsQuery } from "@/redux/api/enrollment-api"
+import { 
+  Search, 
+  Filter, 
+  Copy, 
+  Check, 
+  ChevronLeft, 
+  ChevronRight, 
+  CreditCard
+} from "lucide-react"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+import { toast } from "sonner"
+
+// Reusable states
+import { LoadingState } from "@/components/ui/loading-state"
+import { EmptyState } from "@/components/ui/empty-state"
+
+export default function AdminEnrollmentPage() {
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const [searchTerm, setSearchTerm] = React.useState("")
+  const [statusFilter, setStatusFilter] = React.useState("ALL")
+  const [copiedId, setCopiedId] = React.useState<string | null>(null)
+  
+  const limit = 10
+
+  const { data: enrollmentResponse, isLoading } = useGetAllEnrollmentsQuery({
+    page: currentPage,
+    limit,
+    searchTerm,
+    paymentStatus: statusFilter,
+  })
+
+  const responseData = enrollmentResponse?.data || enrollmentResponse
+  const enrollments = responseData?.data || []
+  const meta = responseData?.meta
+  const totalEnrollments = meta?.total ?? 0
+  const totalPage = meta?.totalPage ?? 1
+
+  const handleCopyTransactionId = (txId: string) => {
+    if (!txId) return
+    navigator.clipboard.writeText(txId)
+    setCopiedId(txId)
+    toast.success("Transaction ID copied!")
+    setTimeout(() => setCopiedId(null), 2000)
+  }
+
+  // Handle page resets when filters change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+    setCurrentPage(1)
+  }
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value)
+    setCurrentPage(1)
+  }
+
+  return (
+    <div className="p-4 sm:p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Enrollment Registry</h1>
+          <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+            Monitor and audit all student course purchases and enrollment activities.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <Filter className="w-3.5 h-3.5 text-muted-foreground/60" />
+            <select
+              value={statusFilter}
+              onChange={handleFilterChange}
+              className="h-10 text-xs font-semibold rounded-xl border border-border bg-background px-4 py-1 cursor-pointer outline-none hover:bg-muted transition-all"
+            >
+              <option value="ALL">All Payment Statuses</option>
+              <option value="PAID">Paid</option>
+              <option value="FREE">Free</option>
+              <option value="PENDING">Pending</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <Card className="border-border bg-card shadow-none rounded-xl overflow-hidden">
+        <CardHeader className="p-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+            <Input
+              placeholder="Search by Transaction ID..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-11 h-12 rounded-xl border-border bg-muted/20 transition-all focus:ring-primary/10"
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="p-0 overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left border-b border-border bg-muted/30">
+                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Student Info</th>
+                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Course Title</th>
+                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Payment Status</th>
+                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Amount Paid</th>
+                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Transaction ID</th>
+                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Enrolled At</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="py-20 text-center">
+                    <LoadingState message="Retrieving enrollment records..." className="min-h-[250px]" />
+                  </td>
+                </tr>
+              ) : enrollments.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-20 text-center">
+                    <EmptyState
+                      icon={CreditCard}
+                      title="No enrollments found"
+                      description="No records match your active search terms or filters."
+                      className="min-h-[250px]"
+                    />
+                  </td>
+                </tr>
+              ) : (
+                enrollments.map((enrollment: any) => {
+                  const enrolledDate = enrollment.enrolledAt
+                    ? new Date(enrollment.enrolledAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      })
+                    : "N/A"
+
+                  const paymentStatus = enrollment.paymentStatus || "PENDING"
+                  const isPaid = paymentStatus === "PAID"
+                  const isFree = paymentStatus === "FREE"
+
+                  return (
+                    <tr key={enrollment.id} className="group hover:bg-muted/20 transition-colors cursor-default">
+                      {/* Student Info */}
+                      <td className="px-8 py-6">
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-11 w-11 rounded-xl border border-border shadow-sm">
+                            <AvatarImage src={enrollment.user?.profilePicture || ""} className="object-cover" />
+                            <AvatarFallback className="font-bold bg-muted text-muted-foreground">
+                              {enrollment.user?.name ? enrollment.user.name[0]?.toUpperCase() : "?"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="space-y-0.5">
+                            <p className="font-bold text-foreground text-sm tracking-tight group-hover:text-primary transition-colors">
+                              {enrollment.user?.name || "Unknown User"}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground font-medium tracking-tight leading-none">
+                              {enrollment.user?.email || "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Course Title */}
+                      <td className="px-8 py-6 max-w-[280px]">
+                        <div className="space-y-1">
+                          <p className="font-bold text-foreground text-sm tracking-tight truncate" title={enrollment.course?.title}>
+                            {enrollment.course?.title || "Unknown Course"}
+                          </p>
+                          <Badge variant="outline" className="text-[8px] font-black px-1.5 py-0.2 rounded bg-muted/65 text-muted-foreground border-transparent uppercase tracking-wider">
+                            {enrollment.course?.type || "FREE"}
+                          </Badge>
+                        </div>
+                      </td>
+
+                      {/* Payment Status */}
+                      <td className="px-8 py-6">
+                        <Badge variant="outline" className={cn(
+                          "text-[9px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider shadow-sm",
+                          isPaid ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20" :
+                          isFree ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20" :
+                          "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-500/20"
+                        )}>
+                          {paymentStatus}
+                        </Badge>
+                      </td>
+
+                      {/* Amount Paid */}
+                      <td className="px-8 py-6">
+                        <span className="text-sm font-bold text-foreground flex items-center gap-0.5">
+                          {enrollment.amountPaid !== null && enrollment.amountPaid !== undefined ? (
+                            `$${enrollment.amountPaid.toFixed(2)}`
+                          ) : isFree ? (
+                            "$0.00"
+                          ) : (
+                            <span className="text-muted-foreground/60 font-semibold italic">N/A</span>
+                          )}
+                        </span>
+                      </td>
+
+                      {/* Transaction ID */}
+                      <td className="px-8 py-6">
+                        {enrollment.transactionId ? (
+                          <button
+                            onClick={() => handleCopyTransactionId(enrollment.transactionId)}
+                            className="inline-flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground hover:text-foreground bg-muted/40 hover:bg-muted border border-border/40 px-2 py-1 rounded-lg transition-all"
+                            title="Click to copy Transaction ID"
+                          >
+                            <span className="truncate max-w-[120px]">{enrollment.transactionId}</span>
+                            {copiedId === enrollment.transactionId ? (
+                              <Check className="w-3 h-3 text-emerald-500" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                        ) : (
+                          <span className="text-muted-foreground/60 italic text-xs font-semibold">N/A</span>
+                        )}
+                      </td>
+
+                      {/* Enrolled At */}
+                      <td className="px-8 py-6 text-right">
+                        <span className="text-xs font-bold text-muted-foreground/80 tracking-tight">
+                          {enrolledDate}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
+        </CardContent>
+        
+        {/* Pagination & Summary */}
+        <div className="p-8 border-t border-border flex items-center justify-between bg-muted/20">
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+            Audit logs • {isLoading ? "..." : totalEnrollments.toLocaleString()} enrollments monitored
+          </p>
+          {totalPage > 1 && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-xl border-border bg-background hover:bg-muted transition-all shadow-sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4.5 w-4.5" />
+              </Button>
+              {Array.from({ length: totalPage }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="icon"
+                  className={cn(
+                    "h-10 w-10 rounded-xl border-border font-black text-[10px] shadow-sm transition-all",
+                    currentPage === page
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/10 border-none"
+                      : "bg-background hover:bg-muted"
+                  )}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-xl border-border bg-background hover:bg-muted transition-all shadow-sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPage))}
+                disabled={currentPage === totalPage}
+              >
+                <ChevronRight className="h-4.5 w-4.5" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </Card>
+    </div>
+  )
+}
