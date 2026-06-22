@@ -23,6 +23,8 @@ import {
   useGetCoursesQuery,
   useUpdateCourseMutation
 } from "@/redux/api/course-api"
+import { LoadingState } from "@/components/ui/loading-state"
+import { EmptyState } from "@/components/ui/empty-state"
 
 export default function AdminCoursePage() {
   // RTK Query hooks
@@ -211,20 +213,15 @@ export default function AdminCoursePage() {
 
       {/* Redesigned Course Cards Grid */}
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center p-16 border rounded-3xl bg-muted/5 border-border/40 min-h-[300px]">
-          <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-          <p className="text-muted-foreground font-bold mt-4">Retrieving courses...</p>
-        </div>
+        <LoadingState message="Retrieving courses..." className="border rounded-3xl bg-muted/5 border-border/40 min-h-[300px] p-16" />
       ) : filteredCourses.length === 0 ? (
-        /* Empty State */
-        <div className="flex flex-col items-center justify-center p-16 border-2 border-dashed rounded-2xl bg-muted/5 border-border text-center">
-          <BookOpen className="w-8 h-8 text-muted-foreground mb-4" />
-          <h3 className="text-xl font-bold text-foreground">No matches found</h3>
-          <p className="text-muted-foreground mb-6 max-w-sm">No courses match your active search terms or filtering parameters.</p>
-          <Button onClick={() => { handleSetSearchTerm(""); handleSetStatusFilter("ALL"); handleSetLevelFilter("ALL"); }} variant="outline" className="rounded-xl">
-            Reset All Filters
-          </Button>
-        </div>
+        <EmptyState
+          title="No matches found"
+          description="No courses match your active search terms or filtering parameters."
+          actionLabel="Reset All Filters"
+          onActionClick={() => { handleSetSearchTerm(""); handleSetStatusFilter("ALL"); handleSetLevelFilter("ALL"); }}
+          className="border-2 border-dashed rounded-2xl bg-muted/5 border-border text-center min-h-[300px] p-16"
+        />
       ) : (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

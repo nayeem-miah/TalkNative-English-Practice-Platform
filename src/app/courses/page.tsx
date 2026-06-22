@@ -18,6 +18,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useGetCoursesQuery } from "@/redux/api/course-api"
+import { EmptyState } from "@/components/ui/empty-state"
 
 export function CoursesPage() {
   const [searchTerm, setSearchTerm] = React.useState("")
@@ -127,20 +128,13 @@ export function CoursesPage() {
             ))}
           </div>
         ) : courses.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-16 border-2 border-dashed rounded-3xl bg-muted/5 border-border/80 text-center min-h-[300px]">
-            <BookOpen className="w-10 h-10 text-muted-foreground/60 mb-4" />
-            <h3 className="text-xl font-bold text-foreground tracking-tight">No courses found</h3>
-            <p className="text-muted-foreground mt-2 max-w-sm text-sm">
-              We couldn't find any courses matching your search terms or filters. Try adjusting your search query.
-            </p>
-            <Button
-              onClick={() => { setSearchTerm(""); setLevelFilter("ALL"); }}
-              variant="outline"
-              className="mt-6 rounded-xl border-border hover:bg-muted font-bold text-xs"
-            >
-              Reset Filters
-            </Button>
-          </div>
+          <EmptyState
+            title="No courses found"
+            description="We couldn't find any courses matching your search terms or filters. Try adjusting your search query."
+            actionLabel="Reset Filters"
+            onActionClick={() => { setSearchTerm(""); setLevelFilter("ALL"); }}
+            className="border-2 border-dashed rounded-3xl min-h-[350px]"
+          />
         ) : (
           <div className="space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

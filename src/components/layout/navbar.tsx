@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
 import { removeCookie } from "@/utils/cookie"
-import { BookOpen, Home, LayoutDashboard, LogOut, PhoneCall, User, Users } from "lucide-react"
+import { BookOpen, GraduationCap, Home, LayoutDashboard, LogOut, PhoneCall, User, Users } from "lucide-react"
 
 const navItems = [
   { name: "Home", href: "/" },
@@ -230,6 +230,18 @@ export function Navbar() {
                       </Link>
 
                       <Link
+                        href="/courses"
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/courses" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <GraduationCap className="h-5 w-5" />
+                        <span>Courses</span>
+                      </Link>
+
+                      <Link
                         href="/resources"
                         onClick={() => setIsOpen(false)}
                         className={cn(
@@ -305,6 +317,18 @@ export function Navbar() {
                       </button>
 
                       <Link
+                        href="/courses"
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/courses" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <GraduationCap className="h-5 w-5" />
+                        <span>Courses</span>
+                      </Link>
+
+                      <Link
                         href="/resources"
                         onClick={() => setIsOpen(false)}
                         className={cn(
@@ -362,6 +386,18 @@ export function Navbar() {
                       >
                         <Home className="h-5 w-5" />
                         <span>Home</span>
+                      </Link>
+
+                      <Link
+                        href="/courses"
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/courses" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <GraduationCap className="h-5 w-5" />
+                        <span>Courses</span>
                       </Link>
 
                       <Link
