@@ -32,10 +32,11 @@ import * as React from "react"
 
 const menuItems = [
   { name: "Overview", icon: LayoutDashboard, href: "/admin/dashboard" },
-  { name: "Moderation", icon: ShieldAlert, href: "/admin/moderation" },
-  { name: "Analytics", icon: BarChart3, href: "/admin/analytics" },
   { name: "Users", icon: Users, href: "/admin/users" },
   { name: "Course", icon: Book, href: "/admin/course" },
+  { name: "Enrollment", icon: Book, href: "/admin/enrollment" },
+  { name: "Moderation", icon: ShieldAlert, href: "/admin/moderation" },
+  { name: "Analytics", icon: BarChart3, href: "/admin/analytics" },
   { name: "Resources", icon: FileText, href: "/admin/resources" },
   { name: "Reports", icon: FileText, href: "/admin/reports" },
 ]
@@ -71,7 +72,7 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: AdminSidebarProps)
         // Desktop widths
         isCollapsed ? "lg:w-20" : "lg:w-64",
         // Mobile layout
-        "fixed inset-y-0 left-0 w-64 lg:static lg:flex",
+        "fixed inset-y-0 left-0 w-64 lg:sticky lg:flex",
         isOpenMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}
     >

@@ -1,3 +1,6 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -5,12 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useGetMeQuery, useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
+import { getCookie } from "@/utils/cookie"
 import { Eye, EyeOff, Lock, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
-import { setCookie } from "@/utils/cookie"
 
 function LoginContent() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -34,7 +37,8 @@ function LoginContent() {
     skip: !mounted,
   })
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
-  const isLoggedIn = !!user && (userResponse?.success !== false)
+  const token = getCookie("accessToken_js") || (typeof window !== "undefined" ? localStorage.getItem("accessToken") : "")
+  const isLoggedIn = !!user && (userResponse?.success !== false) && !!token
 
   React.useEffect(() => {
     if (mounted && !isUserLoading && isLoggedIn) {
