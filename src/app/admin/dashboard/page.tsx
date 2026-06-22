@@ -1,28 +1,94 @@
 "use client"
 
 import * as React from "react"
-import { 
-  Users, 
-  PhoneCall, 
-  ShieldCheck,
-  Server,
-  Bell,
-  ArrowUpRight,
-} from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import {
+  ArrowRight,
+  ArrowUpRight,
+  BarChart3,
+  Bell,
+  Book,
+  CreditCard,
+  FileText,
+  PhoneCall,
+  Server,
+  ShieldAlert,
+  Sparkles,
+  Users
+} from "lucide-react"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 const systemStats = [
   { name: "Active Sessions", value: "1,284", status: "Live", icon: PhoneCall, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
   { name: "Daily Signups", value: "452", change: "+12.5%", icon: Users, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10" },
-  { name: "Safety Health", value: "98.4%", target: "Target: 99%", icon: ShieldCheck, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-500/10" },
+  { name: "Total Accounts", value: "10", target: "Monitored", icon: Users, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-500/10" },
   { name: "Server Load", value: "34%", status: "Optimal", icon: Server, color: "text-zinc-600 dark:text-zinc-400", bg: "bg-zinc-100 dark:bg-zinc-800" },
 ]
 
-const liveActivity = [
-  { id: 1, type: "New Match", title: "English & Spanish", description: "User_842 and User_119 started a call.", time: "2m ago", icon: PhoneCall, iconColor: "text-emerald-500", iconBg: "bg-emerald-50 dark:bg-emerald-500/10" },
-  { id: 2, type: "Report Filed", title: "Safety Alert", description: "Session #FF829 under AI review.", time: "14m ago", icon: ShieldCheck, iconColor: "text-destructive", iconBg: "bg-destructive/5 dark:bg-destructive/10" },
-  { id: 3, type: "Milestone", title: "C1 Assessment", description: "User_429 completed advanced test.", time: "45m ago", icon: ShieldCheck, iconColor: "text-blue-500", iconBg: "bg-blue-50 dark:bg-blue-500/10" },
+const modules = [
+  {
+    name: "User Directory",
+    description: "Manage roles, verify account statuses, promote or suspend user accounts dynamically.",
+    icon: Users,
+    href: "/admin/users",
+    status: "Completed",
+    isDynamic: true,
+    color: "text-blue-600 dark:text-blue-400",
+    bg: "bg-blue-50 dark:bg-blue-500/10 border-blue-100/30"
+  },
+  {
+    name: "Course Manager",
+    description: "Create, update, and delete speaking courses, manage lesson syllabi, and set pricing models.",
+    icon: Book,
+    href: "/admin/course",
+    status: "Completed",
+    isDynamic: true,
+    color: "text-emerald-600 dark:text-emerald-400",
+    bg: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100/30"
+  },
+  {
+    name: "Enrollment Registry",
+    description: "Audit student course enrollments, track Stripe payment checkouts, and copy transaction IDs.",
+    icon: CreditCard,
+    href: "/admin/enrollment",
+    status: "Completed",
+    isDynamic: true,
+    color: "text-purple-600 dark:text-purple-400",
+    bg: "bg-purple-50 dark:bg-purple-500/10 border-purple-100/30"
+  },
+  {
+    name: "AI Moderation",
+    description: "Monitor safety logs, review flag events, and oversee chat/interaction guidelines.",
+    icon: ShieldAlert,
+    href: "/admin/moderation",
+    status: "Static Preview",
+    isDynamic: false,
+    color: "text-rose-600 dark:text-rose-400",
+    bg: "bg-rose-50 dark:bg-rose-500/10 border-rose-100/30"
+  },
+  {
+    name: "Usage Analytics",
+    description: "Visualize platform performance indicators, active session counts, and signup metrics.",
+    icon: BarChart3,
+    href: "/admin/analytics",
+    status: "Static Preview",
+    isDynamic: false,
+    color: "text-amber-600 dark:text-amber-400",
+    bg: "bg-amber-50 dark:bg-amber-500/10 border-amber-100/30"
+  },
+  {
+    name: "Resource Manager",
+    description: "Manage speaking guides, recommended articles, and platform training materials.",
+    icon: FileText,
+    href: "/admin/resources",
+    status: "Static Preview",
+    isDynamic: false,
+    color: "text-zinc-600 dark:text-zinc-400",
+    bg: "bg-zinc-100 dark:bg-zinc-800 border-zinc-200/30"
+  }
 ]
 
 export default function AdminDashboardPage() {
@@ -31,8 +97,10 @@ export default function AdminDashboardPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">System Overview</h1>
-          <p className="text-sm text-muted-foreground font-medium">Platform performance and activity metrics</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+            <Sparkles className="w-5.5 h-5.5 text-primary fill-primary/10" /> System Control Center
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium">TalkNative administration control panel & system status overview</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
@@ -69,66 +137,50 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Usage Analytics */}
-        <Card className="lg:col-span-8 border-border bg-card shadow-none rounded-xl overflow-hidden">
-           <CardHeader className="p-6 border-b border-border flex flex-row items-center justify-between">
-              <div className="space-y-1">
-                <CardTitle className="text-lg font-bold text-foreground">Usage Trends</CardTitle>
-                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest leading-none">Weekly Active Users Distribution</p>
-              </div>
-              <div className="flex gap-1 bg-muted/50 p-1 rounded-lg border border-border">
-                 <Button variant="ghost" size="sm" className="h-7 px-3 rounded-md text-[10px] font-bold uppercase bg-background shadow-sm border border-border text-foreground">24h</Button>
-                 <Button variant="ghost" size="sm" className="h-7 px-3 rounded-md text-[10px] font-bold uppercase text-muted-foreground">7d</Button>
-              </div>
-           </CardHeader>
-            <CardContent className="p-4 sm:p-6 lg:p-10 h-[380px] flex items-end justify-center">
-              <div className="w-full h-full relative group">
-                 {/* Theme-aware Curve */}
-                 <svg viewBox="0 0 1000 300" className="w-full h-full text-muted/20 fill-none stroke-[2] stroke-primary drop-shadow-sm">
-                   <path d="M0,250 Q200,280 400,200 T800,100 T1000,50" />
-                 </svg>
-                 <div className="absolute inset-x-0 bottom-0 flex justify-between px-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-4 pt-4 border-t border-border">
-                    <span>00:00</span>
-                    <span>06:00</span>
-                    <span>12:00</span>
-                    <span>18:00</span>
-                    <span>23:59</span>
-                 </div>
-              </div>
-           </CardContent>
-        </Card>
+      {/* Admin Modules Dashboard Section */}
+      <div className="space-y-5">
+        <div className="border-b border-border/60 pb-3">
+          <h2 className="text-base font-bold text-foreground tracking-tight">System Control Modules</h2>
+          <p className="text-xs text-muted-foreground font-semibold">Implemented features and static previews in the admin panel</p>
+        </div>
 
-        {/* Real-time Activity */}
-        <Card className="lg:col-span-4 border-border bg-card shadow-none rounded-xl overflow-hidden">
-           <CardHeader className="p-6 border-b border-border">
-              <CardTitle className="text-lg font-bold text-foreground">Live Activity</CardTitle>
-           </CardHeader>
-           <CardContent className="p-0">
-              <div className="divide-y divide-border">
-                {liveActivity.map((activity) => (
-                  <div key={activity.id} className="p-6 flex items-start gap-4 hover:bg-muted/30 transition-colors group cursor-default">
-                     <div className={`h-10 w-10 rounded-lg ${activity.iconBg} flex items-center justify-center ${activity.iconColor} flex-shrink-0 shadow-sm`}>
-                        <activity.icon className="h-5 w-5" />
-                     </div>
-                     <div className="space-y-1 flex-1">
-                        <div className="flex items-center justify-between">
-                           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest leading-none">{activity.type}</p>
-                           <p className="text-[9px] text-muted-foreground/60 font-bold uppercase">{activity.time}</p>
-                        </div>
-                        <h4 className="font-bold text-foreground text-sm group-hover:text-primary transition-colors">{activity.title}</h4>
-                        <p className="text-xs text-muted-foreground font-medium leading-relaxed">{activity.description}</p>
-                     </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {modules.map((m) => (
+            <Card key={m.name} className="border-border bg-card/40 hover:bg-card hover:border-primary/30 shadow-none rounded-2xl transition-all duration-300 group flex flex-col justify-between overflow-hidden">
+              <CardHeader className="p-6 pb-2 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className={`h-11 w-11 rounded-xl ${m.bg} flex items-center justify-center ${m.color} border shadow-sm`}>
+                    <m.icon className="h-5 w-5" />
                   </div>
-                ))}
-              </div>
-           </CardContent>
-           <div className="p-6 border-t border-border text-center">
-              <Button variant="link" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors h-auto p-0">
-                 Access Full History Monitor
-              </Button>
-           </div>
-        </Card>
+                  <Badge variant="outline" className={cn(
+                    "text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md shadow-sm border",
+                    m.isDynamic
+                      ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100/40 dark:border-emerald-500/20"
+                      : "bg-muted text-muted-foreground border-transparent"
+                  )}>
+                    {m.status}
+                  </Badge>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-bold text-foreground text-base tracking-tight leading-snug group-hover:text-primary transition-colors">
+                    {m.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground/85 font-medium leading-relaxed">
+                    {m.description}
+                  </p>
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-6 pt-4 border-t border-border/30 mt-auto bg-muted/10 group-hover:bg-muted/20 transition-colors">
+                <Link href={m.href} className="w-full">
+                  <Button variant="ghost" className="w-full justify-between h-9 px-3 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-transparent p-0 hover:text-primary text-muted-foreground group-hover:translate-x-0.5 transition-transform">
+                    Enter Module <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   )
