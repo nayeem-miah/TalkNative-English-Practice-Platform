@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import {
   ArrowLeft,
+  ArrowRight,
   BookOpen,
   CheckCircle2,
   Clock,
@@ -17,8 +19,8 @@ import {
   useCreateCheckoutSessionMutation,
   useEnrollFreeMutation
 } from "@/redux/api/enrollment-api"
-import { toast } from "sonner"
 import { getCookie, removeCookie } from "@/utils/cookie"
+import { toast } from "sonner"
 
 // Import modular sub-components
 import { EnrollmentCard } from "./components/enrollment-card"
@@ -28,6 +30,7 @@ import { SyllabusList } from "./components/syllabus-list"
 import { VideoPlayer } from "./components/video-player"
 
 // Reusable states
+import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/ui/empty-state"
 import { LoadingState } from "@/components/ui/loading-state"
 
@@ -72,15 +75,93 @@ export function CourseDetailsPage({ params }: PageProps) {
   // Component States
   const [selectedLessonId, setSelectedLessonId] = React.useState<string | null>(null)
   const [activeTab, setActiveTab] = React.useState<"about" | "syllabus">("about")
+  const [completedLessonIds, setCompletedLessonIds] = React.useState<string[]>([])
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Load from localStorage on mount
+  React.useEffect(() => {
+    if (mounted && course?.id) {
+      try {
+        const key = `talknative_completed_${course.id}`
+        const saved = localStorage.getItem(key)
+        if (saved) {
+          setCompletedLessonIds(JSON.parse(saved))
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }, [mounted, course?.id])
+
+  const sortedLessons = React.useMemo(() => {
+    return [...lessons].sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+  }, [lessons])
+
+  const unlockedLessonIds = React.useMemo(() => {
+    const unlocked: string[] = []
+    sortedLessons.forEach((lesson, index) => {
+      if (index === 0) {
+        unlocked.push(lesson.id)
+      } else {
+        const prevLesson = sortedLessons[index - 1]
+        if (completedLessonIds.includes(prevLesson.id)) {
+          unlocked.push(lesson.id)
+        }
+      }
+    })
+    return unlocked
+  }, [sortedLessons, completedLessonIds])
 
   // Derived state: Automatically select active lesson if enrolled
   const activeLesson = React.useMemo(() => {
-    if (!course?.isEnrolled || lessons.length === 0) return null
+    if (!course?.isEnrolled || sortedLessons.length === 0) return null
     if (selectedLessonId) {
-      return lessons.find((l: any) => l.id === selectedLessonId) || lessons[0]
+      return sortedLessons.find((l: any) => l.id === selectedLessonId) || sortedLessons[0]
     }
-    return lessons[0]
-  }, [lessons, selectedLessonId, course?.isEnrolled])
+    return sortedLessons[0]
+  }, [sortedLessons, selectedLessonId, course?.isEnrolled])
+
+  const activeLessonIndex = sortedLessons.findIndex((l: any) => l.id === activeLesson?.id)
+  const nextLesson = activeLessonIndex !== -1 && activeLessonIndex < sortedLessons.length - 1
+    ? sortedLessons[activeLessonIndex + 1]
+    : null
+
+  const handleNextLesson = () => {
+    if (!activeLesson) return
+    const newCompleted = [...completedLessonIds]
+    if (!newCompleted.includes(activeLesson.id)) {
+      newCompleted.push(activeLesson.id)
+      setCompletedLessonIds(newCompleted)
+      try {
+        localStorage.setItem(`talknative_completed_${course.id}`, JSON.stringify(newCompleted))
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    if (nextLesson) {
+      setSelectedLessonId(nextLesson.id)
+      toast.success("Lesson completed! Loading next video...")
+    }
+  }
+
+  const handleFinishCourse = () => {
+    if (!activeLesson) return
+    const newCompleted = [...completedLessonIds]
+    if (!newCompleted.includes(activeLesson.id)) {
+      newCompleted.push(activeLesson.id)
+      setCompletedLessonIds(newCompleted)
+      try {
+        localStorage.setItem(`talknative_completed_${course.id}`, JSON.stringify(newCompleted))
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    toast.success("Congratulations! You have completed this course! 🎉")
+  }
 
   if (isLoading) {
     return <LoadingState message="Loading course details..." className="min-h-screen" />
@@ -111,7 +192,7 @@ export function CourseDetailsPage({ params }: PageProps) {
   // Handle Enrollment action
   const handleEnrollment = async () => {
     const token = getCookie("accessToken_js") || getCookie("accessToken") || (typeof window !== "undefined" ? localStorage.getItem("accessToken") : "")
-    
+
     if (!token || isTokenExpired(token)) {
       toast.info("Please login to enroll in this course.")
       // Clear expired credentials
@@ -259,6 +340,36 @@ export function CourseDetailsPage({ params }: PageProps) {
                     {activeLesson.content}
                   </p>
                 )}
+
+                {/* Complete & Next Button */}
+                <div className="pt-4 flex justify-end border-t border-border/50 mt-3">
+                  {nextLesson ? (
+                    <Button
+                      onClick={handleNextLesson}
+                      className="rounded-xl h-10 px-5 text-xs font-bold gap-1 bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer shadow-sm flex items-center"
+                    >
+                      Complete & Next Lesson
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      {completedLessonIds.includes(activeLesson.id) ? (
+                        <Badge className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-3 py-1.5 rounded-lg text-xs font-extrabold flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 fill-emerald-500/10" />
+                          Course Completed! 🎉
+                        </Badge>
+                      ) : (
+                        <Button
+                          onClick={handleFinishCourse}
+                          className="rounded-xl h-10 px-5 text-xs font-bold gap-1 bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer shadow-sm flex items-center"
+                        >
+                          Complete Course
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -300,10 +411,11 @@ export function CourseDetailsPage({ params }: PageProps) {
                   <div className="space-y-4">
                     <h3 className="text-base font-extrabold text-foreground tracking-tight mb-4">Course Lessons</h3>
                     <SyllabusList
-                      lessons={lessons}
+                      lessons={sortedLessons}
                       isEnrolled={!!course.isEnrolled}
                       activeLessonId={activeLesson?.id}
                       onLessonClick={setSelectedLessonId}
+                      unlockedLessonIds={unlockedLessonIds}
                     />
                   </div>
                 )}
