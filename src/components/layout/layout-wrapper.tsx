@@ -7,15 +7,16 @@ import { Footer } from "./footer";
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const isDashboard = pathname?.startsWith("/dashboard");
   const isLiveCall = pathname?.startsWith("/live-call");
 
   return (
     <div className="relative flex min-h-screen flex-col">
-      {!isAdmin && <Navbar />}
+      {!isAdmin && !isDashboard && <Navbar />}
       <main className="flex-1">
         {children}
       </main>
-      {!isAdmin && !isLiveCall && <Footer />}
+      {!isAdmin && !isDashboard && !isLiveCall && <Footer />}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { BookOpen, Headphones, Laptop, MessageCircle, ArrowRight, Star } from "lucide-react"
+import Image from "next/image"
 
 export default function ResourcesPage() {
   const resourceCategories = [
@@ -47,10 +48,12 @@ export default function ResourcesPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                   <Button size="sm" className="w-full">Start Lesson</Button>
                 </div>
-                <img
+                <Image
                   src={`https://images.unsplash.com/photo-${i === 1 ? '1434030216411-0b793f4b4173' : i === 2 ? '1523240795612-9a054b0db644' : '1516321318423-f06f85e504b3'}?q=80&w=600&auto=format&fit=crop`}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   alt="Lesson thumbnail"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 <Badge className="absolute top-3 right-3 bg-white/90 text-black hover:bg-white flex gap-1 items-center">
                   <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" /> 4.9

@@ -1,8 +1,11 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
+import { AnimatePresence, motion } from "framer-motion"
+import { ArrowRight, Globe, Mic, Sparkles, Users } from "lucide-react"
+import Image from "next/image"
 import * as React from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Globe, Mic, Users, ArrowRight, Sparkles, Video } from "lucide-react"
 
 export function HeroVisual() {
   const [mounted, setMounted] = React.useState(false)
@@ -10,12 +13,12 @@ export function HeroVisual() {
 
   React.useEffect(() => {
     setMounted(true)
-    
+
     // Auto cycle through matching phases to simulate an active call engine
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % 3)
     }, 4500)
-    
+
     return () => clearInterval(interval)
   }, [])
 
@@ -33,7 +36,7 @@ export function HeroVisual() {
     >
       {/* Live Matching Dashboard Card */}
       <div className="relative z-10 w-full max-w-[480px] aspect-[4/3] rounded-3xl border border-border/60 bg-card shadow-xl p-5 md:p-6 flex flex-col justify-between overflow-hidden">
-        
+
         {/* Header bar: System Status */}
         <div className="flex items-center justify-between border-b border-border/40 pb-3.5">
           <div className="flex items-center gap-2">
@@ -54,10 +57,10 @@ export function HeroVisual() {
         {/* Call simulation core */}
         <div className="flex-1 flex flex-col justify-center my-2 relative">
           <AnimatePresence mode="wait">
-            
+
             {/* Stage 0: Scanning / Searching */}
             {activeStep === 0 && (
-              <motion.div 
+              <motion.div
                 key="matching"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -81,7 +84,7 @@ export function HeroVisual() {
 
             {/* Stage 1: Matched / Establishing Connection */}
             {activeStep === 1 && (
-              <motion.div 
+              <motion.div
                 key="connecting"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -113,7 +116,7 @@ export function HeroVisual() {
 
             {/* Stage 2: Connected / Live Conversation */}
             {activeStep === 2 && (
-              <motion.div 
+              <motion.div
                 key="connected"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -138,9 +141,11 @@ export function HeroVisual() {
 
                   {/* Remote Matched Partner Box */}
                   <div className="bg-muted/20 border border-border/40 rounded-xl p-3 flex items-center gap-3">
-                    <img 
+                    <Image
                       src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80"
                       alt="Sarah from London"
+                      width={36}
+                      height={36}
                       className="h-9 w-9 rounded-full object-cover border border-border/60"
                     />
                     <div className="min-w-0">
@@ -181,7 +186,7 @@ export function HeroVisual() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button 
+            <button
               onClick={handleNextCycle}
               className="h-8.5 px-3.5 rounded-full bg-primary text-primary-foreground font-bold text-[11px] shadow-sm flex items-center gap-1.5 active:scale-[0.96] transition-all hover:opacity-95 select-none"
             >

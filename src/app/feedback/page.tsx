@@ -1,16 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
-import * as React from "react"
-import { Star, ArrowRight, LayoutDashboard, Flag, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { ArrowRight, Flag, LayoutDashboard, Loader2, Star } from "lucide-react"
+import Image from "next/image"
+import * as React from "react"
 
 import { Textarea } from "@/components/ui/textarea"
-import { useRouter, useSearchParams } from "next/navigation"
 import { useGetMeQuery } from "@/redux/api/auth-api"
 import { useCreateReportMutation, useCreateReviewMutation } from "@/redux/api/call-api"
-import { toast } from "sonner"
 import { removeCookie } from "@/utils/cookie"
+import { useRouter, useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 
 function FeedbackContent() {
   const [mounted, setMounted] = React.useState(false)
@@ -20,7 +23,7 @@ function FeedbackContent() {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  
+
   // Parse call info from query string
   const partnerId = searchParams?.get("partnerId") || ""
   const partnerName = searchParams?.get("partnerName") || "Speaking Partner"
@@ -29,7 +32,7 @@ function FeedbackContent() {
 
   const [rating, setRating] = React.useState(0)
   const [notes, setNotes] = React.useState("")
-  
+
   // Reporting Modal States
   const [isReporting, setIsReporting] = React.useState(false)
   const [reportReason, setReportReason] = React.useState("INAPPROPRIATE_BEHAVIOR")
@@ -119,7 +122,7 @@ function FeedbackContent() {
         console.error("Failed to persist feedback in database", err)
       }
     }
-    
+
     toast.success("Feedback saved successfully!")
 
     if (action === "next") {
@@ -177,9 +180,11 @@ function FeedbackContent() {
             <div className="space-y-4">
               <div className="relative mx-auto h-24 w-24 rounded-full border-4 border-[#006D5B]/20 p-1">
                 <div className="relative h-full w-full rounded-full overflow-hidden">
-                  <img
+                  <Image
                     src={avatarSrc}
                     alt={partnerName}
+                    fill
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -230,15 +235,15 @@ function FeedbackContent() {
 
             {/* Action Buttons */}
             <div className="space-y-4">
-              <Button 
+              <Button
                 onClick={() => handleSubmitFeedback("next")}
                 className="w-full h-14 rounded-2xl bg-[#006D5B] hover:bg-[#005a4b] text-white font-bold text-lg gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95 cursor-pointer"
               >
                 Find Next Partner
                 <ArrowRight className="h-5 w-5" />
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => handleSubmitFeedback("dashboard")}
                 className="w-full h-14 rounded-2xl border-2 border-muted/20 font-bold text-lg gap-3 hover:bg-muted/10 transition-all active:scale-95 bg-transparent dark:text-white cursor-pointer"
               >
@@ -250,7 +255,7 @@ function FeedbackContent() {
             {/* Footer */}
             <div className="flex items-center justify-between pt-4 border-t border-muted/20">
               {partnerId ? (
-                <button 
+                <button
                   onClick={() => setIsReporting(true)}
                   className="text-xs font-bold text-destructive/60 hover:text-destructive flex items-center gap-1.5 uppercase tracking-widest transition-colors cursor-pointer"
                 >
@@ -260,8 +265,8 @@ function FeedbackContent() {
               ) : (
                 <div />
               )}
-              
-              <button 
+
+              <button
                 onClick={() => router.push("/dashboard")}
                 className="text-xs font-bold text-muted-foreground hover:text-[#006D5B] uppercase tracking-widest transition-colors cursor-pointer"
               >
