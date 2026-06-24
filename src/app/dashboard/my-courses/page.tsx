@@ -11,6 +11,7 @@ import { ArrowRight, Book, BookOpen, Filter, Search } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import * as React from "react"
+import { cn } from "@/lib/utils"
 
 const levelColors: Record<string, string> = {
   BEGINNER: "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
@@ -133,66 +134,85 @@ export default function MyCoursesPage() {
           </div>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCourses.map((course: any) => {
-            const thumbnailSrc = course.thumbnail || "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&auto=format&fit=crop&q=60"
-            const lessonsCount = course._count?.lessons ?? course.lessons?.length ?? 0
-            const levelColor = levelColors[course.level?.toUpperCase()] || "bg-muted text-muted-foreground border-transparent"
-            const isFree = course.price === 0 || course.type === "FREE"
+        <Card className="border border-zinc-200/80 dark:border-zinc-800/80 bg-white dark:bg-zinc-900/60 shadow-xs rounded-2xl overflow-hidden">
+          <CardContent className="p-0 overflow-x-auto">
+            <table className="w-full min-w-[700px] border-collapse">
+              <thead>
+                <tr className="text-left border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40">
+                  <th className="px-6 py-4 text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Course</th>
+                  <th className="px-6 py-4 text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Level & Type</th>
+                  <th className="px-6 py-4 text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Lessons</th>
+                  <th className="px-6 py-4 text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-150 dark:divide-zinc-850">
+                {filteredCourses.map((course: any) => {
+                  const thumbnailSrc = course.thumbnail || "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&auto=format&fit=crop&q=60"
+                  const lessonsCount = course._count?.lessons ?? course.lessons?.length ?? 0
+                  const levelColor = levelColors[course.level?.toUpperCase()] || "bg-muted text-muted-foreground border-transparent"
+                  const isFree = course.price === 0 || course.type === "FREE"
 
-            return (
-              <Card key={course.id} className="overflow-hidden border border-zinc-200/80 dark:border-zinc-800/80 hover:border-primary/30 shadow-xs hover:shadow-md flex flex-col rounded-2xl bg-white dark:bg-zinc-900/60 transition-all duration-300 group">
-                {/* Thumbnail */}
-                <div className="relative aspect-video overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-                  <Image
-                    src={thumbnailSrc}
-                    alt={course.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-                  />
-                  <div className="absolute top-3 left-3 flex gap-1.5">
-                    <Badge variant="outline" className={`text-[9px] font-bold px-2 py-0.5 rounded-md border uppercase tracking-wider ${levelColor}`}>
-                      {course.level}
-                    </Badge>
-                  </div>
-                </div>
+                  return (
+                    <tr key={course.id} className="group hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors">
+                      {/* Course Cover & Title */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-4">
+                          <div className="relative h-12 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
+                            <Image
+                              src={thumbnailSrc}
+                              alt={course.title}
+                              fill
+                              sizes="80px"
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="space-y-0.5 max-w-[350px]">
+                            <h4 className="font-bold text-zinc-900 dark:text-zinc-50 text-sm tracking-tight truncate group-hover:text-primary transition-colors" title={course.title}>
+                              {course.title}
+                            </h4>
+                            <p className="text-xs text-zinc-450 dark:text-zinc-500 truncate" title={course.description}>
+                              {course.description}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
 
-                {/* Content */}
-                <CardContent className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="font-bold text-zinc-900 dark:text-zinc-50 text-sm leading-snug group-hover:text-primary transition-colors font-sans truncate" title={course.title}>
-                      {course.title}
-                    </h3>
-                    <p className="text-xs text-zinc-450 dark:text-zinc-500 line-clamp-2 leading-relaxed font-medium">
-                      {course.description}
-                    </p>
-                  </div>
+                      {/* Level & Type */}
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1 items-start">
+                          <Badge variant="outline" className={cn("text-[9px] font-bold px-2 py-0.5 rounded-md border uppercase tracking-wider", levelColor)}>
+                            {course.level}
+                          </Badge>
+                          <Badge variant="secondary" className="text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                            {isFree ? "Free" : course.type}
+                          </Badge>
+                        </div>
+                      </td>
 
-                  <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-1">
-                      <BookOpen className="h-3.5 w-3.5" />
-                      {lessonsCount} {lessonsCount === 1 ? "Lesson" : "Lessons"}
-                    </span>
-                    <Badge variant="secondary" className="text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
-                      {isFree ? "Free" : course.type}
-                    </Badge>
-                  </div>
-                </CardContent>
+                      {/* Lessons Count */}
+                      <td className="px-6 py-4 text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                        <span className="flex items-center gap-1.5">
+                          <BookOpen className="h-4 w-4 text-zinc-400" />
+                          {lessonsCount} {lessonsCount === 1 ? "Lesson" : "Lessons"}
+                        </span>
+                      </td>
 
-                {/* Footer button */}
-                <CardFooter className="p-5 pt-0 bg-transparent">
-                  <Link href={`/courses/${course.id}`} className="w-full">
-                    <Button className="w-full h-10 rounded-xl text-xs font-bold gap-2 cursor-pointer" variant="outline">
-                      Continue Learning
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
-            )
-          })}
-        </div>
+                      {/* Continue CTA Button */}
+                      <td className="px-6 py-4 text-right">
+                        <Link href={`/courses/${course.id}`}>
+                          <Button className="h-9 px-4 rounded-xl text-xs font-bold gap-1.5 cursor-pointer" variant="outline">
+                            Continue
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </Button>
+                        </Link>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
       )}
     </div>
   )
