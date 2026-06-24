@@ -48,6 +48,24 @@ export const courseApi = baseApi.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: "Course", id }],
     }),
+    getReviews: builder.query<any, string>({
+      query: (courseId) => ({
+        url: `/courses/${courseId}/reviews`,
+        method: "GET",
+      }),
+      providesTags: (result, error, courseId) => [{ type: "Course", id: courseId }],
+    }),
+    createReview: builder.mutation<any, { courseId: string; rating: number; comment: string }>({
+      query: ({ courseId, rating, comment }) => ({
+        url: `/courses/${courseId}/reviews`,
+        method: "POST",
+        body: { rating, comment },
+      }),
+      invalidatesTags: (result, error, { courseId }) => [
+        { type: "Course", id: courseId },
+        "Course",
+      ],
+    }),
   }),
 });
 
@@ -57,4 +75,6 @@ export const {
   useUpdateCourseMutation,
   useDeleteCourseMutation,
   useGetCourseByIdQuery,
+  useGetReviewsQuery,
+  useCreateReviewMutation,
 } = courseApi;

@@ -8,12 +8,14 @@ import {
   BookOpen,
   CheckCircle2,
   Clock,
+  Star,
 } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { useGetMeQuery } from "@/redux/api/auth-api"
 import { useGetCourseByIdQuery } from "@/redux/api/course-api"
 import {
   useCreateCheckoutSessionMutation,
@@ -26,6 +28,7 @@ import { toast } from "sonner"
 import { EnrollmentCard } from "./components/enrollment-card"
 import { MarkdownRenderer } from "./components/markdown-renderer"
 import { MetadataCard } from "./components/metadata-card"
+import { ReviewsTab } from "./components/reviews-tab"
 import { SyllabusList } from "./components/syllabus-list"
 import { VideoPlayer } from "./components/video-player"
 
@@ -74,9 +77,14 @@ export function CourseDetailsPage({ params }: PageProps) {
 
   // Component States
   const [selectedLessonId, setSelectedLessonId] = React.useState<string | null>(null)
-  const [activeTab, setActiveTab] = React.useState<"about" | "syllabus">("about")
+  const [activeTab, setActiveTab] = React.useState<"about" | "syllabus" | "reviews">("about")
   const [completedLessonIds, setCompletedLessonIds] = React.useState<string[]>([])
   const [mounted, setMounted] = React.useState(false)
+
+  // Auth/User query
+  const { data: userResponse } = useGetMeQuery(undefined, { skip: !mounted })
+  const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
+  const currentUserId = user?.id || user?._id
 
   React.useEffect(() => {
     setMounted(true)
@@ -292,6 +300,15 @@ export function CourseDetailsPage({ params }: PageProps) {
                 <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4 text-muted-foreground/60" /> {lessonsCount} Lessons</span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-muted-foreground/60" /> {formatDuration(totalDuration)} Total Duration</span>
+                {course.averageRating > 0 && (
+                  <>
+                    <span>•</span>
+                    <span className="flex items-center gap-1 text-amber-500 font-extrabold">
+                      <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                      {course.averageRating.toFixed(1)} ({course.totalReviews || 0})
+                    </span>
+                  </>
+                )}
                 {course.isEnrolled && (
                   <>
                     <span>•</span>
@@ -375,11 +392,11 @@ export function CourseDetailsPage({ params }: PageProps) {
 
             {/* Tab Navigation */}
             <div className="space-y-4">
-              <div className="flex border-b border-border/60">
+              <div className="flex border-b border-border/60 overflow-x-auto scrollbar-none">
                 <button
                   onClick={() => setActiveTab("about")}
                   className={cn(
-                    "pb-3 text-xs font-extrabold uppercase tracking-wider border-b-2 px-4 transition-all",
+                    "pb-3 text-xs font-extrabold uppercase tracking-wider border-b-2 px-4 transition-all whitespace-nowrap",
                     activeTab === "about"
                       ? "border-primary text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground"
@@ -390,13 +407,24 @@ export function CourseDetailsPage({ params }: PageProps) {
                 <button
                   onClick={() => setActiveTab("syllabus")}
                   className={cn(
-                    "pb-3 text-xs font-extrabold uppercase tracking-wider border-b-2 px-4 transition-all",
+                    "pb-3 text-xs font-extrabold uppercase tracking-wider border-b-2 px-4 transition-all whitespace-nowrap",
                     activeTab === "syllabus"
                       ? "border-primary text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground"
                   )}
                 >
                   Syllabus ({lessonsCount})
+                </button>
+                <button
+                  onClick={() => setActiveTab("reviews")}
+                  className={cn(
+                    "pb-3 text-xs font-extrabold uppercase tracking-wider border-b-2 px-4 transition-all whitespace-nowrap",
+                    activeTab === "reviews"
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Reviews ({course.totalReviews || 0})
                 </button>
               </div>
 
@@ -407,7 +435,7 @@ export function CourseDetailsPage({ params }: PageProps) {
                     <h3 className="text-base font-extrabold text-foreground tracking-tight mb-4">Course Details</h3>
                     <MarkdownRenderer content={course.description} />
                   </div>
-                ) : (
+                ) : activeTab === "syllabus" ? (
                   <div className="space-y-4">
                     <h3 className="text-base font-extrabold text-foreground tracking-tight mb-4">Course Lessons</h3>
                     <SyllabusList
@@ -418,6 +446,15 @@ export function CourseDetailsPage({ params }: PageProps) {
                       unlockedLessonIds={unlockedLessonIds}
                     />
                   </div>
+                ) : (
+                  <ReviewsTab
+                    courseId={course.id}
+                    reviews={course.reviews || []}
+                    averageRating={course.averageRating || 0}
+                    totalReviews={course.totalReviews || 0}
+                    isEnrolled={!!course.isEnrolled}
+                    currentUserId={currentUserId}
+                  />
                 )}
               </div>
             </div>
