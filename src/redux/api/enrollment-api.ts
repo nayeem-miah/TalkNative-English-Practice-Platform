@@ -41,6 +41,13 @@ export const enrollmentApi = baseApi.injectEndpoints({
       },
       providesTags: ["Course"],
     }),
+    getAdminDashboardOverview: builder.query<any, void>({
+      query: () => ({
+        url: "/admin/dashboard-overview",
+        method: "GET",
+      }),
+      providesTags: ["Course"],
+    }),
   }),
 });
 
@@ -49,4 +56,5 @@ export const {
   useCreateCheckoutSessionMutation,
   useGetMyCoursesQuery,
   useGetAllEnrollmentsQuery,
+  useGetAdminDashboardOverviewQuery,
 } = enrollmentApi;

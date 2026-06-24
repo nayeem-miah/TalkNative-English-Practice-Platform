@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react/no-unescaped-entities */
+ 
 "use client"
 
 import {
   BookMarked,
-  BookOpen,
   GraduationCap,
   Search
 } from "lucide-react"
@@ -15,10 +14,10 @@ import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { EmptyState } from "@/components/ui/empty-state"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useGetCoursesQuery } from "@/redux/api/course-api"
-import { EmptyState } from "@/components/ui/empty-state"
 
 export function CoursesPage() {
   const [searchTerm, setSearchTerm] = React.useState("")
@@ -52,25 +51,7 @@ export function CoursesPage() {
 
   return (
     <div className="min-h-screen bg-background pb-16">
-      {/* Hero Section */}
-      {/* <div className="relative overflow-hidden bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-700 py-16 sm:py-24 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent)]" />
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-indigo-500/30 blur-3xl" />
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-violet-500/30 blur-3xl" />
 
-        <div className="max-w-6xl mx-auto px-6 relative z-10 text-center space-y-6">
-          <Badge className="bg-white/10 hover:bg-white/15 text-white border-none py-1 px-3 text-xs gap-1.5 rounded-full backdrop-blur-sm animate-pulse">
-            <Sparkles className="w-3 h-3 text-amber-300 fill-amber-300" /> Learn from Native Speakers
-          </Badge>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-tight">
-            Unlock Your Potential with Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-yellow-400">English Courses</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-indigo-100/90 max-w-2xl mx-auto font-medium leading-relaxed">
-            Gain fluency, confidence, and vocabulary through structured lessons designed by expert native language coaches.
-          </p>
-        </div>
-      </div> */}
 
       {/* Main Content & Filters */}
       <div className="max-w-6xl mx-auto px-6 mt-12 space-y-10">

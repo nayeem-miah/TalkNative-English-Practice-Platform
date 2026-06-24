@@ -19,7 +19,6 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
-  Languages,
   LayoutDashboard,
   LogOut,
   MoreHorizontal,
@@ -79,11 +78,10 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: AdminSidebarProps)
       {/* Brand Header */}
       <div className="h-20 flex items-center justify-between px-6 border-b border-border/50">
         <Link href="/" onClick={() => onCloseMobile?.()} className="flex items-center gap-3 overflow-hidden">
-          <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-            <Languages className="h-5 w-5 text-primary-foreground" />
-          </div>
           {!isCollapsed && (
-            <span className="font-bold text-lg text-zinc-900 dark:text-white tracking-tight">TalkNative</span>
+            <span className="font-black text-xl tracking-tight bg-gradient-to-r from-primary via-emerald-600 to-teal-500 dark:from-primary dark:via-cyan-400 dark:to-emerald-400 bg-clip-text text-transparent">
+              TalkNative
+            </span>
           )}
         </Link>
       </div>

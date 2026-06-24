@@ -1,15 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { BookOpen, Plus } from "lucide-react"
+import { BookOpen, Plus, Edit, ExternalLink, MoreVertical, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import Image from "next/image"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
 
 // Modular Sub-components
-import { CourseCard } from "./components/course-card"
 import { CourseCreateModal } from "./components/course-create-modal"
 import { CourseUpdateModal } from "./components/course-update-modal"
 import { DeleteConfirmModal } from "./components/delete-confirm-modal"
@@ -224,17 +235,131 @@ export default function AdminCoursePage() {
         />
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCourses.map((course) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                onStartEdit={handleStartEdit}
-                onPublishToggle={handlePublishToggle}
-                onStartDelete={handleStartDelete}
-              />
-            ))}
-          </div>
+          <Card className="border-border bg-card shadow-none rounded-xl overflow-hidden">
+            <CardContent className="p-0 overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left border-b border-border bg-muted/30">
+                    <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Course Info</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Level & Type</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Lessons</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Students</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Price</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Status</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredCourses.map((course) => {
+                    const thumbnailSrc = course.thumbnail || "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&auto=format&fit=crop&q=60"
+                    const lessonsCount = course._count?.lessons ?? 0
+                    const studentsCount = course.studentsCount ?? 0
+
+                    return (
+                      <tr key={course.id} className="group hover:bg-muted/20 transition-colors cursor-default">
+                        {/* Course Info */}
+                        <td className="px-8 py-6">
+                          <div className="flex items-center gap-4">
+                            <div className="relative h-12 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
+                              <Image
+                                width={80}
+                                height={48}
+                                src={thumbnailSrc}
+                                alt={course.title}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                            <div className="space-y-0.5 max-w-[320px]">
+                              <p className="font-bold text-foreground text-sm tracking-tight truncate group-hover:text-primary transition-colors" title={course.title}>
+                                {course.title}
+                              </p>
+                              <p className="text-[11px] text-muted-foreground font-medium tracking-tight truncate" title={course.description}>
+                                {course.description}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Level & Type */}
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col gap-1 items-start">
+                            <Badge variant="outline" className="text-[8px] font-black px-1.5 py-0.2 rounded bg-muted/65 text-muted-foreground border-transparent uppercase tracking-wider">
+                              {course.level}
+                            </Badge>
+                            <Badge variant="outline" className="text-[8px] font-black px-1.5 py-0.2 rounded bg-primary/10 text-primary border-transparent uppercase tracking-wider">
+                              {course.type || "FREE"}
+                            </Badge>
+                          </div>
+                        </td>
+
+                        {/* Lessons */}
+                        <td className="px-8 py-6 text-sm font-bold text-muted-foreground/80">
+                          {lessonsCount} {lessonsCount === 1 ? "Lesson" : "Lessons"}
+                        </td>
+
+                        {/* Students */}
+                        <td className="px-8 py-6 text-sm font-bold text-muted-foreground/80">
+                          {studentsCount} {studentsCount === 1 ? "Learner" : "Learners"}
+                        </td>
+
+                        {/* Price */}
+                        <td className="px-8 py-6 text-sm font-bold text-foreground">
+                          {course.price > 0 ? `$${course.price.toFixed(2)}` : "Free"}
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-8 py-6">
+                          <Badge className={cn(
+                            "rounded-lg border px-2.5 py-0.5 text-[9px] font-bold tracking-wide uppercase shadow-sm border-none text-white",
+                            course.isPublished
+                              ? "bg-emerald-500 hover:bg-emerald-500"
+                              : "bg-amber-500 hover:bg-amber-500"
+                          )}>
+                            {course.isPublished ? "Published" : "Draft"}
+                          </Badge>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-8 py-6 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Link href={`/admin/course/${course.id}`}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 rounded-lg text-xs font-bold gap-1 border-border/80 hover:bg-muted text-muted-foreground hover:text-foreground"
+                              >
+                                View Course
+                              </Button>
+                            </Link>
+
+                            <DropdownMenu>
+                              <DropdownMenuTrigger className="h-8 w-8 rounded-lg bg-background hover:bg-muted text-foreground flex items-center justify-center border border-border/80 cursor-pointer focus:outline-none">
+                                <MoreVertical className="w-4 h-4" />
+                              </DropdownMenuTrigger>
+
+                              <DropdownMenuContent className="w-48 p-1.5 rounded-xl border border-border bg-card shadow-lg" align="end">
+                                <DropdownMenuItem onClick={() => handleStartEdit(course)} className="rounded-lg cursor-pointer py-2 text-xs font-semibold gap-2">
+                                  <Edit className="w-4 h-4 text-muted-foreground" /> Edit Details
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handlePublishToggle(course.id)} className="rounded-lg cursor-pointer py-2 text-xs font-semibold gap-2">
+                                  <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                                  {course.isPublished ? "Revert to Draft" : "Publish Live"}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="my-1 bg-muted" />
+                                <DropdownMenuItem onClick={() => handleStartDelete(course)} className="rounded-lg cursor-pointer py-2 text-xs font-semibold text-destructive focus:bg-destructive/5 dark:focus:bg-destructive/15 gap-2">
+                                  <Trash2 className="w-4 h-4 text-destructive" /> Delete Course
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
 
           {/* Premium Pagination controls */}
           {coursesResponse?.meta?.totalPage && coursesResponse.meta.totalPage > 1 && (

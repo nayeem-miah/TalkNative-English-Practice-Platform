@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unescaped-entities */
+ 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client"
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useGetMeQuery } from "@/redux/api/auth-api"
 import { useGetCallHistoryQuery } from "@/redux/api/call-api"
+import { useGetMyCoursesQuery } from "@/redux/api/enrollment-api"
+import Image from "next/image"
 import { removeCookie } from "@/utils/cookie"
 import {
   ArrowRight,
@@ -34,9 +36,11 @@ export default function UserDashboardPage() {
 
   const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined, { skip: !mounted })
   const { data: callHistoryResponse, isLoading: isHistoryLoading } = useGetCallHistoryQuery(undefined, { skip: !mounted })
+  const { data: myCoursesResponse, isLoading: isCoursesLoading } = useGetMyCoursesQuery(undefined, { skip: !mounted })
 
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
   const calls = callHistoryResponse?.data || []
+  const myCourses = myCoursesResponse?.data || []
   const isLoggedIn = !!user && (userResponse?.success !== false)
 
   React.useEffect(() => {
@@ -60,7 +64,38 @@ export default function UserDashboardPage() {
     return "Good evening"
   }, [])
 
-  if (!mounted || isUserLoading || isHistoryLoading) {
+  // Load completed lesson counts from localStorage for each enrolled course
+  const courseProgressList = React.useMemo(() => {
+    if (!mounted || !myCourses) return []
+    return myCourses.map((course: any) => {
+      let completedCount = 0
+      try {
+        const saved = localStorage.getItem(`talknative_completed_${course.id}`)
+        if (saved) {
+          const ids = JSON.parse(saved)
+          if (Array.isArray(ids)) {
+            completedCount = ids.length
+          }
+        }
+      } catch (e) {
+        console.error(e)
+      }
+      const totalLessons = course._count?.lessons || 0
+      const percent = totalLessons > 0 ? Math.min(100, Math.round((completedCount / totalLessons) * 100)) : 0
+      return {
+        ...course,
+        completedCount,
+        totalLessons,
+        percent,
+      }
+    })
+  }, [mounted, myCourses])
+
+  const totalCompletedLessons = React.useMemo(() => {
+    return courseProgressList.reduce((acc: number, course: any) => acc + course.completedCount, 0)
+  }, [courseProgressList])
+
+  if (!mounted || isUserLoading || isHistoryLoading || isCoursesLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center gap-4">
         <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
@@ -92,7 +127,6 @@ export default function UserDashboardPage() {
   }, 0)
 
   const totalMinutes = Math.floor(totalSeconds / 60)
-  const totalHours = (totalSeconds / 3600).toFixed(1)
 
   // Map call history into recent partners format
   const recentPartners = calls.slice(0, 3).map((call: any) => {
@@ -177,11 +211,11 @@ export default function UserDashboardPage() {
         <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm bg-white dark:bg-zinc-900/60 rounded-xl overflow-hidden">
           <CardContent className="p-5 flex items-center gap-4">
             <div className="h-10 w-10 rounded-lg bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-amber-500 dark:text-amber-400">
-              <Star className="h-4.5 w-4.5" />
+              <BookOpen className="h-4.5 w-4.5" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-xs font-semibold text-zinc-450 uppercase tracking-wider">Avg. Rating</p>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-white">5.0</p>
+              <p className="text-xs font-semibold text-zinc-450 uppercase tracking-wider">Enrolled Courses</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{myCourses.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -192,8 +226,8 @@ export default function UserDashboardPage() {
               <Award className="h-4.5 w-4.5" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-xs font-semibold text-zinc-450 uppercase tracking-wider">Level</p>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-white">Intermediate</p>
+              <p className="text-xs font-semibold text-zinc-450 uppercase tracking-wider">Completed Lessons</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-white">{totalCompletedLessons}</p>
             </div>
           </CardContent>
         </Card>
@@ -224,6 +258,86 @@ export default function UserDashboardPage() {
               </div>
             </div>
           </Card>
+
+          {/* Active Courses Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between px-1">
+              <div className="space-y-0.5">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-white font-sans">Active Courses</h3>
+                <p className="text-xs text-zinc-400 font-medium">Your course enrollment and learning progress</p>
+              </div>
+              <Link href="/dashboard/my-courses" className="text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                All My Courses <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
+            {courseProgressList.length === 0 ? (
+              <Card className="border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm rounded-xl bg-white dark:bg-zinc-900/60">
+                <CardContent className="p-8 text-center space-y-4">
+                  <BookOpen className="h-8 w-8 text-zinc-300 dark:text-zinc-700 mx-auto" />
+                  <div className="space-y-1">
+                    <p className="text-sm text-zinc-550 dark:text-zinc-400 font-bold">No enrolled courses yet</p>
+                    <p className="text-xs text-zinc-400 max-w-sm mx-auto font-medium">
+                      Unlock structured speaking curriculum, lessons, and practice materials.
+                    </p>
+                  </div>
+                  <Link href="/courses">
+                    <Button variant="outline" size="sm" className="rounded-lg font-bold text-xs cursor-pointer mt-1">
+                      Browse Course Catalog
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {courseProgressList.slice(0, 2).map((course: any) => (
+                  <Card key={course.id} className="border border-zinc-200/60 dark:border-zinc-800/60 shadow-sm rounded-xl bg-white dark:bg-zinc-900/60 overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors flex flex-col">
+                    <div className="relative aspect-video w-full bg-muted overflow-hidden flex-shrink-0">
+                      <Image
+                        fill
+                        src={course.thumbnail || "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&auto=format&fit=crop&q=60"}
+                        alt={course.title}
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                    <CardContent className="p-4 flex flex-col justify-between flex-1 space-y-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          <Badge variant="outline" className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20">
+                            {course.level}
+                          </Badge>
+                          <Badge variant="outline" className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-primary/5 text-primary border-primary/20">
+                            {course.type || "FREE"}
+                          </Badge>
+                        </div>
+                        <h4 className="font-extrabold text-sm text-zinc-900 dark:text-white leading-tight font-sans line-clamp-1">
+                          {course.title}
+                        </h4>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-[11px] font-bold">
+                          <span className="text-zinc-450">{course.completedCount}/{course.totalLessons} Lessons</span>
+                          <span className="text-primary">{course.percent}% completed</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full" style={{ width: `${course.percent}%` }} />
+                        </div>
+                      </div>
+
+                      <Link href={`/courses/${course.id}`} className="w-full">
+                        <Button className="w-full h-9 rounded-lg font-bold text-xs cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1.5">
+                          Continue Learning
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* List of recent speaking sessions */}
           <div className="space-y-4">

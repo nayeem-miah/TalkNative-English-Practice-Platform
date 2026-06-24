@@ -80,7 +80,7 @@ export default function AdminLayout({
           >
             <Menu className="h-6 w-6" />
           </button>
-          <span className="font-bold text-sm text-zinc-900 dark:text-white">TalkNative Admin</span>
+          <span className="font-black text-base tracking-tight bg-gradient-to-r from-primary via-emerald-600 to-teal-500 dark:from-primary dark:via-cyan-400 dark:to-emerald-400 bg-clip-text text-transparent">TalkNative Admin</span>
           <div className="w-10" />
         </header>
 
