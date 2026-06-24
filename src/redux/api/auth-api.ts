@@ -44,12 +44,12 @@ export const authApi = baseApi.injectEndpoints({
           // (backend sets httpOnly cookie which JS cannot read,
           //  and also sets accessToken_js which JS CAN read)
           if (accessToken && typeof window !== "undefined") {
-            try { localStorage.setItem("accessToken", accessToken); } catch (e) {}
+            try { localStorage.setItem("accessToken", accessToken); } catch {}
           }
           if (refreshToken && typeof window !== "undefined") {
-            try { localStorage.setItem("refreshToken", refreshToken); } catch (e) {}
+            try { localStorage.setItem("refreshToken", refreshToken); } catch {}
           }
-        } catch (err) {}
+        } catch {}
       },
     }),
     logout: builder.mutation<any, void>({
@@ -61,7 +61,7 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled }) {
         try {
           await queryFulfilled;
-        } catch (err) {}
+        } catch {}
         // Always clear all token storage regardless of API result
         removeCookie("accessToken");
         removeCookie("refreshToken");
@@ -70,7 +70,7 @@ export const authApi = baseApi.injectEndpoints({
           try {
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
-          } catch (e) {}
+          } catch {}
         }
       },
     }),

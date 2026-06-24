@@ -150,12 +150,11 @@ export function Testimonials() {
 
   const maxIndex = Math.max(0, testimonials.length - itemsPerPage);
 
-  // Auto-adjust activeIndex when itemsPerPage shifts to avoid empty overflow
-  React.useEffect(() => {
-    if (activeIndex > maxIndex) {
-      setActiveIndex(maxIndex);
-    }
-  }, [itemsPerPage, activeIndex, maxIndex]);
+  // Directly adjust activeIndex during rendering if it exceeds maxIndex
+  const safeActiveIndex = Math.min(activeIndex, maxIndex);
+  if (activeIndex > maxIndex) {
+    setActiveIndex(maxIndex);
+  }
 
   const nextSlide = () => {
     setActiveIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
@@ -182,7 +181,7 @@ export function Testimonials() {
           <div
             className="flex transition-transform duration-500 ease-in-out"
             style={{
-              transform: `translateX(-${activeIndex * (100 / itemsPerPage)}%)`,
+              transform: `translateX(-${safeActiveIndex * (100 / itemsPerPage)}%)`,
             }}
           >
             {testimonials.map((t, i) => (
@@ -196,7 +195,7 @@ export function Testimonials() {
                         ))}
                       </div>
                       <p className="text-muted-foreground text-xs leading-relaxed text-left italic">
-                        "{t.feedback}"
+                        &ldquo;{t.feedback}&rdquo;
                       </p>
                     </div>
 
@@ -234,7 +233,7 @@ export function Testimonials() {
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  activeIndex === idx ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  safeActiveIndex === idx ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
                 }`}
               />
             ))}

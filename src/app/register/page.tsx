@@ -24,7 +24,9 @@ export default function RegisterPage() {
 
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => {
-    setMounted(true)
+    setTimeout(() => {
+      setMounted(true)
+    }, 0)
   }, [])
 
   const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined, {
@@ -81,8 +83,9 @@ export default function RegisterPage() {
         toast.success("Account created successfully!", { id: toastId })
         router.push(`/verify-user?email=${formData.email}`)
       }
-    } catch (err: any) {
-      const errorMessage = err?.data?.message || "Something went wrong during registration"
+    } catch (err) {
+      const error = err as { data?: { message?: string } };
+      const errorMessage = error?.data?.message || "Something went wrong during registration"
 
       // If user already exists, redirect to verification or login
       if (errorMessage.toLowerCase().includes("already exist")) {
@@ -222,22 +225,4 @@ export default function RegisterPage() {
   )
 }
 
-function CircleDecoration() {
-  return (
-    <svg viewBox="0 0 200 200" className="w-full h-full text-primary/20 fill-current">
-      <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="0.5" fill="none" />
-      <circle cx="100" cy="100" r="40" opacity="0.1" />
-      <path d="M100,20 L100,180 M20,100 L180,100" stroke="currentColor" strokeWidth="0.2" />
-    </svg>
-  )
-}
 
-function SquareDecoration() {
-  return (
-    <svg viewBox="0 0 200 200" className="w-full h-full text-accent/20 fill-current">
-      <rect x="40" y="40" width="120" height="120" rx="20" stroke="currentColor" strokeWidth="0.5" fill="none" />
-      <rect x="70" y="70" width="60" height="60" rx="10" opacity="0.1" />
-      <path d="M40,40 L160,160 M160,40 L40,160" stroke="currentColor" strokeWidth="0.2" />
-    </svg>
-  )
-}

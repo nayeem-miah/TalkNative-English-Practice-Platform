@@ -1,9 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardTitle } from "@/components/ui/card"
+import { Card, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { ShieldCheck, Headphones, Mail, ArrowLeft } from "lucide-react"
+import { ShieldCheck, Mail, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
 
@@ -76,8 +76,9 @@ function VerifyUserContent() {
                 toast.success("Account verified successfully!", { id: toastId })
                 router.push("/login")
             }
-        } catch (err: any) {
-            toast.error(err?.data?.message || "Verification failed", { id: toastId })
+        } catch (err) {
+            const error = err as { data?: { message?: string } };
+            toast.error(error?.data?.message || "Verification failed", { id: toastId })
         }
     }
 
@@ -91,8 +92,9 @@ function VerifyUserContent() {
                 toast.success("Verification code resent!", { id: toastId })
                 setTimer(120) // Reset timer to 2 minutes
             }
-        } catch (err: any) {
-            toast.error(err?.data?.message || "Failed to resend code", { id: toastId })
+        } catch (err) {
+            const error = err as { data?: { message?: string } };
+            toast.error(error?.data?.message || "Failed to resend code", { id: toastId })
         }
     }
 
@@ -104,7 +106,7 @@ function VerifyUserContent() {
             <div className="z-10 w-full max-w-md space-y-8">
                 {/* Logo Section */}
                 <div className="text-center space-y-1">
-                    <h1 className="text-3xl font-heading font-bold tracking-tight text-foreground">TalkNative</h1>
+                    <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-primary via-emerald-600 to-teal-500 dark:from-primary dark:via-cyan-400 dark:to-emerald-400 bg-clip-text text-transparent">TalkNative</h1>
                     <p className="text-[10px] font-bold text-primary tracking-[0.3em] uppercase opacity-80">Secure Verification</p>
                 </div>
 
@@ -118,12 +120,13 @@ function VerifyUserContent() {
                         <div className="space-y-3">
                             <CardTitle className="text-2xl sm:text-3xl font-heading font-bold">Check your email</CardTitle>
                             <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                                We've sent a 6-digit verification code to <span className="text-foreground font-bold italic">{email || "your email"}</span>.
+                                {"We've sent a 6-digit verification code to "}
+                                <span className="text-foreground font-bold italic">{email || "your email"}</span>.
                             </p>
                         </div>
 
                         {/* OTP Inputs */}
-                        <div className="flex gap-2 sm:gap-3 justify-center py-2">
+                        <div className="flex gap-2 sm:gap-2.5 justify-center py-2">
                             {otp.map((digit, idx) => (
                                 <Input
                                     key={idx}
@@ -132,7 +135,7 @@ function VerifyUserContent() {
                                     value={digit}
                                     onChange={(e) => handleOtpChange(idx, e.target.value)}
                                     onPaste={handlePaste}
-                                    className="w-10 h-14 sm:w-16 sm:h-20 text-center text-xl sm:text-2xl font-bold rounded-2xl border-none bg-muted dark:bg-zinc-800 text-foreground focus:ring-2 focus:ring-primary/40 transition-all"
+                                    className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-bold rounded-xl border border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900/50 text-foreground focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all"
                                     maxLength={1}
                                     disabled={isVerifying}
                                 />
@@ -150,7 +153,7 @@ function VerifyUserContent() {
 
                         {/* Resend & Timer */}
                         <div className="w-full flex items-center justify-between px-2">
-                            <p className="text-[11px] font-bold text-muted-foreground leading-tight text-left">Didn't receive the<br />code?</p>
+                            <p className="text-[11px] font-bold text-muted-foreground leading-tight text-left">{"Didn't receive the"}<br />code?</p>
                             <div className="flex items-center gap-4">
                                 <button 
                                     onClick={handleResend}

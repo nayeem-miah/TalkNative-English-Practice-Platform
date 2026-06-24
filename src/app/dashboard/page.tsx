@@ -40,7 +40,9 @@ export default function UserDashboardPage() {
 
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
   const calls = callHistoryResponse?.data || []
-  const myCourses = myCoursesResponse?.data || []
+  const myCourses = React.useMemo(() => {
+    return myCoursesResponse?.data || []
+  }, [myCoursesResponse?.data])
   const isLoggedIn = !!user && (userResponse?.success !== false)
 
   React.useEffect(() => {

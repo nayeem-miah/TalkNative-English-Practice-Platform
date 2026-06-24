@@ -28,7 +28,9 @@ export function HeroContent() {
   }, [allUsersResponse])
 
   React.useEffect(() => {
-    setMounted(true)
+    setTimeout(() => {
+      setMounted(true)
+    }, 0)
   }, [])
 
   return (

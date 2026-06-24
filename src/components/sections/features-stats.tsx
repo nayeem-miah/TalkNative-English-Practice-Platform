@@ -9,7 +9,9 @@ export function FeaturesStats() {
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true);
+    setTimeout(() => {
+      setMounted(true);
+    }, 0);
   }, []);
 
   // Fetch dynamic total users count

@@ -23,7 +23,7 @@ export default function NotFound() {
           Page not found
         </h1>
         <p className="mt-6 text-lg font-medium leading-7 text-muted-foreground max-w-lg mx-auto">
-          Sorry, we couldn't find the page you're looking for. It might have been moved, deleted, or never existed.
+          {"Sorry, we couldn't find the page you're looking for. It might have been moved, deleted, or never existed."}
         </p>
         
         <div className="mt-10 flex items-center justify-center gap-x-6">

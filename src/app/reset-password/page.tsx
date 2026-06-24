@@ -83,8 +83,9 @@ function ResetPasswordForm() {
             const res = await resetPassword({ token, password }).unwrap()
             toast.success(res?.message || "Password reset successful!", { id: toastId })
             router.push("/login")
-        } catch (error: any) {
-            toast.error(error?.data?.message || "Failed to reset password. Token might be expired.", { id: toastId })
+        } catch (error) {
+            const err = error as { data?: { message?: string } };
+            toast.error(err?.data?.message || "Failed to reset password. Token might be expired.", { id: toastId })
         }
     }, [token, isValid, password, resetPassword, router])
 

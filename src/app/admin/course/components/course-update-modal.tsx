@@ -67,16 +67,18 @@ export function CourseUpdateModal({
   // Load course details when it is selected for editing
   useEffect(() => {
     if (open && course) {
-      setNewCourse({
-        title: course.title,
-        description: course.description || "",
-        level: course.level || "BEGINNER",
-        type: course.type || "PAID",
-        price: course.price || 0,
-        file: null
-      })
-      setPreviewUrl(course.thumbnail || null)
-      setErrors({})
+      setTimeout(() => {
+        setNewCourse({
+          title: course.title,
+          description: course.description || "",
+          level: course.level || "BEGINNER",
+          type: course.type || "PAID",
+          price: course.price || 0,
+          file: null
+        })
+        setPreviewUrl(course.thumbnail || null)
+        setErrors({})
+      }, 0)
     }
   }, [open, course])
 

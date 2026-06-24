@@ -92,10 +92,10 @@ function LoginContent() {
         // Save to localStorage as reliable fallback for base-api prepareHeaders
         // (backend already set httpOnly accessToken + non-httpOnly accessToken_js via Set-Cookie)
         if (accessToken) {
-          try { localStorage.setItem("accessToken", accessToken) } catch (e) {}
+          try { localStorage.setItem("accessToken", accessToken) } catch {}
         }
         if (refreshToken) {
-          try { localStorage.setItem("refreshToken", refreshToken) } catch (e) {}
+          try { localStorage.setItem("refreshToken", refreshToken) } catch {}
         }
 
         toast.success("Logged in successfully!", { id: toastId })
@@ -137,10 +137,10 @@ function LoginContent() {
         const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || res?.refreshToken
 
         if (accessToken) {
-          try { localStorage.setItem("accessToken", accessToken) } catch (e) {}
+          try { localStorage.setItem("accessToken", accessToken) } catch {}
         }
         if (refreshToken) {
-          try { localStorage.setItem("refreshToken", refreshToken) } catch (e) {}
+          try { localStorage.setItem("refreshToken", refreshToken) } catch {}
         }
 
         toast.success("Logged in successfully!", { id: toastId })
@@ -314,23 +314,4 @@ export default function LoginPage() {
     </React.Suspense>
   )
 }
-function MessageCircle3D() {
-  return (
-    <svg viewBox="0 0 200 200" className="w-full h-full text-primary/30 fill-current">
-      <circle cx="100" cy="100" r="80" opacity="0.1" />
-      <path d="M60,140 L40,160 L40,120 C30,100 30,70 50,50 C70,30 110,30 130,50 C150,70 150,110 130,130 C110,150 70,150 60,140 Z" />
-      <circle cx="100" cy="90" r="30" className="text-primary/40" />
-    </svg>
-  )
-}
 
-function Globe3D() {
-  return (
-    <svg viewBox="0 0 200 200" className="w-full h-full text-accent/30 fill-current">
-      <circle cx="100" cy="100" r="80" stroke="currentColor" strokeWidth="0.5" fill="none" />
-      <path d="M20,100 Q100,20 180,100 Q100,180 20,100" stroke="currentColor" strokeWidth="1" fill="none" />
-      <path d="M100,20 Q180,100 100,180 Q20,100 100,20" stroke="currentColor" strokeWidth="1" fill="none" />
-      <circle cx="100" cy="100" r="40" opacity="0.2" />
-    </svg>
-  )
-}

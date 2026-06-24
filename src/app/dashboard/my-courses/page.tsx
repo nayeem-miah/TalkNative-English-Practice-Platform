@@ -4,7 +4,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useGetMyCoursesQuery } from "@/redux/api/enrollment-api"
 import { ArrowRight, Book, BookOpen, Filter, Search } from "lucide-react"

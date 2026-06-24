@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
 import { AdminSidebar } from "@/components/layout/admin-sidebar"
@@ -6,6 +5,7 @@ import { useGetMeQuery } from "@/redux/api/auth-api"
 import { removeCookie } from "@/utils/cookie"
 import { Menu } from "lucide-react"
 import * as React from "react"
+import { ModeToggle } from "@/components/mode-toggle"
 
 export default function AdminLayout({
   children,
@@ -16,7 +16,9 @@ export default function AdminLayout({
   const [isMobileOpen, setIsMobileOpen] = React.useState(false)
 
   React.useEffect(() => {
-    setMounted(true)
+    setTimeout(() => {
+      setMounted(true)
+    }, 0)
   }, [])
 
   const { data: userResponse, isLoading } = useGetMeQuery(undefined, { skip: !mounted })
@@ -81,7 +83,7 @@ export default function AdminLayout({
             <Menu className="h-6 w-6" />
           </button>
           <span className="font-black text-base tracking-tight bg-gradient-to-r from-primary via-emerald-600 to-teal-500 dark:from-primary dark:via-cyan-400 dark:to-emerald-400 bg-clip-text text-transparent">TalkNative Admin</span>
-          <div className="w-10" />
+          <ModeToggle />
         </header>
 
         <div className="flex-1 max-w-[1600px] w-full mx-auto">

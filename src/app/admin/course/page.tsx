@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { BookOpen, Plus, Edit, ExternalLink, MoreVertical, Trash2 } from "lucide-react"
+import { Plus, Edit, ExternalLink, MoreVertical, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import Image from "next/image"

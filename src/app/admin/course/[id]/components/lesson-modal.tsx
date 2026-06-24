@@ -26,7 +26,7 @@ interface LessonModalProps {
   onSave: (payload: any) => Promise<void>
 }
 
-export function LessonModal({ open, onOpenChange, editingLesson, courseId, defaultOrder, onSave }: LessonModalProps) {
+export function LessonModal({ open, onOpenChange, editingLesson, defaultOrder, onSave }: LessonModalProps) {
   const [lessonForm, setLessonForm] = useState({
     title: "",
     content: "",
@@ -78,7 +78,7 @@ export function LessonModal({ open, onOpenChange, editingLesson, courseId, defau
       setIsSubmitting(true)
       await onSave(result.data)
       onOpenChange(false)
-    } catch (err: any) {
+    } catch {
       // Errors handled by parent component's toast notifications
     } finally {
       setIsSubmitting(false)

@@ -28,7 +28,6 @@ import {
     ShieldCheck,
     User as UserIcon
 } from "lucide-react"
-import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
 
@@ -41,7 +40,6 @@ export default function ProfilePage() {
     const { data: userResponse, isLoading } = useGetMeQuery(undefined, { skip: !mounted })
     const [logout] = useLogoutMutation()
     const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation()
-    const router = useRouter()
 
     const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
     const isLoggedIn = !!user && (userResponse?.success !== false)
@@ -152,8 +150,9 @@ export default function ProfilePage() {
                 setIsEditModalOpen(false)
                 setFormData(prev => ({ ...prev, oldPassword: "", newPassword: "" }))
             }
-        } catch (err: any) {
-            toast.error(err?.data?.message || "Failed to update profile")
+        } catch (err) {
+            const error = err as { data?: { message?: string } };
+            toast.error(error?.data?.message || "Failed to update profile")
         }
     }
 
@@ -161,7 +160,7 @@ export default function ProfilePage() {
         try {
             await logout(undefined).unwrap()
             window.location.href = "/login"
-        } catch (err) {
+        } catch {
             window.location.href = "/login"
         }
     }

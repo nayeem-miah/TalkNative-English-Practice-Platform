@@ -75,11 +75,6 @@ export function Faq() {
     (faq) => activeCategory === "all" || faq.category === activeCategory
   );
 
-  // Close open accordions when changing categories
-  React.useEffect(() => {
-    setOpenQuestion(null);
-  }, [activeCategory]);
-
   const leftColumnFaqs = filteredFaqs.filter((_, idx) => idx % 2 === 0);
   const rightColumnFaqs = filteredFaqs.filter((_, idx) => idx % 2 !== 0);
 
@@ -103,7 +98,10 @@ export function Faq() {
             return (
               <button
                 key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
+                onClick={() => {
+                  setActiveCategory(cat.id);
+                  setOpenQuestion(null);
+                }}
                 className={`h-9 px-4 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 border focus:outline-none ${
                   isActive
                     ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/10"

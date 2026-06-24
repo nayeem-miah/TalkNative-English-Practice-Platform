@@ -27,8 +27,9 @@ export default function ForgotPasswordPage() {
             const res = await forgotPassword({ email }).unwrap()
             setIsSubmitted(true)
             toast.success(res?.message || "Reset link sent to your email!", { id: toastId })
-        } catch (error: any) {
-            toast.error(error?.data?.message || "Failed to send reset link. Please try again.", { id: toastId })
+        } catch (error) {
+            const err = error as { data?: { message?: string } };
+            toast.error(err?.data?.message || "Failed to send reset link. Please try again.", { id: toastId })
         }
     }, [email, forgotPassword])
 

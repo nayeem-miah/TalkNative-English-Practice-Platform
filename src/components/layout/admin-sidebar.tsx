@@ -18,7 +18,6 @@ import {
   Book,
   ChevronLeft,
   ChevronRight,
-  FileText,
   LayoutDashboard,
   LogOut,
   MoreHorizontal,
@@ -36,8 +35,6 @@ const menuItems = [
   { name: "Enrollment", icon: Book, href: "/admin/enrollment" },
   { name: "Moderation", icon: ShieldAlert, href: "/admin/moderation" },
   { name: "Analytics", icon: BarChart3, href: "/admin/analytics" },
-  { name: "Resources", icon: FileText, href: "/admin/resources" },
-  { name: "Reports", icon: FileText, href: "/admin/reports" },
 ]
 
 interface AdminSidebarProps {
@@ -56,11 +53,11 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: AdminSidebarProps)
   const handleLogout = async () => {
     try {
       await logout(undefined).unwrap()
-    } catch (err) {}
+    } catch {}
     removeCookie("accessToken")
     removeCookie("refreshToken")
-    try { localStorage.removeItem("accessToken") } catch (e) {}
-    try { localStorage.removeItem("refreshToken") } catch (e) {}
+    try { localStorage.removeItem("accessToken") } catch {}
+    try { localStorage.removeItem("refreshToken") } catch {}
     window.location.href = "/login"
   }
 
@@ -84,6 +81,9 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: AdminSidebarProps)
             </span>
           )}
         </Link>
+        <div className={cn(isCollapsed ? "mx-auto" : "")}>
+          <ModeToggle />
+        </div>
       </div>
 
       {/* Navigation */}
@@ -180,10 +180,6 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: AdminSidebarProps)
         )}
 
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 mb-2">
-            <ModeToggle />
-            {!isCollapsed && <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Appearance</span>}
-          </div>
 
           <Button
             variant="ghost"

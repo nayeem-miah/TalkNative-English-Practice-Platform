@@ -29,7 +29,7 @@ export default function Error({
         
         <p className="text-base font-bold text-destructive uppercase tracking-widest">Something went wrong</p>
         <h1 className="mt-4 text-4xl font-heading font-bold tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
-          We've encountered a problem
+          {"We've encountered a problem"}
         </h1>
         <p className="mt-6 text-lg font-medium leading-7 text-muted-foreground">
           An unexpected error occurred while processing your request. Our team has been notified and is working on a fix.

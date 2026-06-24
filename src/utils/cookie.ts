@@ -37,7 +37,7 @@ export const getCookie = (name: string) => {
         setCookie(name, localVal);
         return localVal;
       }
-    } catch (e) {
+    } catch {
       // Ignore
     }
   }
@@ -61,7 +61,7 @@ export const removeCookie = (name: string) => {
     if (typeof window !== "undefined") {
       try {
         localStorage.removeItem(n);
-      } catch (e) {
+      } catch {
         // Ignore
       }
     }

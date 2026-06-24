@@ -5,11 +5,9 @@ import {
   Phone,
   Clock,
   Star,
-  LayoutDashboard,
   Video,
   ChevronLeft,
-  Calendar,
-  Sparkles
+  Calendar
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,10 +17,38 @@ import { useGetMeQuery } from "@/redux/api/auth-api"
 import { useGetCallHistoryQuery } from "@/redux/api/call-api"
 import { removeCookie } from "@/utils/cookie"
 
+interface SpeakPartner {
+  name?: string;
+  profilePicture?: string;
+}
+
+interface CallRecord {
+  id: string;
+  callerId: string;
+  callee?: SpeakPartner;
+  caller?: SpeakPartner;
+  startTime: string;
+  endTime: string;
+  duration?: number;
+}
+
+interface MappedCall {
+  id: string;
+  name: string;
+  language: string;
+  duration: string;
+  rating: number;
+  dateStr: string;
+  timeStr: string;
+  image: string;
+}
+
 export default function CallHistoryPage() {
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => {
-    setMounted(true)
+    setTimeout(() => {
+      setMounted(true)
+    }, 0)
   }, [])
 
   const { data: userResponse, isLoading: isUserLoading } = useGetMeQuery(undefined, { skip: !mounted })
@@ -63,7 +89,7 @@ export default function CallHistoryPage() {
   }
 
   // Map call history into recent partners format
-  const mappedCalls = calls.map((call: any) => {
+  const mappedCalls = (calls as CallRecord[]).map((call: CallRecord): MappedCall => {
     const isCaller = call.callerId === user?.id
     const partner = isCaller ? call.callee : call.caller
     
@@ -144,7 +170,7 @@ export default function CallHistoryPage() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {mappedCalls.map((partner: any) => (
+            {mappedCalls.map((partner: MappedCall) => (
               <Card key={partner.id} className="border-none shadow-sm rounded-2xl bg-white dark:bg-zinc-900 hover:shadow-md transition-all border border-zinc-100 dark:border-zinc-800 group overflow-hidden">
                 <CardContent className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   {/* Left Column: Avatar & Profile */}

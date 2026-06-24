@@ -63,11 +63,11 @@ export default function DashboardLayout({
   const handleLogout = async () => {
     try {
       await logout(undefined).unwrap()
-    } catch (err) {}
+    } catch {}
     removeCookie("accessToken")
     removeCookie("refreshToken")
-    try { localStorage.removeItem("accessToken") } catch (e) {}
-    try { localStorage.removeItem("refreshToken") } catch (e) {}
+    try { localStorage.removeItem("accessToken") } catch {}
+    try { localStorage.removeItem("refreshToken") } catch {}
     window.location.href = "/login"
   }
 
@@ -93,6 +93,9 @@ export default function DashboardLayout({
             </span>
           )}
         </Link>
+        <div className={cn(isCollapsed ? "mx-auto" : "")}>
+          <ModeToggle />
+        </div>
       </div>
 
       {/* Navigation */}
@@ -188,10 +191,6 @@ export default function DashboardLayout({
         )}
 
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 mb-2">
-            <ModeToggle />
-            {!isCollapsed && <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Appearance</span>}
-          </div>
 
           <Button
             variant="ghost"
@@ -243,12 +242,12 @@ export default function DashboardLayout({
         <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 flex items-center px-4 sm:px-6 lg:hidden justify-between w-full flex-shrink-0">
           <button
             onClick={() => setIsMobileOpen(true)}
-            className="p-2 -ml-2 rounded-lg hover:bg-muted text-zinc-500 dark:text-zinc-400 cursor-pointer"
+            className="p-2 -ml-2 rounded-lg hover:bg-muted text-zinc-550 dark:text-zinc-400 cursor-pointer"
           >
             <Menu className="h-5 w-5" />
           </button>
           <span className="font-bold text-sm text-zinc-900 dark:text-white">TalkNative Dashboard</span>
-          <div className="w-10" />
+          <ModeToggle />
         </header>
 
         <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-10">
