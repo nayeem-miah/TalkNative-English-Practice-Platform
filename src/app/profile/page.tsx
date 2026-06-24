@@ -1,3 +1,6 @@
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -9,13 +12,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useGetMeQuery, useLogoutMutation, useUpdateProfileMutation } from "@/redux/api/auth-api"
+import { removeCookie } from "@/utils/cookie"
 import {
     Activity,
     CalendarDays,
+    Camera,
     Clock,
     Edit,
     Globe,
     Languages,
+    Loader2,
     LogOut,
     Mail,
     Phone,
@@ -25,7 +31,6 @@ import {
 import { useRouter } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
-import { removeCookie } from "@/utils/cookie"
 
 export default function ProfilePage() {
     const [mounted, setMounted] = React.useState(false)
@@ -50,6 +55,7 @@ export default function ProfilePage() {
     }, [mounted, isLoading, isLoggedIn])
 
     const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
+    const [isUpdatingPhoto, setIsUpdatingPhoto] = React.useState(false)
     const [formData, setFormData] = React.useState({
         name: "",
         phone: "",
@@ -79,6 +85,45 @@ export default function ProfilePage() {
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
+    const handleProfilePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("Image size must be less than 5MB.")
+            return
+        }
+
+        setIsUpdatingPhoto(true)
+        const toastId = toast.loading("Uploading profile picture...")
+
+        try {
+            const fd = new FormData()
+            fd.append("file", file)
+
+            const textData = {
+                name: user?.name || "",
+                phone: user?.phone || user?.Phone || "",
+                nativeLanguage: user?.nativeLanguage || "Bengali",
+                learningLanguage: user?.learningLanguage || "English",
+                bio: user?.bio || ""
+            }
+            fd.append("data", JSON.stringify(textData))
+
+            const res = await updateProfile(fd).unwrap()
+            if (res?.success || res?.statusCode === 201 || res?.statusCode === 200) {
+                toast.success("Profile picture updated successfully!", { id: toastId })
+            } else {
+                toast.error("Failed to update profile picture.", { id: toastId })
+            }
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Failed to upload profile picture.", { id: toastId })
+        } finally {
+            setIsUpdatingPhoto(false)
+            e.target.value = ""
+        }
+    }
+
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
@@ -98,8 +143,11 @@ export default function ProfilePage() {
                 return toast.error("Please provide both old and new password to change it.")
             }
 
-            const res = await updateProfile(payload).unwrap()
-            if (res?.success) {
+            const fd = new FormData()
+            fd.append("data", JSON.stringify(payload))
+
+            const res = await updateProfile(fd).unwrap()
+            if (res?.success || res?.statusCode === 201 || res?.statusCode === 200) {
                 toast.success("Profile updated successfully!")
                 setIsEditModalOpen(false)
                 setFormData(prev => ({ ...prev, oldPassword: "", newPassword: "" }))
@@ -158,17 +206,45 @@ export default function ProfilePage() {
                             <CardContent className="pt-8 pb-6 px-6 flex flex-col items-center text-center">
                                 <div className="relative mb-4">
                                     <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl scale-110" />
-                                    <Avatar className="h-32 w-32 border-4 border-background relative shadow-lg">
-                                        <AvatarImage src={user.profilePicture || user.image} alt={user.name} />
-                                        <AvatarFallback className="bg-primary/5 text-primary text-4xl font-bold">
-                                            {user.name?.charAt(0).toUpperCase()}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    {user.isVerified && (
-                                        <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-1.5 border-2 border-background shadow-sm" title="Verified User">
-                                            <ShieldCheck className="h-4 w-4" />
-                                        </div>
-                                    )}
+                                    <div className="relative group w-32 h-32">
+                                        <Avatar className="h-32 w-32 border-4 border-background relative shadow-lg overflow-hidden">
+                                            <AvatarImage src={user.profilePicture || user.image} alt={user.name} className="object-cover w-full h-full" />
+                                            <AvatarFallback className="bg-primary/5 text-primary text-4xl font-bold">
+                                                {user.name?.charAt(0).toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
+
+                                        {/* Hover Overlay */}
+                                        {!isUpdatingPhoto ? (
+                                            <label
+                                                htmlFor="profile-photo-file-input"
+                                                className="absolute inset-0 rounded-full bg-black/65 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer text-white"
+                                            >
+                                                <Camera className="h-6 w-6 mb-1 text-white animate-pulse" />
+                                                <span className="text-[10px] font-black uppercase tracking-wider">Change Photo</span>
+                                            </label>
+                                        ) : (
+                                            <div className="absolute inset-0 rounded-full bg-black/65 flex flex-col items-center justify-center text-white">
+                                                <Loader2 className="h-6 w-6 text-white animate-spin mb-1" />
+                                                <span className="text-[10px] font-black uppercase tracking-wider">Uploading...</span>
+                                            </div>
+                                        )}
+
+                                        <input
+                                            id="profile-photo-file-input"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleProfilePictureChange}
+                                            className="hidden"
+                                            disabled={isUpdatingPhoto}
+                                        />
+
+                                        {user.isVerified && (
+                                            <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-1.5 border-2 border-background shadow-sm z-10" title="Verified User">
+                                                <ShieldCheck className="h-4 w-4" />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <h1 className="text-2xl font-heading font-bold mb-1">{user.name}</h1>
@@ -256,7 +332,7 @@ export default function ProfilePage() {
                                                             className="rounded-xl h-12 bg-muted/50 border-transparent focus:border-primary focus:ring-primary/20"
                                                         />
                                                     </div>
-                                                    
+
                                                     <datalist id="languages">
                                                         {[
                                                             "Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Azerbaijani", "Basque", "Belarusian", "Bengali", "Bosnian", "Bulgarian", "Catalan", "Cebuano", "Chichewa", "Chinese", "Corsican", "Croatian", "Czech", "Danish", "Dutch", "English", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "Frisian", "Galician", "Georgian", "German", "Greek", "Gujarati", "Haitian Creole", "Hausa", "Hawaiian", "Hebrew", "Hindi", "Hmong", "Hungarian", "Icelandic", "Igbo", "Indonesian", "Irish", "Italian", "Japanese", "Javanese", "Kannada", "Kazakh", "Khmer", "Kinyarwanda", "Korean", "Kurdish", "Kyrgyz", "Lao", "Latin", "Latvian", "Lithuanian", "Luxembourgish", "Macedonian", "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", "Mongolian", "Myanmar (Burmese)", "Nepali", "Norwegian", "Odia", "Pashto", "Persian", "Polish", "Portuguese", "Punjabi", "Romanian", "Russian", "Samoan", "Scots Gaelic", "Serbian", "Sesotho", "Shona", "Sindhi", "Sinhala", "Slovak", "Slovenian", "Somali", "Spanish", "Sundanese", "Swahili", "Swedish", "Tajik", "Tamil", "Tatar", "Telugu", "Thai", "Turkish", "Turkmen", "Ukrainian", "Urdu", "Uyghur", "Uzbek", "Vietnamese", "Welsh", "Xhosa", "Yiddish", "Yoruba", "Zulu"

@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { Languages } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 export function Footer() {
@@ -16,13 +15,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b pb-12">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-primary p-1.5 shadow-sm shadow-primary/20">
-                <Languages className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-2xl font-heading font-bold tracking-tight">TalkNative</span>
+                 <Link href="/" className="flex items-center gap-2">
+            <span className="font-black text-xl tracking-tight bg-gradient-to-r from-primary via-emerald-600 to-teal-500 dark:from-primary dark:via-cyan-400 dark:to-emerald-400 bg-clip-text text-transparent">
+              TalkNative
+            </span>
+          </Link>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
-              Empowering global voices through conversational AI and human connection. 
+              Empowering global voices through conversational AI and human connection.
               Practice anywhere, anytime.
             </p>
           </div>
