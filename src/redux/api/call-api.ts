@@ -19,7 +19,20 @@ export const callApi = baseApi.injectEndpoints({
     getCallHistory: builder.query({
       query: () => "/call/history",
     }),
+    getReports: builder.query({
+      query: () => ({
+        url: "/call/reports",
+        method: "GET",
+      }),
+      providesTags: ["Report"],
+    }),
   }),
 });
 
-export const { useCreateReportMutation, useCreateReviewMutation, useGetCallHistoryQuery } = callApi;
+export const {
+  useCreateReportMutation,
+  useCreateReviewMutation,
+  useGetCallHistoryQuery,
+  useGetReportsQuery,
+} = callApi;
+
