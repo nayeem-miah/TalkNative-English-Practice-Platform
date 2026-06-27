@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
@@ -8,79 +9,130 @@ import { cn } from "@/lib/utils"
 import { CheckCircle2, MoreVertical, Paperclip, Search, Send } from "lucide-react"
 import * as React from "react"
 
-// Mock Data
-const MOCK_USERS = [
-  { id: 1, name: "Alice Johnson", email: "alice@example.com", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=60", unread: 2, status: "online", lastMessage: "I need help with billing." },
-  { id: 2, name: "Bob Smith", email: "bob@example.com", avatar: "", unread: 0, status: "offline", lastMessage: "Thank you for the support!" },
-  { id: 3, name: "Charlie Davis", email: "charlie@example.com", avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&auto=format&fit=crop&q=60", unread: 1, status: "online", lastMessage: "Video player is not working." },
-]
+import { useGetMeQuery } from "@/redux/api/auth-api"
+import { useGetMessagesQuery, useGetTicketsQuery, useResolveTicketMutation, useMarkTicketReadMutation } from "@/redux/api/chat-api"
+import { Socket, io } from "socket.io-client"
 
 export default function AdminSupportPage() {
-  const [activeUser, setActiveUser] = React.useState(MOCK_USERS[0])
+  const { data: ticketsData, refetch: refetchTickets } = useGetTicketsQuery()
+  const tickets = ticketsData?.data || ticketsData?.result || []
+
+  const [activeTicket, setActiveTicket] = React.useState<any>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
-
-  // Store messages for each user ID
-  const [messagesByUser, setMessagesByUser] = React.useState<Record<number, any[]>>({
-    1: [
-      { id: 1, sender: "user", content: "Hi, I am Alice Johnson.", timestamp: "09:00 AM" },
-      { id: 2, sender: "user", content: "I need help with billing.", timestamp: "09:05 AM" }
-    ],
-    2: [
-      { id: 1, sender: "user", content: "Hi, I am Bob Smith.", timestamp: "09:00 AM" },
-      { id: 2, sender: "user", content: "Thank you for the support!", timestamp: "09:05 AM" }
-    ],
-    3: [
-      { id: 1, sender: "user", content: "Hi, I am Charlie Davis.", timestamp: "09:00 AM" },
-      { id: 2, sender: "user", content: "Video player is not working.", timestamp: "09:05 AM" }
-    ]
-  })
-
+  const [messages, setMessages] = React.useState<any[]>([])
+  
   const [inputValue, setInputValue] = React.useState("")
-  const [isTyping, setIsTyping] = React.useState(false)
+  const [socket, setSocket] = React.useState<Socket | null>(null)
+  const [isOtherTyping, setIsOtherTyping] = React.useState(false)
+  
   const endOfMessagesRef = React.useRef<HTMLDivElement>(null)
+  const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
-  const activeMessages = messagesByUser[activeUser.id] || []
+  const { data: userData } = useGetMeQuery()
+  const adminId = userData?.data?.id || userData?.result?.id
+
+  const { data: historyData } = useGetMessagesQuery(activeTicket?.id, { skip: !activeTicket?.id })
+  const [resolveTicket] = useResolveTicketMutation()
+  const [markTicketRead] = useMarkTicketReadMutation()
+
+  React.useEffect(() => {
+    if (activeTicket?.id && activeTicket?.unreadCount > 0) {
+      markTicketRead(activeTicket.id).unwrap().then(() => {
+        refetchTickets()
+      }).catch(console.error)
+    }
+  }, [activeTicket?.id, activeTicket?.unreadCount, markTicketRead, refetchTickets])
+
+  React.useEffect(() => {
+    if (historyData?.data) {
+      setMessages(historyData.data)
+    } else if (historyData?.result) {
+      setMessages(historyData.result)
+    } else {
+      setMessages([])
+    }
+  }, [historyData])
+
+  React.useEffect(() => {
+    let token = "";
+    if (typeof document !== "undefined") {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; accessToken_js=`);
+      if (parts.length === 2) {
+        token = parts.pop()?.split(";").shift() || "";
+      }
+    }
+    if (!token && typeof window !== "undefined") {
+      token = localStorage.getItem("accessToken") || "";
+    }
+    const cleanToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_API?.replace('/api/v1', '') || 'http://localhost:5000'
+
+    const newSocket = io(baseUrl, {
+      auth: { token: cleanToken }
+    })
+
+    setSocket(newSocket)
+
+    newSocket.on("newMessage", (msg) => {
+      setMessages(prev => [...prev, msg])
+      setIsOtherTyping(false) // stop typing when message received
+      refetchTickets()
+    })
+
+    newSocket.on("typingStart", (data) => {
+      if (data.senderId !== adminId) setIsOtherTyping(true)
+    })
+
+    newSocket.on("typingStop", (data) => {
+      if (data.senderId !== adminId) setIsOtherTyping(false)
+    })
+
+    return () => {
+      newSocket.disconnect()
+    }
+  }, [refetchTickets, adminId])
+
+  React.useEffect(() => {
+    if (socket && activeTicket?.id) {
+      socket.emit("joinTicket", activeTicket.id)
+    }
+  }, [socket, activeTicket?.id])
 
   React.useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [activeMessages, activeUser, isTyping])
+  }, [messages])
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() || !activeTicket || !adminId) return
 
-    const newMessage = {
-      id: Date.now(),
-      sender: "admin",
-      content: inputValue,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    }
-
-    setMessagesByUser(prev => ({
-      ...prev,
-      [activeUser.id]: [...(prev[activeUser.id] || []), newMessage]
-    }))
-
-    setInputValue("")
-    setIsTyping(true)
-
-    // Simulate auto reply from user after 2 seconds
-    setTimeout(() => {
-      setIsTyping(false)
-      const userReply = {
-        id: Date.now() + 1,
-        sender: "user",
-        content: "Understood. Thank you!",
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    if (socket) {
+      const msgPayload = {
+        ticketId: activeTicket.id,
+        senderId: adminId,
+        senderModel: "ADMIN",
+        content: inputValue
       }
-      setMessagesByUser(prev => ({
-        ...prev,
-        [activeUser.id]: [...(prev[activeUser.id] || []), userReply]
-      }))
-    }, 2000)
+
+      socket.emit("sendMessage", msgPayload)
+      setInputValue("")
+    }
   }
 
-  const filteredUsers = MOCK_USERS.filter(u => u.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  const handleResolve = async () => {
+    if (!activeTicket) return
+    try {
+      await resolveTicket(activeTicket.id).unwrap()
+      refetchTickets()
+      setActiveTicket(null)
+    } catch (error) {
+      console.error("Failed to resolve ticket", error)
+    }
+  }
+
+  const filteredTickets = tickets.filter((t: any) => t.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
 
   return (
     <div className="h-[calc(100vh-100px)] flex flex-col animate-in fade-in duration-500 pb-6">
@@ -112,35 +164,35 @@ export default function AdminSupportPage() {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto divide-y divide-border/50">
-            {filteredUsers.map((user) => (
+            {filteredTickets.map((ticket: any) => (
               <button
-                key={user.id}
-                onClick={() => setActiveUser(user)}
+                key={ticket.id}
+                onClick={() => setActiveTicket(ticket)}
                 className={cn(
                   "w-full p-4 flex items-start gap-3 text-left transition-colors hover:bg-muted/50",
-                  activeUser.id === user.id ? "bg-primary/5 border-l-2 border-l-primary" : "border-l-2 border-l-transparent"
+                  activeTicket?.id === ticket.id ? "bg-primary/5 border-l-2 border-l-primary" : "border-l-2 border-l-transparent"
                 )}
               >
                 <div className="relative">
                   <Avatar className="h-10 w-10 border border-border">
-                    <AvatarImage src={user.avatar} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-bold">{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={ticket.user?.profilePicture || ""} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-bold">{ticket.user?.name?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
                   <div className={cn(
                     "absolute bottom-0 right-0 h-2.5 w-2.5 border-2 border-card rounded-full",
-                    user.status === "online" ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
+                    ticket.status === "OPEN" ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
                   )} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-bold text-foreground truncate pr-2">{user.name}</p>
-                    {user.unread > 0 && (
+                    <p className="text-sm font-bold text-foreground truncate pr-2">{ticket.user?.name || "Unknown User"}</p>
+                    {ticket.unreadCount > 0 && (
                       <span className="flex-shrink-0 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                        {user.unread}
+                        {ticket.unreadCount}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">{user.lastMessage}</p>
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">{ticket.lastMessage || "No messages yet"}</p>
                 </div>
               </button>
             ))}
@@ -148,111 +200,136 @@ export default function AdminSupportPage() {
         </Card>
 
         {/* Right Area - Chat Window */}
-        <Card className="flex-1 flex flex-col overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-card">
-          {/* Chat Header */}
-          <div className="h-16 px-6 border-b border-border bg-muted/20 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10 border border-border shadow-sm">
-                <AvatarImage src={activeUser.avatar} />
-                <AvatarFallback className="bg-primary/10 text-primary font-bold">{activeUser.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-bold text-foreground leading-none">{activeUser.name}</p>
-                <p className="text-xs text-muted-foreground font-medium mt-1">{activeUser.email}</p>
+        <Card className="flex-1 flex flex-col overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-card relative">
+          {!activeTicket ? (
+            <div className="flex flex-col items-center justify-center h-full text-center opacity-70">
+              <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Send className="h-8 w-8 text-primary ml-1" />
               </div>
+              <h3 className="text-lg font-bold text-foreground">Select a ticket to view messages</h3>
+              <p className="text-sm text-muted-foreground mt-1 max-w-[250px]">
+                Choose a conversation from the sidebar to respond to users.
+              </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="h-8 text-xs font-semibold">
-                <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Resolve
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground">
-                <MoreVertical className="h-4.5 w-4.5" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Chat Messages Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-zinc-50/50 dark:bg-zinc-900/10">
-            <div className="flex justify-center">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border/50">
-                Ticket Opened Today
-              </span>
-            </div>
-
-            {activeMessages.map((msg) => {
-              const isAdmin = msg.sender === "admin"
-              return (
-                <div key={msg.id} className={`flex items-end gap-2 ${isAdmin ? "justify-end" : "justify-start"}`}>
-                  {!isAdmin && (
-                    <Avatar className="h-8 w-8 border border-border shrink-0 mb-1">
-                      <AvatarImage src={activeUser.avatar} />
-                      <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">{activeUser.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  )}
-
-                  <div className={`max-w-[75%] lg:max-w-[65%] flex flex-col ${isAdmin ? "items-end" : "items-start"}`}>
-                    <div
-                      className={`px-4 py-3 rounded-2xl ${
-                        isAdmin
-                          ? "bg-primary text-primary-foreground rounded-br-sm shadow-md shadow-primary/10"
-                          : "bg-white dark:bg-zinc-800 border border-border text-foreground rounded-bl-sm shadow-sm"
-                      }`}
-                    >
-                      <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
-                    </div>
-                    <span className="text-[10px] font-semibold text-muted-foreground mt-1.5 px-1">
-                      {msg.timestamp}
-                    </span>
+          ) : (
+            <>
+              {/* Chat Header */}
+              <div className="h-16 px-6 border-b border-border bg-muted/20 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 border border-border shadow-sm">
+                    <AvatarImage src={activeTicket.user?.profilePicture || ""} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-bold">{activeTicket.user?.name?.charAt(0) || "U"}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-bold text-foreground leading-none">{activeTicket.user?.name || "Unknown User"}</p>
+                    <p className="text-xs text-muted-foreground font-medium mt-1">{activeTicket.user?.email}</p>
                   </div>
                 </div>
-              )
-            })}
-
-            {/* Typing Indicator */}
-            {isTyping && (
-              <div className="flex items-end gap-2 justify-start animate-in fade-in duration-300">
-                <Avatar className="h-8 w-8 border border-border shrink-0 mb-1">
-                  <AvatarImage src={activeUser.avatar} />
-                  <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">{activeUser.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="bg-white dark:bg-zinc-800 border border-border text-foreground rounded-2xl rounded-bl-sm shadow-sm px-4 py-3.5 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                  <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                  <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={handleResolve} className="h-8 text-xs font-semibold">
+                    <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Resolve
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground">
+                    <MoreVertical className="h-4.5 w-4.5" />
+                  </Button>
                 </div>
               </div>
-            )}
 
-            <div ref={endOfMessagesRef} />
-          </div>
+              {/* Chat Messages Area */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-zinc-50/50 dark:bg-zinc-900/10">
+                {messages.length > 0 ? (
+                  <div className="flex justify-center">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border/50">
+                      Ticket Opened
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex justify-center mt-10">
+                    <p className="text-sm text-muted-foreground font-medium">No messages yet.</p>
+                  </div>
+                )}
 
-          {/* Chat Input Area */}
-          <div className="p-4 bg-card border-t border-border shrink-0">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-2 max-w-4xl mx-auto w-full">
-              <Button type="button" variant="ghost" size="icon" className="h-10 w-10 shrink-0 text-muted-foreground hover:bg-muted rounded-xl transition-colors">
-                <Paperclip className="h-5 w-5" />
-              </Button>
+                {messages.map((msg) => {
+                  const isAdmin = msg.senderModel === "ADMIN" || msg.isOptimistic
+                  return (
+                    <div key={msg.id} className={`flex items-end gap-2 ${isAdmin ? "justify-end" : "justify-start"}`}>
+                      {!isAdmin && (
+                        <Avatar className="h-8 w-8 border border-border shrink-0 mb-1">
+                          <AvatarImage src={activeTicket.user?.profilePicture || ""} />
+                          <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">{activeTicket.user?.name?.charAt(0) || "U"}</AvatarFallback>
+                        </Avatar>
+                      )}
 
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={`Reply to ${activeUser.name}...`}
-                  className="w-full h-11 px-4 rounded-xl border border-border bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-medium text-sm placeholder:text-muted-foreground/60"
-                />
+                      <div className={`max-w-[75%] lg:max-w-[65%] flex flex-col ${isAdmin ? "items-end" : "items-start"}`}>
+                        <div
+                          className={`px-4 py-3 rounded-2xl ${
+                            isAdmin
+                              ? "bg-primary text-primary-foreground rounded-br-sm shadow-md shadow-primary/10"
+                              : "bg-white dark:bg-zinc-800 border border-border text-foreground rounded-bl-sm shadow-sm"
+                          }`}
+                        >
+                          <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
+                        </div>
+                        <span className="text-[10px] font-semibold text-muted-foreground mt-1.5 px-1">
+                          {msg.timestamp || (msg.createdAt && new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+
+                <div ref={endOfMessagesRef} />
               </div>
 
-              <Button
-                type="submit"
-                disabled={!inputValue.trim()}
-                className="h-11 px-5 shrink-0 rounded-xl bg-primary text-primary-foreground font-bold shadow-md shadow-primary/10 transition-all hover:bg-primary/95 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
-              >
-                <Send className="h-4.5 w-4.5 mr-2" />
-                Reply
-              </Button>
-            </form>
-          </div>
+              {/* Typing Indicator */}
+              {isOtherTyping && (
+                <div className="flex items-end gap-2 justify-start animate-in fade-in duration-300 absolute bottom-24 left-6 z-10">
+                  <div className="bg-white dark:bg-zinc-800 border border-border text-foreground rounded-2xl rounded-bl-sm shadow-sm px-4 py-3.5 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </div>
+                </div>
+              )}
+
+              {/* Chat Input Area */}
+              <div className="p-4 bg-card border-t border-border shrink-0">
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2 max-w-4xl mx-auto w-full">
+                  <Button type="button" variant="ghost" size="icon" className="h-10 w-10 shrink-0 text-muted-foreground hover:bg-muted rounded-xl transition-colors">
+                    <Paperclip className="h-5 w-5" />
+                  </Button>
+
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => {
+                        setInputValue(e.target.value)
+                        if (socket && activeTicket) {
+                          socket.emit("typingStart", { ticketId: activeTicket.id, senderId: adminId })
+                          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+                          typingTimeoutRef.current = setTimeout(() => {
+                            socket.emit("typingStop", { ticketId: activeTicket.id, senderId: adminId })
+                          }, 1500)
+                        }
+                      }}
+                      placeholder={`Reply to ${activeTicket.user?.name || "User"}...`}
+                      className="w-full h-11 px-4 rounded-xl border border-border bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-medium text-sm placeholder:text-muted-foreground/60"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={!inputValue.trim()}
+                    className="h-11 px-5 shrink-0 rounded-xl bg-primary text-primary-foreground font-bold shadow-md shadow-primary/10 transition-all hover:bg-primary/95 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    <Send className="h-4.5 w-4.5 mr-2" />
+                    Reply
+                  </Button>
+                </form>
+              </div>
+            </>
+          )}
         </Card>
       </div>
     </div>

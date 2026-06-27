@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import * as React from "react"
-import { Megaphone, Bell, Calendar, ArrowRight, ShieldAlert, Star } from "lucide-react"
-import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { ArrowRight, Bell, Calendar, Megaphone, ShieldAlert, Star } from "lucide-react"
 
 import { useGetAnnouncementFeedQuery } from "@/redux/api/announcement-api"
 import { Loader2 } from "lucide-react"
@@ -44,14 +44,14 @@ export default function UserAnnouncementsPage() {
             const isFeature = announcement.category === "FEATURE_UPDATE"
             const isPromo = announcement.category === "PROMOTION"
             const displayDate = new Date(announcement.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
-            
+
             return (
-              <Card 
-                key={announcement.id} 
+              <Card
+                key={announcement.id}
                 className={cn(
                   "p-6 sm:p-8 border rounded-2xl shadow-sm transition-all hover:shadow-md relative overflow-hidden group",
-                  announcement.isUrgent 
-                    ? "border-red-200 dark:border-red-900/50 bg-red-50/30 dark:bg-red-900/10" 
+                  announcement.isUrgent
+                    ? "border-red-200 dark:border-red-900/50 bg-red-50/30 dark:bg-red-900/10"
                     : "border-zinc-200/80 dark:border-zinc-800/80 bg-card hover:border-primary/30"
                 )}
               >
@@ -62,7 +62,7 @@ export default function UserAnnouncementsPage() {
                      </div>
                   </div>
                 )}
-                
+
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                   <div className="shrink-0">
                     <div className={cn(
@@ -76,7 +76,7 @@ export default function UserAnnouncementsPage() {
                       {isPromo && <Megaphone className="h-5.5 w-5.5" />}
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3 flex-1">
                     <div>
                       <div className="flex items-center gap-3 mb-1">
@@ -99,11 +99,11 @@ export default function UserAnnouncementsPage() {
                         {announcement.title}
                       </h2>
                     </div>
-                    
+
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {announcement.content}
                     </p>
-                    
+
                     {isPromo && (
                       <div className="pt-2">
                         <span className="inline-flex items-center text-sm font-bold text-orange-600 dark:text-orange-400 cursor-pointer hover:underline underline-offset-4">

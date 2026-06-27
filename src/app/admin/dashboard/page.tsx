@@ -42,14 +42,6 @@ export default function AdminDashboardPage() {
     { name: "Total Revenue", value: `$${totalRevenue.toFixed(2)}`, status: "Stripe", icon: CreditCard, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-500/10" },
   ], [totalCourses, totalEnrollments, totalRevenue])
 
-  const modules = React.useMemo(() => [
-    { name: "Users", icon: Users, href: "/admin/users", status: "Live", isLive: true, color: "text-blue-500 bg-blue-50 dark:bg-blue-500/10" },
-    { name: "Courses", icon: Book, href: "/admin/course", status: "Live", isLive: true, color: "text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10" },
-    { name: "Enrollments", icon: CreditCard, href: "/admin/enrollment", status: "Live", isLive: true, color: "text-purple-500 bg-purple-50 dark:bg-purple-500/10" },
-    { name: "AI Moderation", icon: ShieldAlert, href: "/admin/moderation", status: "Preview", isLive: false, color: "text-rose-500 bg-rose-50 dark:bg-rose-500/10" },
-    { name: "Resources", icon: FileText, href: "/admin/resources", status: "Preview", isLive: false, color: "text-zinc-500 bg-zinc-100 dark:bg-zinc-800" },
-  ], [])
-
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center gap-4">

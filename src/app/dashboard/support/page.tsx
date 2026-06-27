@@ -1,58 +1,124 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import * as React from "react"
-import { Send, Paperclip, MoreVertical, ShieldAlert } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { MoreVertical, Paperclip, Send } from "lucide-react"
+import * as React from "react"
+
+import { useGetMessagesQuery, useGetUserTicketQuery, useMarkTicketReadMutation } from "@/redux/api/chat-api"
+import { useGetMeQuery } from "@/redux/api/auth-api"
+import { Socket, io } from "socket.io-client"
 
 export default function SupportPage() {
-  const [messages, setMessages] = React.useState([
-    {
-      id: 1,
-      sender: "admin",
-      content: "Hello! How can we help you today?",
-      timestamp: "10:00 AM",
-    }
-  ])
   const [inputValue, setInputValue] = React.useState("")
-  const [isTyping, setIsTyping] = React.useState(false)
+  const [messages, setMessages] = React.useState<any[]>([])
+  const [socket, setSocket] = React.useState<Socket | null>(null)
+  const [isOtherTyping, setIsOtherTyping] = React.useState(false)
+
   const endOfMessagesRef = React.useRef<HTMLDivElement>(null)
+  const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
+
+  // Fetch current user
+  const { data: userData } = useGetMeQuery()
+  const user = userData?.data || userData?.result
+
+  // Fetch active ticket for the user
+  const { data: ticketData, refetch: refetchTicket } = useGetUserTicketQuery()
+  const ticket = ticketData?.data || ticketData?.result
+  const ticketId = ticket?.id
+
+  // Fetch message history if ticket exists
+  const { data: historyData } = useGetMessagesQuery(ticketId, { skip: !ticketId })
+  const [markTicketRead] = useMarkTicketReadMutation()
+
+  React.useEffect(() => {
+    if (ticketId && ticket?.unreadCount > 0) {
+      markTicketRead(ticketId).unwrap().then(() => {
+        refetchTicket()
+      }).catch(console.error)
+    }
+  }, [ticketId, ticket?.unreadCount, markTicketRead, refetchTicket])
+
+  React.useEffect(() => {
+    if (historyData?.data) {
+      setMessages(historyData.data)
+    } else if (historyData?.result) {
+      setMessages(historyData.result)
+    }
+  }, [historyData])
+
+  React.useEffect(() => {
+    // Determine token
+    let token = "";
+    if (typeof document !== "undefined") {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; accessToken_js=`);
+      if (parts.length === 2) {
+        token = parts.pop()?.split(";").shift() || "";
+      }
+    }
+    if (!token && typeof window !== "undefined") {
+      token = localStorage.getItem("accessToken") || "";
+    }
+    const cleanToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_API?.replace('/api/v1', '') || 'http://localhost:5000'
+
+    const newSocket = io(baseUrl, {
+      auth: { token: cleanToken }
+    })
+
+    setSocket(newSocket)
+
+    if (ticketId) {
+      newSocket.emit("joinTicket", ticketId)
+    }
+
+    newSocket.on("newMessage", (msg) => {
+      setMessages(prev => [...prev, msg])
+      setIsOtherTyping(false)
+    })
+
+    newSocket.on("typingStart", (data) => {
+      if (data.senderId !== user?.id) setIsOtherTyping(true)
+    })
+
+    newSocket.on("typingStop", (data) => {
+      if (data.senderId !== user?.id) setIsOtherTyping(false)
+    })
+
+    return () => {
+      newSocket.disconnect()
+    }
+  }, [ticketId, user?.id])
 
   React.useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, isTyping])
+  }, [messages])
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!inputValue.trim()) return
+    if (!inputValue.trim() || !user?.id) return
 
-    // Add user message
-    const newMessage = {
-      id: Date.now(),
-      sender: "user",
-      content: inputValue,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    if (socket) {
+      const msgPayload = {
+        ticketId: ticketId || undefined,
+        senderId: user.id,
+        senderModel: "USER",
+        content: inputValue
+      }
+
+      socket.emit("sendMessage", msgPayload)
+      setInputValue("")
+      
+      // If we didn't have a ticket, refetch ticket shortly after sending so we capture the new active ticket
+      if (!ticketId) {
+        setTimeout(() => refetchTicket(), 1000)
+      }
     }
-    setMessages(prev => [...prev, newMessage])
-    setInputValue("")
-
-    // Start typing indicator
-    setIsTyping(true)
-
-    // Simulate auto reply from admin after 2 seconds
-    setTimeout(() => {
-      setIsTyping(false)
-      setMessages(prev => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          sender: "admin",
-          content: "Thank you for reaching out. A support agent will be with you shortly. (This is a simulated auto-response).",
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }
-      ])
-    }, 2000)
   }
 
   return (
@@ -85,14 +151,26 @@ export default function SupportPage() {
 
         {/* Chat Messages Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-zinc-50/50 dark:bg-zinc-900/10">
-          <div className="flex justify-center">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border/50">
-              Today
-            </span>
-          </div>
-          
+          {messages.length > 0 ? (
+            <div className="flex justify-center">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border/50">
+                Today
+              </span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full text-center opacity-70">
+              <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                <Send className="h-8 w-8 text-primary ml-1" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">Send a message to start</h3>
+              <p className="text-sm text-muted-foreground mt-1 max-w-[250px]">
+                Our support team is ready to help you with any questions.
+              </p>
+            </div>
+          )}
+
           {messages.map((msg) => {
-            const isUser = msg.sender === "user"
+            const isUser = msg.senderModel === "USER" || msg.isOptimistic
             return (
               <div key={msg.id} className={`flex items-end gap-2 ${isUser ? "justify-end" : "justify-start"}`}>
                 {!isUser && (
@@ -101,27 +179,27 @@ export default function SupportPage() {
                     <AvatarImage src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=60" />
                   </Avatar>
                 )}
-                
+
                 <div className={`max-w-[75%] lg:max-w-[65%] flex flex-col ${isUser ? "items-end" : "items-start"}`}>
-                  <div 
+                  <div
                     className={`px-4 py-3 rounded-2xl ${
-                      isUser 
-                        ? "bg-primary text-primary-foreground rounded-br-sm shadow-md shadow-primary/10" 
+                      isUser
+                        ? "bg-primary text-primary-foreground rounded-br-sm shadow-md shadow-primary/10"
                         : "bg-white dark:bg-zinc-800 border border-border text-foreground rounded-bl-sm shadow-sm"
                     }`}
                   >
                     <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
                   </div>
                   <span className="text-[10px] font-semibold text-muted-foreground mt-1.5 px-1">
-                    {msg.timestamp}
+                    {msg.timestamp || (msg.createdAt && new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
                   </span>
                 </div>
               </div>
             )
           })}
-          
+
           {/* Typing Indicator */}
-          {isTyping && (
+          {isOtherTyping && (
             <div className="flex items-end gap-2 justify-start animate-in fade-in duration-300">
               <Avatar className="h-8 w-8 border border-border shrink-0 mb-1">
                 <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">A</AvatarFallback>
@@ -144,19 +222,28 @@ export default function SupportPage() {
             <Button type="button" variant="ghost" size="icon" className="h-10 w-10 shrink-0 text-muted-foreground hover:bg-muted rounded-xl transition-colors">
               <Paperclip className="h-5 w-5" />
             </Button>
-            
+
             <div className="flex-1 relative">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={(e) => {
+                  setInputValue(e.target.value)
+                  if (socket && ticketId) {
+                    socket.emit("typingStart", { ticketId, senderId: user?.id })
+                    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current)
+                    typingTimeoutRef.current = setTimeout(() => {
+                      socket.emit("typingStop", { ticketId, senderId: user?.id })
+                    }, 1500)
+                  }
+                }}
                 placeholder="Type your message..."
                 className="w-full h-11 px-4 rounded-xl border border-border bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all font-medium text-sm placeholder:text-muted-foreground/60"
               />
             </div>
-            
-            <Button 
-              type="submit" 
+
+            <Button
+              type="submit"
               disabled={!inputValue.trim()}
               className="h-11 px-5 shrink-0 rounded-xl bg-primary text-primary-foreground font-bold shadow-md shadow-primary/10 transition-all hover:bg-primary/95 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
             >
