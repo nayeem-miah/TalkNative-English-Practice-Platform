@@ -36,6 +36,7 @@ import {
 } from "lucide-react"
 import * as React from "react"
 import { toast } from "sonner"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
 export default function UsersPage() {
   const [currentPage, setCurrentPage] = React.useState(1)
@@ -311,50 +312,20 @@ export default function UsersPage() {
             </tbody>
           </table>
         </CardContent>
-        <div className="p-8 border-t border-border flex items-center justify-between bg-muted/20">
+        <div className="p-4 border-t border-border flex items-center justify-between bg-muted/20">
           <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
             Global Registry • {isLoading ? "..." : totalUsersCount.toLocaleString()} total accounts monitored
           </p>
-          {totalPage > 1 && (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-10 w-10 rounded-xl border-border bg-background hover:bg-muted transition-all shadow-sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4.5 w-4.5" />
-              </Button>
-              {Array.from({ length: totalPage }, (_, i) => i + 1).map((page) => (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "default" : "outline"}
-                  size="icon"
-                  className={cn(
-                    "h-10 w-10 rounded-xl border-border font-black text-[10px] shadow-sm transition-all",
-                    currentPage === page
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/10 border-none"
-                      : "bg-background hover:bg-muted"
-                  )}
-                  onClick={() => setCurrentPage(page)}
-                >
-                  {page}
-                </Button>
-              ))}
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-10 w-10 rounded-xl border-border bg-background hover:bg-muted transition-all shadow-sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPage))}
-                disabled={currentPage === totalPage}
-              >
-                <ChevronRight className="h-4.5 w-4.5" />
-              </Button>
-            </div>
-          )}
         </div>
       </Card>
+      
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPage}
+        totalItems={totalUsersCount}
+        limit={limit}
+        onPageChange={setCurrentPage}
+      />
 
       {/* User Details Modal */}
       <Dialog open={isDetailsOpen} onOpenChange={(open) => {

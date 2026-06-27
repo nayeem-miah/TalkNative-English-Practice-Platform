@@ -36,6 +36,7 @@ import {
 } from "@/redux/api/course-api"
 import { LoadingState } from "@/components/ui/loading-state"
 import { EmptyState } from "@/components/ui/empty-state"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 
 export default function AdminCoursePage() {
   // RTK Query hooks
@@ -362,77 +363,13 @@ export default function AdminCoursePage() {
           </Card>
 
           {/* Premium Pagination controls */}
-          {coursesResponse?.meta?.totalPage && coursesResponse.meta.totalPage > 1 && (
-            <div className="flex items-center justify-between border-t border-border/40 px-4 py-4 sm:px-6 mt-8">
-              <div className="flex flex-1 justify-between sm:hidden">
-                <Button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  variant="outline"
-                  className="rounded-xl"
-                >
-                  Previous
-                </Button>
-                <Button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, coursesResponse.meta.totalPage))}
-                  disabled={currentPage === coursesResponse.meta.totalPage}
-                  variant="outline"
-                  className="rounded-xl"
-                >
-                  Next
-                </Button>
-              </div>
-              <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Showing <span className="font-semibold text-foreground">{(currentPage - 1) * limit + 1}</span> to{" "}
-                    <span className="font-semibold text-foreground">
-                      {Math.min(currentPage * limit, totalCoursesCount)}
-                    </span>{" "}
-                    of <span className="font-semibold text-foreground">{totalCoursesCount}</span> results
-                  </p>
-                </div>
-                <div>
-                  <nav className="isolate inline-flex -space-x-px rounded-xl gap-1" aria-label="Pagination">
-                    <Button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                      variant="outline"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl border-border/50 hover:bg-muted"
-                    >
-                      <span className="sr-only">Previous</span>
-                      &larr;
-                    </Button>
-                    {Array.from({ length: coursesResponse.meta.totalPage }, (_, i) => i + 1).map((page) => (
-                      <Button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        variant={currentPage === page ? "default" : "outline"}
-                        className={`h-9 w-9 rounded-xl p-0 font-semibold text-xs transition-all ${
-                          currentPage === page
-                            ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/95 border-none"
-                            : "border-border/50 hover:bg-muted text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {page}
-                      </Button>
-                    ))}
-                    <Button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, coursesResponse.meta.totalPage))}
-                      disabled={currentPage === coursesResponse.meta.totalPage}
-                      variant="outline"
-                      size="icon"
-                      className="h-9 w-9 rounded-xl border-border/50 hover:bg-muted"
-                    >
-                      <span className="sr-only">Next</span>
-                      &rarr;
-                    </Button>
-                  </nav>
-                </div>
-              </div>
-            </div>
-          )}
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={coursesResponse?.meta?.totalPage || 1}
+            totalItems={totalCoursesCount}
+            limit={limit}
+            onPageChange={setCurrentPage}
+          />
         </div>
       )}
 
