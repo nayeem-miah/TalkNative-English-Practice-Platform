@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TalkNative English Practice Platform
 
-## Getting Started
+**Live Demo**: [https://talk-native-english-practice-platfo.vercel.app](https://talk-native-english-practice-platfo.vercel.app)
 
-First, run the development server:
+TalkNative is a comprehensive platform designed to help users practice and improve their English communication skills. It features interactive learning, real-time support chat, and a robust admin dashboard for managing users, courses, and announcements.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### For Students (Users)
+- **Interactive Dashboard**: Track practice progress and enrolled courses.
+- **Real-Time Support Chat**: Get instant help from admins with real-time typing indicators and message status (Socket.io).
+- **Course Enrollment**: Browse and enroll in various English practice modules.
+- **Live Calls**: Practice English directly with native speakers or tutors.
+- **Announcements**: Stay updated with the latest news and scheduled maintenance.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### For Administrators
+- **Admin Dashboard**: Comprehensive overview of platform metrics.
+- **User Management**: Monitor, suspend, or manage student accounts.
+- **Support Inbox**: Resolve user tickets efficiently through a live real-time chat interface.
+- **Announcement Management**: Create, edit, and publish important notices for all users.
+- **Course & Lesson Management**: Add and manage educational content.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 💻 Tech Stack
 
-## Learn More
+- **Frontend**: [Next.js](https://nextjs.org/) (App Router), Tailwind CSS, shadcn/ui, Redux Toolkit (RTK Query), Socket.io Client.
+- **Backend**: Node.js, Express.js, Socket.io (Real-time).
+- **Database**: MongoDB with [Prisma ORM](https://www.prisma.io/).
+- **Language**: TypeScript (Full Stack).
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ensure you have the following installed on your machine:
+- Node.js (v18 or higher)
+- npm or yarn or pnpm
+- MongoDB URI (for the backend)
 
-## Deploy on Vercel
+### Installation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Clone the repository** (if applicable):
+   ```bash
+   git clone https://github.com/nayeem-miah/TalkNative-English-Practice-Platform.git
+   cd TalkNative-English-Practice-Platform
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Environment Variables**:
+   Create a `.env` file in the root directory and add the necessary variables:
+   ```env
+   NEXT_PUBLIC_BASE_API=http://localhost:5000/api/v1
+   ```
+
+4. **Run the Development Server**:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+
+## 📂 Project Structure
+
+- `/src/app`: Contains all the Next.js pages and routing (App Router).
+- `/src/components`: Reusable UI components (including shadcn/ui).
+- `/src/redux`: State management and API integration using RTK Query.
+- `/src/app/admin`: Dedicated routes for the administrative panel.
+- `/src/app/dashboard`: Dedicated routes for the student/user panel.
+
+## 📄 License
+
+This project is proprietary and confidential.
