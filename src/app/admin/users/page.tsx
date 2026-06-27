@@ -100,6 +100,54 @@ export default function UsersPage() {
         </div>
       </div>
 
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="bg-primary/10 p-3 rounded-xl">
+              <Users className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+              <h3 className="text-2xl font-bold">{totalUsersCount}</h3>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="bg-emerald-500/10 p-3 rounded-xl">
+              <UserCheck className="w-6 h-6 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Active Users</p>
+              <h3 className="text-2xl font-bold">{meta?.activeUsers ?? users.filter((u: any) => u.status === 'ACTIVE').length}</h3>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="bg-destructive/10 p-3 rounded-xl">
+              <UserX className="w-6 h-6 text-destructive" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Suspended</p>
+              <h3 className="text-2xl font-bold">{meta?.suspendedUsers ?? users.filter((u: any) => u.status === 'SUSPENDED').length}</h3>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="bg-blue-500/10 p-3 rounded-xl">
+              <Shield className="w-6 h-6 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Admins</p>
+              <h3 className="text-2xl font-bold">{meta?.adminUsers ?? users.filter((u: any) => u.role === 'ADMIN').length}</h3>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="border-border bg-card shadow-none rounded-xl overflow-hidden">
         <CardHeader className="p-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card">
           <div className="relative flex-1 max-w-sm">
@@ -549,8 +597,8 @@ export default function UsersPage() {
               disabled={isUpdatingStatus}
               className={cn(
                 "rounded-xl text-xs font-bold h-10 px-6 text-white hover:opacity-90 transition-all active:scale-95 shadow-md",
-                statusConfirmData?.newStatus === "SUSPENDED" 
-                  ? "bg-rose-600 hover:bg-rose-700 shadow-rose-600/10" 
+                statusConfirmData?.newStatus === "SUSPENDED"
+                  ? "bg-rose-600 hover:bg-rose-700 shadow-rose-600/10"
                   : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/10"
               )}
               onClick={async () => {

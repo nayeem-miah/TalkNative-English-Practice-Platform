@@ -10,7 +10,11 @@ import {
   Check, 
   ChevronLeft, 
   ChevronRight, 
-  CreditCard
+  CreditCard,
+  GraduationCap,
+  BadgeCheck,
+  Gift,
+  Clock
 } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -87,21 +91,67 @@ export default function AdminEnrollmentPage() {
               <option value="PENDING">Pending</option>
             </select>
           </div>
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by ID or course..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="pl-9 w-[200px] h-9 rounded-xl border-border bg-muted/30"
+            />
+          </div>
         </div>
       </div>
 
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="bg-primary/10 p-3 rounded-xl">
+              <GraduationCap className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Total Enrollments</p>
+              <h3 className="text-2xl font-bold">{totalEnrollments}</h3>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="bg-emerald-500/10 p-3 rounded-xl">
+              <BadgeCheck className="w-6 h-6 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Paid Enrollments</p>
+              <h3 className="text-2xl font-bold">{meta?.paidEnrollments ?? enrollments.filter((e: any) => e.paymentStatus === 'PAID').length}</h3>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="bg-blue-500/10 p-3 rounded-xl">
+              <Gift className="w-6 h-6 text-blue-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Free Enrollments</p>
+              <h3 className="text-2xl font-bold">{meta?.freeEnrollments ?? enrollments.filter((e: any) => e.paymentStatus === 'FREE').length}</h3>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="bg-amber-500/10 p-3 rounded-xl">
+              <Clock className="w-6 h-6 text-amber-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Pending</p>
+              <h3 className="text-2xl font-bold">{meta?.pendingEnrollments ?? enrollments.filter((e: any) => e.paymentStatus === 'PENDING').length}</h3>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="border-border bg-card shadow-none rounded-xl overflow-hidden">
-        <CardHeader className="p-6 border-b border-border flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
-            <Input
-              placeholder="Search by Transaction ID..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="pl-11 h-12 rounded-xl border-border bg-muted/20 transition-all focus:ring-primary/10"
-            />
-          </div>
-        </CardHeader>
         <CardContent className="p-0 overflow-x-auto">
           <table className="w-full">
             <thead>
