@@ -16,11 +16,12 @@ export default function SupportPage() {
     }
   ])
   const [inputValue, setInputValue] = React.useState("")
+  const [isTyping, setIsTyping] = React.useState(false)
   const endOfMessagesRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [messages, isTyping])
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,8 +37,12 @@ export default function SupportPage() {
     setMessages(prev => [...prev, newMessage])
     setInputValue("")
 
-    // Simulate auto reply from admin after 1 second
+    // Start typing indicator
+    setIsTyping(true)
+
+    // Simulate auto reply from admin after 2 seconds
     setTimeout(() => {
+      setIsTyping(false)
       setMessages(prev => [
         ...prev,
         {
@@ -47,7 +52,7 @@ export default function SupportPage() {
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         }
       ])
-    }, 1000)
+    }, 2000)
   }
 
   return (
@@ -114,6 +119,22 @@ export default function SupportPage() {
               </div>
             )
           })}
+          
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="flex items-end gap-2 justify-start animate-in fade-in duration-300">
+              <Avatar className="h-8 w-8 border border-border shrink-0 mb-1">
+                <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold">A</AvatarFallback>
+                <AvatarImage src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=60" />
+              </Avatar>
+              <div className="bg-white dark:bg-zinc-800 border border-border text-foreground rounded-2xl rounded-bl-sm shadow-sm px-4 py-3.5 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+              </div>
+            </div>
+          )}
+
           <div ref={endOfMessagesRef} />
         </div>
 
