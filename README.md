@@ -23,9 +23,7 @@ TalkNative is a comprehensive platform designed to help users practice and impro
 ## 💻 Tech Stack
 
 - **Frontend**: [Next.js](https://nextjs.org/) (App Router), Tailwind CSS, shadcn/ui, Redux Toolkit (RTK Query), Socket.io Client.
-- **Backend**: Node.js, Express.js, Socket.io (Real-time).
-- **Database**: MongoDB with [Prisma ORM](https://www.prisma.io/).
-- **Language**: TypeScript (Full Stack).
+- **Language**: TypeScript.
 
 ## 🛠️ Getting Started
 
@@ -34,11 +32,10 @@ TalkNative is a comprehensive platform designed to help users practice and impro
 Ensure you have the following installed on your machine:
 - Node.js (v18 or higher)
 - npm or yarn or pnpm
-- MongoDB URI (for the backend)
 
 ### Installation
 
-1. **Clone the repository** (if applicable):
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/nayeem-miah/TalkNative-English-Practice-Platform.git
    cd TalkNative-English-Practice-Platform
@@ -52,7 +49,7 @@ Ensure you have the following installed on your machine:
    ```
 
 3. **Environment Variables**:
-   Create a `.env` file in the root directory and add the necessary variables:
+   Create a `.env` file in the root directory and add the necessary variables for the frontend:
    ```env
    NEXT_PUBLIC_BASE_API=http://localhost:5000/api/v1
    ```
