@@ -22,7 +22,9 @@ import {
   LogOut,
   MoreHorizontal,
   ShieldAlert,
-  Users
+  Users,
+  MessageSquare,
+  Megaphone
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -34,6 +36,8 @@ const menuItems = [
   { name: "Course", icon: Book, href: "/admin/course" },
   { name: "Enrollment", icon: Book, href: "/admin/enrollment" },
   { name: "Moderation", icon: ShieldAlert, href: "/admin/moderation" },
+  { name: "Support Chat", icon: MessageSquare, href: "/admin/support" },
+  { name: "Announcements", icon: Megaphone, href: "/admin/announcements" },
 ]
 
 interface AdminSidebarProps {

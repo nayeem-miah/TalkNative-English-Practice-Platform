@@ -21,7 +21,9 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
-  MoreHorizontal
+  MoreHorizontal,
+  MessageSquare,
+  Megaphone
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -30,6 +32,8 @@ import * as React from "react"
 const menuItems = [
   { name: "Overview", icon: LayoutDashboard, href: "/dashboard" },
   { name: "My Courses", icon: BookOpen, href: "/dashboard/my-courses" },
+  { name: "Support Chat", icon: MessageSquare, href: "/dashboard/support" },
+  { name: "Announcements", icon: Megaphone, href: "/dashboard/announcements" },
 ]
 
 export default function DashboardLayout({
