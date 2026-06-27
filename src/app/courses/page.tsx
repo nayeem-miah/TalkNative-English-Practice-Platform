@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
- 
+
 "use client"
 
 import {
@@ -44,7 +44,9 @@ export function CoursesPage() {
     searchTerm,
   })
 
-  const courses = coursesResponse?.data || []
+  const allCourses = coursesResponse?.data || []
+  const courses = allCourses.filter((course: any) => course.isPublished === true)
+  console.log(courses)
   const meta = coursesResponse?.meta
   const totalCourses = meta?.total ?? 0
   const totalPages = meta?.totalPage ?? 1
