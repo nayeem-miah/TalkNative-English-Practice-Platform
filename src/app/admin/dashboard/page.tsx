@@ -4,14 +4,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { useGetAdminDashboardOverviewQuery } from "@/redux/api/enrollment-api"
 import {
   ArrowRight,
-  BarChart3,
   Book,
   CreditCard,
+  Download,
   FileText,
   PhoneCall,
   ShieldAlert,
@@ -47,7 +47,6 @@ export default function AdminDashboardPage() {
     { name: "Courses", icon: Book, href: "/admin/course", status: "Live", isLive: true, color: "text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10" },
     { name: "Enrollments", icon: CreditCard, href: "/admin/enrollment", status: "Live", isLive: true, color: "text-purple-500 bg-purple-50 dark:bg-purple-500/10" },
     { name: "AI Moderation", icon: ShieldAlert, href: "/admin/moderation", status: "Preview", isLive: false, color: "text-rose-500 bg-rose-50 dark:bg-rose-500/10" },
-    { name: "Analytics", icon: BarChart3, href: "/admin/analytics", status: "Preview", isLive: false, color: "text-amber-500 bg-amber-50 dark:bg-amber-500/10" },
     { name: "Resources", icon: FileText, href: "/admin/resources", status: "Preview", isLive: false, color: "text-zinc-500 bg-zinc-100 dark:bg-zinc-800" },
   ], [])
 
@@ -102,35 +101,66 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Quick Access Modules Grid */}
-      <div className="space-y-4">
-        <div className="border-b border-border/50 pb-2">
-          <h2 className="text-xs font-bold text-zinc-450 uppercase tracking-wider">Quick Navigation</h2>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {modules.map((m) => (
-            <Link href={m.href} key={m.name} className="block">
-              <Card className="border border-zinc-200/80 dark:border-zinc-800/80 bg-card hover:bg-muted/10 hover:border-primary/30 transition-all flex flex-col items-center justify-center p-4 text-center gap-2 h-28 group rounded-xl shadow-none cursor-pointer">
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${m.color} group-hover:scale-105 transition-transform shadow-sm`}>
-                  <m.icon className="h-4 w-4" />
+
+
+      {/* Engagement & Analytics Graphs */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <Card className="lg:col-span-8 border border-zinc-200/60 dark:border-zinc-800/60 shadow-sm rounded-2xl bg-card overflow-hidden">
+           <CardHeader className="p-6 border-b border-border flex flex-row items-center justify-between bg-muted/10">
+              <div className="space-y-1">
+                <CardTitle className="text-lg font-bold text-foreground">Engagement Trends</CardTitle>
+                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest leading-none">Weekly Active Users Distribution</p>
+              </div>
+              <Button variant="ghost" className="text-[9px] font-bold uppercase tracking-widest gap-2 bg-muted/50 hover:bg-muted h-9 px-5 rounded-lg border border-border transition-all">
+                <Download className="h-3.5 w-3.5 text-muted-foreground" /> Export Data
+              </Button>
+           </CardHeader>
+           <CardContent className="p-4 sm:p-6 lg:p-10 h-[380px] flex items-end justify-between relative px-4 sm:px-12 gap-4">
+              {(dashboardData.engagementTrends || [40, 70, 55, 90, 65, 85, 50]).map((h: number, i: number) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
+                   <div className="w-full bg-muted/30 border border-border rounded-lg transition-all group-hover:bg-primary/20 group-hover:border-primary/40 group-hover:shadow-lg group-hover:shadow-primary/5 relative cursor-pointer" style={{ height: `${h * 2.5}px` }}>
+                      <div className="absolute -top-10 left-1/2 -translate-y-1/2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-1 pointer-events-none whitespace-nowrap z-10 shadow-xl">
+                         {h * 124} sessions
+                      </div>
+                   </div>
+                   <span className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest">Day {i + 1}</span>
                 </div>
-                <div className="space-y-0.5 w-full">
-                  <p className="font-extrabold text-[11px] text-foreground group-hover:text-primary transition-colors truncate">
-                    {m.name}
-                  </p>
-                  <span className={cn(
-                    "text-[8px] font-black uppercase tracking-wider px-1.5 py-0.2 rounded border",
-                    m.isLive
-                      ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100/40"
-                      : "bg-muted text-muted-foreground border-transparent"
-                  )}>
-                    {m.status}
-                  </span>
-                </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
+              ))}
+           </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-4 border border-zinc-200/60 dark:border-zinc-800/60 shadow-sm rounded-2xl bg-card overflow-hidden">
+           <CardHeader className="p-6 border-b border-border bg-muted/10">
+              <CardTitle className="text-lg font-bold text-foreground">Language Distribution</CardTitle>
+           </CardHeader>
+           <CardContent className="p-8 space-y-10">
+              <div className="relative h-56 w-56 mx-auto">
+                 <div className="absolute inset-0 rounded-full border-[18px] border-muted/20" />
+                 <div className="absolute inset-0 rounded-full border-[18px] border-primary border-t-transparent border-l-transparent rotate-[35deg] drop-shadow-sm transition-transform duration-1000" />
+                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                    <p className="text-4xl font-bold text-foreground leading-none">{dashboardData.matchSuccessRate || "82%"}</p>
+                    <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-2 max-w-[80px]">Match Success</p>
+                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                 {(dashboardData.languageDistribution || [
+                   { name: "Spanish", value: "43%", color: "bg-emerald-500" },
+                   { name: "English", value: "40%", color: "bg-primary" },
+                   { name: "Mandarin", value: "12%", color: "bg-zinc-400" },
+                   { name: "Others", value: "5%", color: "bg-zinc-200 dark:bg-zinc-800" },
+                 ]).map((lang: any) => (
+                   <div key={lang.name} className="space-y-1 group cursor-default">
+                      <div className="flex items-center gap-2">
+                         <div className={`h-2.5 w-2.5 rounded-full ${lang.color || 'bg-primary'} transition-transform group-hover:scale-125 shadow-sm`} />
+                         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{lang.name}</span>
+                      </div>
+                      <span className="text-base font-bold text-foreground block ml-4 leading-none tracking-tighter">{lang.value}</span>
+                   </div>
+                 ))}
+              </div>
+           </CardContent>
+        </Card>
       </div>
 
       {/* Dynamic Data Grid */}

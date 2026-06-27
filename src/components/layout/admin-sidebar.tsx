@@ -34,7 +34,6 @@ const menuItems = [
   { name: "Course", icon: Book, href: "/admin/course" },
   { name: "Enrollment", icon: Book, href: "/admin/enrollment" },
   { name: "Moderation", icon: ShieldAlert, href: "/admin/moderation" },
-  { name: "Analytics", icon: BarChart3, href: "/admin/analytics" },
 ]
 
 interface AdminSidebarProps {
