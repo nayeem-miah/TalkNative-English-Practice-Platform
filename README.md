@@ -48,22 +48,22 @@ Ensure you have the following installed on your machine:
    yarn install
    ```
 
-3. **Environment Variables**:
-   Create a `.env` file in the root directory and add the necessary variables for the frontend:
-   ```env
-   NEXT_PUBLIC_BASE_API=http://localhost:5000/api/v1
-   ```
+## ⚙️ Environment Variables
+Create a `.env` file in the root directory and add the necessary variables for the frontend:
+```env
+NEXT_PUBLIC_BASE_API=http://localhost:5000/api/v1
+```
 
-4. **Run the Development Server**:
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
+## 🏃 Run the Development Server
+```bash
+npm run dev
+# or
+yarn dev
+```
 
-5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-## 📂 Project Structure
+## 📁 Folder Structure
 
 - `/src/app`: Contains all the Next.js pages and routing (App Router).
 - `/src/components`: Reusable UI components (including shadcn/ui).
