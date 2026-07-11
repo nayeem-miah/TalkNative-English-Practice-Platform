@@ -23,7 +23,8 @@ import {
   Menu,
   MoreHorizontal,
   MessageSquare,
-  Megaphone
+  Megaphone,
+  Users
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -34,6 +35,7 @@ const menuItems = [
   { name: "My Courses", icon: BookOpen, href: "/dashboard/my-courses" },
   { name: "Support Chat", icon: MessageSquare, href: "/dashboard/support" },
   { name: "Announcements", icon: Megaphone, href: "/dashboard/announcements" },
+  { name: "Community", icon: Users, href: "/community" },
 ]
 
 export default function DashboardLayout({
