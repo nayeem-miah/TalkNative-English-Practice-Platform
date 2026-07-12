@@ -31,7 +31,15 @@ function FeedbackContent() {
   const durationSec = Number(searchParams?.get("duration") || 0)
 
   const [rating, setRating] = React.useState(0)
+  const [hoverRating, setHoverRating] = React.useState(0)
   const [notes, setNotes] = React.useState("")
+
+  React.useEffect(() => {
+    const urlNotes = searchParams?.get("notes") || ""
+    if (urlNotes) {
+      setNotes(urlNotes)
+    }
+  }, [searchParams])
 
   // Reporting Modal States
   const [isReporting, setIsReporting] = React.useState(false)
@@ -52,6 +60,36 @@ function FeedbackContent() {
       window.location.href = "/login?redirect=/feedback"
     }
   }, [mounted, isUserLoading, isLoggedIn])
+
+  // Clean alphanumeric usernames to human-readable names
+  const cleanPartnerName = React.useMemo(() => {
+    if (!partnerName) return "English Speaker"
+    if (/^[a-z0-9]{5,20}$/i.test(partnerName) && !/[aeiou]/i.test(partnerName)) {
+      const names = ["Aiden", "Chloe", "David", "Emma", "Felix", "Grace", "Hiro", "Isabella", "Julian", "Kate", "Liam", "Mia", "Noah", "Olivia", "Ryan", "Sophia"]
+      const codeSum = partnerName.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0)
+      return names[codeSum % names.length]
+    }
+    return partnerName
+  }, [partnerName])
+
+  // Generate highly-inclusive diverse Unsplash avatars if default is used
+  const cleanAvatarSrc = React.useMemo(() => {
+    if (partnerAvatar && !partnerAvatar.includes("default") && !partnerAvatar.includes("avatar") && !partnerAvatar.includes("placeholder")) {
+      return partnerAvatar
+    }
+    const DIVERSE_AVATARS = [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=180&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=180&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=180&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=180&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=180&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=180&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=180&auto=format&fit=crop&q=80",
+    ]
+    if (!partnerId) return DIVERSE_AVATARS[0]
+    const charSum = partnerId.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0)
+    return DIVERSE_AVATARS[charSum % DIVERSE_AVATARS.length]
+  }, [partnerAvatar, partnerId])
 
   if (!mounted || isUserLoading) {
     return (
@@ -84,7 +122,6 @@ function FeedbackContent() {
 
   // Handle saving feedback (notes and rating)
   const handleSubmitFeedback = async (action: "next" | "dashboard") => {
-    // If no feedback given (rating is 0 and notes are empty), skip everything and redirect
     if (rating === 0 && !notes.trim()) {
       if (action === "next") {
         router.push("/live-call?autoStart=true")
@@ -94,14 +131,13 @@ function FeedbackContent() {
       return
     }
 
-    // If the user typed any private notes, save them in localStorage
     if (notes.trim()) {
       try {
         const savedNotes = JSON.parse(localStorage.getItem("talknative_call_notes") || "[]")
         savedNotes.push({
-          partnerName,
+          partnerName: cleanPartnerName,
           date: new Date().toLocaleDateString(),
-          rating: rating || 5, // fallback if they wrote notes but no star rating
+          rating: rating || 5,
           notes: notes.trim()
         })
         localStorage.setItem("talknative_call_notes", JSON.stringify(savedNotes))
@@ -110,12 +146,11 @@ function FeedbackContent() {
       }
     }
 
-    // Call backend API to persist review in MongoDB
     if (partnerId) {
       try {
         await createReview({
           revieweeId: partnerId,
-          rating: rating || 5, // fallback if they wrote notes but no star rating
+          rating: rating || 5,
           notes: notes.trim()
         }).unwrap()
       } catch (err) {
@@ -160,17 +195,6 @@ function FeedbackContent() {
     }
   }
 
-  // Default avatar fallback
-  const avatarSrc = partnerAvatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <Card className="z-10 w-full max-w-lg border border-border/60 bg-card shadow-sm rounded-3xl p-8 sm:p-12 text-center">
@@ -181,8 +205,8 @@ function FeedbackContent() {
               <div className="relative mx-auto h-24 w-24 rounded-full border-4 border-[#006D5B]/20 p-1">
                 <div className="relative h-full w-full rounded-full overflow-hidden">
                   <Image
-                    src={avatarSrc}
-                    alt={partnerName}
+                    src={cleanAvatarSrc}
+                    alt={cleanPartnerName}
                     fill
                     unoptimized
                     className="w-full h-full object-cover"
@@ -190,15 +214,22 @@ function FeedbackContent() {
                 </div>
               </div>
               <div className="space-y-1">
-                <h1 className="text-3xl font-heading font-bold text-[#1a2b3b] dark:text-white">
-                  Conversation with {partnerName}
+                <h1 className="text-3xl font-heading font-extrabold text-[#1a2b3b] dark:text-white leading-tight">
+                  Conversation with {cleanPartnerName}
                 </h1>
-                <p className="text-sm text-muted-foreground font-medium flex items-center justify-center gap-2">
+                <p className="text-sm text-muted-foreground font-semibold flex items-center justify-center gap-2 mt-1">
                   <span className="h-2 w-2 rounded-full bg-primary/40 animate-pulse" />
                   Call Duration: {formatDuration(durationSec)}
                 </p>
               </div>
             </div>
+
+            {/* Short Call Notice */}
+            {durationSec < 45 && (
+              <div className="bg-amber-500/5 border border-amber-500/25 rounded-2xl p-3.5 text-[11px] text-amber-600 dark:text-amber-400 font-semibold text-center leading-normal max-w-sm mx-auto animate-in fade-in duration-300">
+                ⚠️ Short call detected ({formatDuration(durationSec)}). Feedback is optional for brief conversations. Feel free to skip if you prefer!
+              </div>
+            )}
 
             <hr className="border-muted/30" />
 
@@ -210,10 +241,16 @@ function FeedbackContent() {
                   <button
                     key={star}
                     onClick={() => setRating(star)}
-                    className="transition-transform active:scale-90 cursor-pointer"
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    className="transition-all active:scale-90 cursor-pointer"
                   >
                     <Star
-                      className={`h-8 w-8 sm:h-10 sm:w-10 ${star <= rating ? 'fill-[#2af5d1] text-[#2af5d1]' : 'text-zinc-200 dark:text-zinc-700'}`}
+                      className={`h-8 w-8 sm:h-9 sm:w-9 transition-all duration-150 ${
+                        star <= (hoverRating || rating)
+                          ? 'fill-amber-400 text-amber-500 scale-110 drop-shadow-md'
+                          : 'text-zinc-250 dark:text-zinc-700 hover:scale-105'
+                      }`}
                     />
                   </button>
                 ))}
@@ -229,7 +266,7 @@ function FeedbackContent() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Add keywords you learned, common mistakes, or things to follow up on next time..."
-                className="min-h-[120px] rounded-2xl bg-[#f8faff] dark:bg-zinc-800/50 border-none focus-visible:ring-primary/20 resize-none p-4 transition-colors"
+                className="min-h-[120px] rounded-2xl bg-[#f8faff] dark:bg-zinc-800/50 border-none focus-visible:ring-primary/20 resize-none p-4 transition-colors text-xs font-semibold"
               />
             </div>
 
@@ -237,7 +274,7 @@ function FeedbackContent() {
             <div className="space-y-4">
               <Button
                 onClick={() => handleSubmitFeedback("next")}
-                className="w-full h-14 rounded-2xl bg-[#006D5B] hover:bg-[#005a4b] text-white font-bold text-lg gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95 cursor-pointer"
+                className="w-full h-13 rounded-2xl bg-[#006D5B] hover:bg-[#005a4b] text-white font-extrabold text-base gap-3 shadow-md shadow-primary/10 transition-all active:scale-95 cursor-pointer border-none"
               >
                 Find Next Partner
                 <ArrowRight className="h-5 w-5" />
@@ -245,30 +282,32 @@ function FeedbackContent() {
               <Button
                 variant="outline"
                 onClick={() => handleSubmitFeedback("dashboard")}
-                className="w-full h-14 rounded-2xl border-2 border-muted/20 font-bold text-lg gap-3 hover:bg-muted/10 transition-all active:scale-95 bg-transparent dark:text-white cursor-pointer"
+                className="w-full h-13 rounded-2xl border-2 border-muted/20 font-bold text-base gap-3 hover:bg-muted/10 transition-all active:scale-95 bg-transparent dark:text-white cursor-pointer"
               >
                 <LayoutDashboard className="h-5 w-5" />
                 Back to Dashboard
               </Button>
             </div>
 
-            {/* Footer */}
-            <div className="flex items-center justify-between pt-4 border-t border-muted/20">
+            {/* Footer / Safety Controls */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-muted/25 mt-4">
               {partnerId ? (
-                <button
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsReporting(true)}
-                  className="text-xs font-bold text-destructive/60 hover:text-destructive flex items-center gap-1.5 uppercase tracking-widest transition-colors cursor-pointer"
+                  className="text-xs font-black text-red-500 border-red-500/20 bg-red-500/5 hover:bg-red-500/10 dark:hover:bg-red-950/20 dark:border-red-900/40 uppercase tracking-wider px-4 py-2 h-9 rounded-xl transition-all cursor-pointer shadow-none flex items-center gap-1.5"
                 >
                   <Flag className="h-3.5 w-3.5" />
-                  Report User
-                </button>
+                  Report Safety Violation
+                </Button>
               ) : (
                 <div />
               )}
 
               <button
                 onClick={() => router.push("/dashboard")}
-                className="text-xs font-bold text-muted-foreground hover:text-[#006D5B] uppercase tracking-widest transition-colors cursor-pointer"
+                className="text-xs font-bold text-muted-foreground hover:text-[#006D5B] uppercase tracking-widest transition-colors cursor-pointer hover:underline"
               >
                 Skip Feedback
               </button>
@@ -279,8 +318,8 @@ function FeedbackContent() {
           <form onSubmit={handleReportUser} className="space-y-8 text-left">
             <div className="text-center space-y-2">
               <Flag className="h-12 w-12 text-destructive mx-auto animate-bounce" />
-              <h2 className="text-2xl font-heading font-bold text-[#1a2b3b] dark:text-white">Report {partnerName}</h2>
-              <p className="text-sm text-muted-foreground">
+              <h2 className="text-2xl font-heading font-extrabold text-[#1a2b3b] dark:text-white leading-tight">Report {cleanPartnerName}</h2>
+              <p className="text-sm text-muted-foreground font-medium">
                 Help us keep TalkNative safe and constructive. Please tell us what happened.
               </p>
             </div>
@@ -311,7 +350,7 @@ function FeedbackContent() {
                 value={reportDesc}
                 onChange={(e) => setReportDesc(e.target.value)}
                 placeholder="Please describe the conversation or behavior in detail..."
-                className="min-h-[100px] rounded-xl bg-[#f8faff] dark:bg-zinc-800/50 border-none focus-visible:ring-primary/20 resize-none p-4 transition-colors"
+                className="min-h-[100px] rounded-xl bg-[#f8faff] dark:bg-zinc-800/50 border-none focus-visible:ring-primary/20 resize-none p-4 transition-colors text-xs font-semibold"
               />
             </div>
 
@@ -331,7 +370,7 @@ function FeedbackContent() {
               <Button
                 type="submit"
                 disabled={isReportingSubmitting}
-                className="flex-1 h-12 rounded-xl bg-destructive hover:bg-destructive/90 text-white font-bold gap-2 cursor-pointer"
+                className="flex-1 h-12 rounded-xl bg-destructive hover:bg-destructive/90 text-white font-bold gap-2 cursor-pointer border-none"
               >
                 {isReportingSubmitting ? (
                   <Loader2 className="h-5 w-5 animate-spin" />

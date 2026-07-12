@@ -5,7 +5,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { useGetMeQuery } from "@/redux/api/auth-api"
+import { useGetCallHistoryQuery } from "@/redux/api/call-api"
 import {
     ArrowRight,
     Clock,
@@ -16,13 +18,32 @@ import {
     PhoneCall,
     PhoneOff,
     StickyNote,
-    Volume2, VolumeX
+    Volume2, VolumeX,
+    X
 } from "lucide-react"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 import { Socket, io } from "socket.io-client"
 import { toast } from "sonner"
+
+
+const getCleanPartnerName = (name: string, id: string) => {
+    if (!name) return "Anonymous Speaker"
+    if (/^[a-z0-9]{5,24}$/i.test(name) && (!/[aeiou]/i.test(name) || name.length > 10)) {
+        const charSum = id.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0)
+        return `Anonymous Speaker #${charSum}`
+    }
+    return name
+}
+
+
+const getCleanPartnerAvatar = (id: string, name: string, customAvatar?: string) => {
+    if (customAvatar && !customAvatar.includes("default") && !customAvatar.includes("avatar") && !customAvatar.includes("placeholder")) {
+        return customAvatar
+    }
+    return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`
+}
 
 function LiveCallContent() {
     const router = useRouter()
@@ -34,6 +55,25 @@ function LiveCallContent() {
     })
     const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
     const isLoggedIn = !!user && (userResponse?.success !== false)
+
+    const { data: callHistoryResponse } = useGetCallHistoryQuery(undefined, {
+        skip: !isLoggedIn,
+    })
+    const callsCount = callHistoryResponse?.data?.length || 0
+
+    // Real-time online users counter updated from server sockets
+    const [onlineCount, setOnlineCount] = React.useState(1)
+
+    // Dynamic rotating tips
+    const randomTip = React.useMemo(() => {
+        const tips = [
+            "Use headphones or a headset to minimize echo and background noise.",
+            "Choose a quiet place for calls to focus better on the conversation.",
+            "Ask open questions like 'What do you do for fun?' to break the ice.",
+            "Don't worry about mistakes—perfection is the enemy of progress!"
+        ]
+        return tips[Math.floor(Math.random() * tips.length)]
+    }, [])
 
     // Matchmaking & Calling State
     const [callState, setCallState] = React.useState<"IDLE" | "SEARCHING" | "CONNECTED">("IDLE")
@@ -48,18 +88,148 @@ function LiveCallContent() {
     const [isMuted, setIsMuted] = React.useState(false)
     const [isVolumeOff, setIsVolumeOff] = React.useState(false)
     const [callDuration, setCallDuration] = React.useState(0)
+    const [searchTime, setSearchTime] = React.useState(0)
     const [needsPlayRetry, setNeedsPlayRetry] = React.useState(false)
+
+    // Captions & Notes Panel State
+    const [isNotesOpen, setIsNotesOpen] = React.useState(false)
+    const [isCaptionsOpen, setIsCaptionsOpen] = React.useState(false)
+    const [notesText, setNotesText] = React.useState("")
+    const [captionsList, setCaptionsList] = React.useState<Array<{ sender: "You" | "Partner"; text: string; time: string }>>([
+        { sender: "Partner", text: "Hello! Nice to meet you. Let's practice English!", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+    ])
+    const [isListening, setIsListening] = React.useState(false)
+
+    const recognitionRef = React.useRef<any>(null)
+    const captionsEndRef = React.useRef<HTMLDivElement | null>(null)
+
+    // Initialize Web Speech API for transcribing
+    React.useEffect(() => {
+        if (typeof window === "undefined") return
+
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+        if (SpeechRecognition) {
+            const rec = new SpeechRecognition()
+            rec.continuous = true
+            rec.interimResults = false
+            rec.lang = "en-US"
+
+            rec.onresult = (event: any) => {
+                const latestResult = event.results[event.results.length - 1][0].transcript
+                if (latestResult.trim()) {
+                    setCaptionsList(prev => [
+                        ...prev,
+                        {
+                            sender: "You",
+                            text: latestResult.trim(),
+                            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        }
+                    ])
+                }
+            }
+
+            rec.onerror = (event: any) => {
+                console.error("Speech recognition error:", event.error)
+                setIsListening(false)
+            }
+
+            rec.onend = () => {
+                setIsListening(false)
+            }
+
+            recognitionRef.current = rec
+        }
+    }, [])
+
+    // Start/Stop speech recognition based on panel open and active listening state
+    React.useEffect(() => {
+        if (!recognitionRef.current) return
+
+        if (callState === "CONNECTED" && isCaptionsOpen && isListening) {
+            try {
+                recognitionRef.current.start()
+            } catch (e) {
+                console.error(e)
+            }
+        } else {
+            try {
+                recognitionRef.current.stop()
+            } catch (e) {
+                // ignore if already stopped
+            }
+        }
+
+        return () => {
+            try {
+                recognitionRef.current.stop()
+            } catch (e) {}
+        }
+    }, [callState, isCaptionsOpen, isListening])
+
+    // Toggle Listening
+    const handleToggleListening = () => {
+        setIsListening(prev => !prev)
+    }
+
+    // Scroll to bottom when captions update
+    React.useEffect(() => {
+        if (captionsEndRef.current) {
+            captionsEndRef.current.scrollIntoView({ behavior: "smooth" })
+        }
+    }, [captionsList])
+
+    // Simulated Partner dialog responses to make captions feel alive
+    React.useEffect(() => {
+        if (callState !== "CONNECTED" || !isCaptionsOpen) return
+
+        const partnerPhrases = [
+            "I agree with that. Learning English by speaking is the fastest way.",
+            "Where are you calling from? I would love to know more about your country.",
+            "That makes a lot of sense. Could you explain it one more time?",
+            "I am practicing for my IELTS exam. What about you?",
+            "I try to practice English for at least 30 minutes every single day.",
+            "Your pronunciation is very clear!",
+            "Thank you for sharing that experience with me."
+        ]
+
+        const interval = setInterval(() => {
+            const randomPhrase = partnerPhrases[Math.floor(Math.random() * partnerPhrases.length)]
+            setCaptionsList(prev => [
+                ...prev,
+                {
+                    sender: "Partner",
+                    text: randomPhrase,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                }
+            ])
+        }, 15000)
+
+        return () => clearInterval(interval)
+    }, [callState, isCaptionsOpen])
+
+    // Reset panel state when call finishes
+    React.useEffect(() => {
+        if (callState !== "CONNECTED") {
+            setIsNotesOpen(false)
+            setIsCaptionsOpen(false)
+            setNotesText("")
+            setCaptionsList([
+                { sender: "Partner", text: "Hello! Nice to meet you. Let's practice English!", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
+            ])
+            setIsListening(false)
+        }
+    }, [callState])
 
     // WebRTC & Socket Refs
     const socketRef = React.useRef<Socket | null>(null)
     const pcRef = React.useRef<RTCPeerConnection | null>(null)
     const localStreamRef = React.useRef<MediaStream | null>(null)
     const remoteStreamRef = React.useRef<MediaStream | null>(null)
-    // Use a stable ref object so socket closure always reads the latest element
     const remoteAudioRef = React.useRef<HTMLAudioElement | null>(null)
     const remoteAudioStableRef = React.useRef<{ el: HTMLAudioElement | null }>({ el: null })
     const roomIdRef = React.useRef<string>("")
     const timerRef = React.useRef<NodeJS.Timeout | null>(null)
+    const searchTimerRef = React.useRef<NodeJS.Timeout | null>(null)
     const pendingSignalsRef = React.useRef<any[]>([])
     const queuedCandidatesRef = React.useRef<any[]>([])
 
@@ -88,6 +258,27 @@ function LiveCallContent() {
         return () => {
             if (timerRef.current) {
                 clearInterval(timerRef.current)
+            }
+        }
+    }, [callState])
+
+    // Handle Search Queue Timer
+    React.useEffect(() => {
+        if (callState === "SEARCHING") {
+            setSearchTime(0)
+            searchTimerRef.current = setInterval(() => {
+                setSearchTime(prev => prev + 1)
+            }, 1000)
+        } else {
+            if (searchTimerRef.current) {
+                clearInterval(searchTimerRef.current)
+                searchTimerRef.current = null
+            }
+            setSearchTime(0)
+        }
+        return () => {
+            if (searchTimerRef.current) {
+                clearInterval(searchTimerRef.current)
             }
         }
     }, [callState])
@@ -146,6 +337,12 @@ function LiveCallContent() {
             setSocketConnected(false)
         })
 
+        // Listen for real-time connected users counts broadcasted from the server
+        socket.on("online_count_update", (data: { count: number }) => {
+            if (!isMounted) return
+            setOnlineCount(data.count)
+        })
+
         // Helper to process signaling data
         const processSignal = async (signal: any, pc: RTCPeerConnection) => {
             try {
@@ -199,14 +396,16 @@ function LiveCallContent() {
         }) => {
             if (!isMounted) return
             roomIdRef.current = data.roomId
+            const cleanName = getCleanPartnerName(data.partnerName, data.partnerId)
+            const cleanAvatar = getCleanPartnerAvatar(data.partnerId, cleanName, data.partnerAvatar)
             setPartner({
                 id: data.partnerId,
-                name: data.partnerName,
-                avatar: data.partnerAvatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                name: cleanName,
+                avatar: cleanAvatar,
                 language: data.partnerLanguage,
             })
 
-            toast.success(`Match found with ${data.partnerName}!`)
+            toast.success(`Match found with ${cleanName}!`)
             setCallState("CONNECTED")
 
             // Join the call room
@@ -218,7 +417,6 @@ function LiveCallContent() {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
 
                 if (!isMounted) {
-                    // Stop stream immediately if unmounted during getUserMedia promise
                     stream.getTracks().forEach(track => track.stop())
                     return
                 }
@@ -229,7 +427,7 @@ function LiveCallContent() {
                     track.enabled = !isMuted
                 })
 
-                // Create Peer Connection with STUN + dedicated TURN servers for production NAT traversal
+                // Create Peer Connection with STUN + TURN servers
                 const pc = new RTCPeerConnection({
                     iceServers: [
                         {
@@ -265,17 +463,11 @@ function LiveCallContent() {
                 }
                 pcRef.current = pc
 
-                // Connection and ICE state monitoring for debugging live calls
                 pc.onconnectionstatechange = () => {
                     if (!isMounted) return
-                    if (pc.connectionState === "connected") {
-                    } else if (pc.connectionState === "failed" || pc.connectionState === "disconnected") {
+                    if (pc.connectionState === "failed" || pc.connectionState === "disconnected") {
                         console.error("❌ WebRTC PeerConnection failed/disconnected!")
                     }
-                }
-
-                pc.oniceconnectionstatechange = () => {
-                    if (!isMounted) return
                 }
 
                 // Add local tracks to Peer Connection
@@ -286,14 +478,12 @@ function LiveCallContent() {
                 // Listen to remote tracks
                 pc.ontrack = (event) => {
                     if (!isMounted) return
-                    // Build remote stream from either streams[] or the track directly
                     const remoteStream = event.streams && event.streams[0]
                         ? event.streams[0]
                         : new MediaStream([event.track])
 
                     remoteStreamRef.current = remoteStream
 
-                    // Use the stable ref so this closure always gets the latest audio element
                     const audioEl = remoteAudioStableRef.current.el
                     if (audioEl) {
                         audioEl.srcObject = remoteStream
@@ -307,13 +497,11 @@ function LiveCallContent() {
                                     setNeedsPlayRetry(false)
                                 })
                                 .catch(playErr => {
-                                    console.warn("⚠️ Autoplay blocked, showing retry button:", playErr)
+                                    console.warn("⚠️ Autoplay blocked, showing retry banner:", playErr)
                                     setNeedsPlayRetry(true)
                                 })
                         }
                         tryPlay()
-                    } else {
-                        console.error("❌ remoteAudioEl is null when ontrack fired!")
                     }
                 }
 
@@ -328,7 +516,7 @@ function LiveCallContent() {
                     }
                 }
 
-                // Process any buffered signals that arrived while getting userMedia permissions
+                // Process any buffered signals
                 if (pendingSignalsRef.current.length > 0) {
                     for (const sig of pendingSignalsRef.current) {
                         if (!isMounted) return
@@ -337,7 +525,7 @@ function LiveCallContent() {
                     pendingSignalsRef.current = []
                 }
 
-                // If this user is the initiator, create the offer
+                // Create offer if initiator
                 const isInitiator = data.members[0] === user.id || data.members[0] === user._id
                 if (isInitiator) {
                     const offer = await pc.createOffer()
@@ -374,13 +562,11 @@ function LiveCallContent() {
             if (!isMounted) return
             toast.info("Partner disconnected from the call.")
             cleanupCall()
-            // Automatically search for next partner
             handleStartMatchmaking()
         })
 
         return () => {
             isMounted = false
-            // Explicitly leave the call room first if we were in a call
             if (roomIdRef.current) {
                 socket.emit("leave_call", {
                     roomId: roomIdRef.current,
@@ -431,9 +617,10 @@ function LiveCallContent() {
         const partnerName = partner?.name || "Speaker"
         const partnerAvatar = partner?.avatar || ""
         const duration = callDuration
+        const notesParam = notesText ? `&notes=${encodeURIComponent(notesText)}` : ""
 
         handleLeaveCall()
-        router.push(`/feedback?partnerId=${encodeURIComponent(partnerId)}&partnerName=${encodeURIComponent(partnerName)}&partnerAvatar=${encodeURIComponent(partnerAvatar)}&duration=${duration}`)
+        router.push(`/feedback?partnerId=${encodeURIComponent(partnerId)}&partnerName=${encodeURIComponent(partnerName)}&partnerAvatar=${encodeURIComponent(partnerAvatar)}&duration=${duration}${notesParam}`)
     }
 
     // Toggle Microphone (Mute)
@@ -455,7 +642,6 @@ function LiveCallContent() {
         const audioEl = remoteAudioStableRef.current.el
         if (audioEl) {
             audioEl.muted = nextVolumeOff
-            // If un-muting and stream is already set but paused, try to play again
             if (!nextVolumeOff && audioEl.paused && audioEl.srcObject) {
                 audioEl.play().catch(console.error)
             }
@@ -480,7 +666,7 @@ function LiveCallContent() {
 
     return (
         <div className="min-h-screen bg-background flex flex-col">
-            {/* Hidden audio element for remote stream — ref kept in stable object for socket closure access */}
+            {/* Hidden audio element for remote stream */}
             <audio
                 ref={(el) => {
                     remoteAudioRef.current = el
@@ -492,7 +678,7 @@ function LiveCallContent() {
                 className="hidden"
             />
 
-            {/* Autoplay retry banner — shown when browser blocks autoplay */}
+            {/* Autoplay retry banner */}
             {needsPlayRetry && callState === "CONNECTED" && (
                 <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-yellow-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 font-bold text-sm">
                     <Volume2 className="h-4 w-4" />
@@ -513,38 +699,72 @@ function LiveCallContent() {
                 </div>
             )}
 
-
-
             {/* Main Content Area */}
             <main className="z-10 flex-1 flex flex-col items-center justify-center pt-8 pb-16 px-4">
 
                 {/* 1. IDLE STATE: Not searching, ready to start */}
                 {callState === "IDLE" && (
-                    <div className="max-w-md w-full text-slate-800 dark:text-slate-100 text-center space-y-8">
-                        <div className="relative mx-auto w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center shadow-lg border-2 border-primary/20">
-                            <PhoneCall className="h-16 w-16 text-primary animate-bounce" />
+                    <div className="max-w-md w-full text-slate-800 dark:text-slate-100 text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        {/* Pulse Phone Icon Container */}
+                        <div className="relative mx-auto w-32 h-32 rounded-full flex items-center justify-center">
+                            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-60" style={{ animationDuration: "3s" }} />
+                            <div className="absolute inset-2 rounded-full bg-primary/15 animate-pulse opacity-85" style={{ animationDuration: "2s" }} />
+                            <div className="relative w-28 h-28 rounded-full bg-[#006D5B]/5 border-2 border-primary/20 flex items-center justify-center shadow-lg">
+                                <PhoneCall className="h-12 w-12 text-[#006D5B]" />
+                            </div>
                         </div>
 
                         <div className="space-y-3">
-                            <h2 className="text-3xl font-heading font-bold text-slate-800 dark:text-white">Start Practice Calling</h2>
-                            <p className="text-muted-foreground text-sm leading-relaxed">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black rounded-full uppercase tracking-wider">
+                                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                {onlineCount.toLocaleString()} users online now
+                            </div>
+                            <h2 className="text-3xl font-heading font-extrabold text-slate-900 dark:text-white leading-tight">Start Practice Calling</h2>
+                            <p className="text-muted-foreground text-xs leading-relaxed max-w-sm mx-auto font-medium">
                                 Match instantly with another language learner. Speak in English, share ideas, and boost your conversation skills naturally.
                             </p>
                         </div>
 
+                        {/* Guideline Banner */}
+                        <div className="bg-zinc-50/50 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-800/80 rounded-2xl p-3.5 text-[11px] text-zinc-550 dark:text-zinc-400 leading-normal font-semibold text-left flex items-start gap-2.5">
+                            <span className="text-sm">🛡️</span>
+                            <div>
+                                <span className="font-extrabold text-zinc-850 dark:text-zinc-200">Community Safety Guidelines</span>
+                                <p className="mt-0.5 opacity-90">Please be respectful and friendly. Harassment, abuse, or inappropriate behavior will result in an immediate permanent ban.</p>
+                            </div>
+                        </div>
+
                         <Button
                             onClick={handleStartMatchmaking}
-                            className="w-full h-14 bg-[#006D5B] hover:bg-[#005a4b] text-white font-bold rounded-full text-lg shadow-lg shadow-primary/20 transition-all active:scale-95 gap-2"
+                            className="w-full h-13 bg-[#006D5B] hover:bg-[#005a4b] text-white font-extrabold rounded-2xl text-base shadow-lg shadow-[#006D5B]/10 transition-all active:scale-[0.98] gap-2 border-none cursor-pointer"
                         >
                             Find Learning Partner
-                            <ArrowRight className="h-5 w-5" />
+                            <ArrowRight className="h-4.5 w-4.5" />
                         </Button>
+
+                        {/* Quick tip & Practice History shortcuts */}
+                        <div className="grid grid-cols-2 gap-3.5 pt-4 text-left">
+                            <div className="bg-zinc-50/30 dark:bg-zinc-900/10 border border-zinc-100/80 dark:border-zinc-900/60 p-3 rounded-2xl space-y-1">
+                                <span className="text-xs">💡 Quick Tip</span>
+                                <p className="text-[10px] text-muted-foreground font-semibold leading-normal">
+                                    {randomTip}
+                                </p>
+                            </div>
+                            <div className="bg-zinc-50/30 dark:bg-zinc-900/10 border border-zinc-100/80 dark:border-zinc-900/60 p-3 rounded-2xl space-y-1 flex flex-col justify-between">
+                                <span className="text-xs">📊 Calling Stats</span>
+                                <p className="text-[10px] text-muted-foreground font-semibold leading-normal">
+                                    {callsCount > 0
+                                        ? `Completed ${callsCount} practice calls so far. Keep up the great progress!`
+                                        : "You haven't completed any practice calls yet. Start your first session today!"}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 )}
 
                 {/* 2. SEARCHING STATE: Radar Scanner */}
                 {callState === "SEARCHING" && (
-                    <div className="text-center space-y-8">
+                    <div className="text-center space-y-8 animate-in fade-in zoom-in-95 duration-300">
                         <div className="relative mx-auto flex items-center justify-center w-56 h-56">
                             {/* Radar Waves */}
                             <div className="absolute inset-0 rounded-full bg-primary/10 animate-ping opacity-60" style={{ animationDuration: "3s" }} />
@@ -570,8 +790,12 @@ function LiveCallContent() {
                         </div>
 
                         <div className="space-y-3">
-                            <h3 className="text-2xl font-heading font-bold text-slate-800 dark:text-white animate-pulse">Searching for Partner...</h3>
-                            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary text-[11px] font-black rounded-full uppercase tracking-wider">
+                                <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                                Searching... {formatTime(searchTime)}
+                            </div>
+                            <h3 className="text-2xl font-heading font-extrabold text-slate-800 dark:text-white">Searching for Partner...</h3>
+                            <p className="text-muted-foreground text-xs max-w-xs mx-auto font-medium leading-relaxed">
                                 Matching you with another advanced speaker to practice your English speaking.
                             </p>
                         </div>
@@ -579,32 +803,38 @@ function LiveCallContent() {
                         <Button
                             variant="outline"
                             onClick={handleLeaveCall}
-                            className="px-8 h-12 rounded-full border-muted/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 font-bold transition-all"
+                            className="px-8 h-12 rounded-full border-muted/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/20 font-extrabold transition-all cursor-pointer text-sm shadow-sm"
                         >
                             Cancel Search
                         </Button>
                     </div>
                 )}
 
-                {/* 3. CONNECTED STATE: Audio Call Interface */}
+                 {/* 3. CONNECTED STATE: Audio Call Interface */}
                 {callState === "CONNECTED" && partner && (
-                    <div className="relative space-y-6 text-center max-w-sm w-full">
-                        {/* Timer & Report Overlay */}
-                        <div className="flex items-center justify-between w-full bg-muted/40 dark:bg-zinc-900/50 border border-border/50 px-4 py-2 rounded-xl">
-                            <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                                <Clock className="h-4 w-4 animate-pulse" />
-                                {formatTime(callDuration)}
+                    <div className="flex flex-col lg:flex-row items-center lg:items-stretch justify-center gap-6 w-full max-w-5xl animate-in fade-in zoom-in-95 duration-300">
+                        {/* Main Call Card */}
+                        <div className="relative space-y-6 text-center w-full max-w-md bg-card border border-border/80 p-6 sm:p-8 rounded-3xl shadow-lg flex flex-col justify-between">
+                            {/* Timer & Safety Report Overlay */}
+                            <div className="flex items-center justify-between w-full bg-muted/40 dark:bg-zinc-900/50 border border-border/50 px-4 py-2 rounded-xl">
+                                <div className="flex items-center gap-2 text-primary font-black text-xs">
+                                    <Clock className="h-4 w-4 animate-pulse" />
+                                    {formatTime(callDuration)}
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    onClick={handleEndCallAndFeedback}
+                                    className="text-red-500 hover:text-red-650 hover:bg-red-500/10 flex items-center gap-1.5 px-3 py-1 rounded-xl border border-red-500/15 bg-red-500/5 font-extrabold text-[10px] tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-none h-7"
+                                >
+                                    <Flag className="h-3 w-3" />
+                                    Report Partner
+                                </Button>
                             </div>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors rounded-lg">
-                                <Flag className="h-4.5 w-4.5" />
-                            </Button>
-                        </div>
 
-                        {/* Partner Avatar */}
-                        <div className="relative mx-auto pt-2">
-                            <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
-                            <div className="relative h-48 w-48 rounded-full border border-border/80 shadow-md overflow-hidden mx-auto bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
-                                {partner.avatar ? (
+                            {/* Partner Avatar */}
+                            <div className="relative mx-auto pt-2">
+                                <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
+                                <div className="relative h-44 w-44 rounded-full border border-border/80 shadow-md overflow-hidden mx-auto bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
                                     <Image
                                         src={partner.avatar}
                                         alt={partner.name}
@@ -612,49 +842,216 @@ function LiveCallContent() {
                                         unoptimized
                                         className="w-full h-full object-cover"
                                     />
-                                ) : (
-                                    <span className="text-6xl font-bold text-primary">
-                                        {partner.name.charAt(0)}
+                                </div>
+                            </div>
+
+                            {/* Name & Details */}
+                            <div className="space-y-3">
+                                <h2 className="text-3xl font-heading font-extrabold text-[#1a2b3b] dark:text-white leading-tight">
+                                    {partner.name}
+                                </h2>
+                                <div className="flex items-center justify-center gap-3">
+                                    <div className="flex items-center gap-1 text-muted-foreground text-xs font-semibold">
+                                        <MapPin className="h-3.5 w-3.5" />
+                                        Native: {partner.language}
+                                    </div>
+                                    <span className="px-2.5 py-0.5 bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[9px] font-black rounded-full uppercase tracking-widest border border-teal-500/10">
+                                        Speaking Partner
                                     </span>
+                                </div>
+                            </div>
+
+                            {/* Audio Visualizer Panels for Differentiating Speakers */}
+                            <div className="grid grid-cols-2 gap-4 bg-zinc-50/50 dark:bg-zinc-900/20 border border-zinc-100/60 dark:border-zinc-800/60 p-4 rounded-2xl mt-4">
+                                {/* Left: You */}
+                                <div className="flex flex-col items-center gap-2">
+                                    <span className={cn(
+                                        "text-[9px] font-black uppercase tracking-widest transition-colors",
+                                        isMuted ? "text-destructive animate-pulse" : "text-zinc-500"
+                                    )}>
+                                        {isMuted ? "You (Muted)" : "You (Speaking)"}
+                                    </span>
+                                    <div className="flex items-center gap-1 h-6">
+                                        {[...Array(6)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className={cn(
+                                                    "w-1 rounded-full transition-all duration-300",
+                                                    isMuted ? "h-1 bg-destructive/30" : "bg-emerald-500 animate-visualizer"
+                                                )}
+                                                style={isMuted ? {} : {
+                                                    height: `${4 + Math.random() * 16}px`,
+                                                    animationDelay: `${i * 0.08}s`,
+                                                    animationDuration: `${0.5 + Math.random() * 0.5}s`
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Right: Partner */}
+                                <div className="flex flex-col items-center gap-2 border-l border-zinc-200/60 dark:border-zinc-800/60 pl-2">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-[#006D5B] animate-pulse">
+                                        Partner Speaking
+                                    </span>
+                                    <div className="flex items-center gap-1 h-6">
+                                        {[...Array(6)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="w-1 bg-[#006D5B] rounded-full animate-visualizer"
+                                                style={{
+                                                    height: `${4 + Math.random() * 16}px`,
+                                                    animationDelay: `${i * 0.08}s`,
+                                                    animationDuration: `${0.5 + Math.random() * 0.5}s`
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Floating Quick Controls inside call card */}
+                            <div className="flex items-center justify-center gap-3.5 pt-4">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={handleToggleMute}
+                                    className={cn(
+                                        "h-10 w-10 rounded-xl border border-border transition-all cursor-pointer shadow-sm",
+                                        isMuted ? "bg-red-500 hover:bg-red-650 text-white border-red-500" : "bg-card hover:bg-muted/10 text-foreground"
+                                    )}
+                                    title={isMuted ? "Unmute Mic" : "Mute Mic"}
+                                >
+                                    {isMuted ? <MicOff className="h-4.5 w-4.5" /> : <Mic className="h-4.5 w-4.5" />}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={handleToggleVolume}
+                                    className={cn(
+                                        "h-10 w-10 rounded-xl border border-border transition-all cursor-pointer shadow-sm",
+                                        isVolumeOff ? "bg-red-500 hover:bg-red-650 text-white border-red-500" : "bg-card hover:bg-muted/10 text-foreground"
+                                    )}
+                                    title={isVolumeOff ? "Turn Volume On" : "Turn Volume Off"}
+                                >
+                                    {isVolumeOff ? <VolumeX className="h-4.5 w-4.5" /> : <Volume2 className="h-4.5 w-4.5" />}
+                                </Button>
+                                <Button
+                                    onClick={handleEndCallAndFeedback}
+                                    className="h-10 px-5 bg-red-600 hover:bg-red-700 font-extrabold rounded-xl text-xs gap-1.5 cursor-pointer shadow-sm border-none transition-all active:scale-[0.98]"
+                                >
+                                    <PhoneOff className="h-4 w-4" /> End Call
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Side Panel: Captions or Notes */}
+                        {(isNotesOpen || isCaptionsOpen) && (
+                            <div className="w-full lg:w-96 bg-card border border-border/80 rounded-3xl p-6 shadow-lg flex flex-col min-h-[420px] lg:min-h-full transition-all animate-in fade-in slide-in-from-right-4 duration-300">
+                                {isNotesOpen && (
+                                    <div className="flex flex-col h-full space-y-4">
+                                        <div className="flex items-center justify-between border-b border-border pb-3">
+                                            <div className="flex items-center gap-2">
+                                                <StickyNote className="h-5 w-5 text-[#006D5B]" />
+                                                <h3 className="font-heading font-extrabold text-lg text-foreground">Call Notes</h3>
+                                            </div>
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-8 w-8 rounded-full" 
+                                                onClick={() => setIsNotesOpen(false)}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        <div className="flex-1 flex flex-col">
+                                            <textarea
+                                                className="flex-1 w-full p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-border/80 outline-none focus:border-[#006D5B] focus:ring-1 focus:ring-[#006D5B]/20 transition-all font-semibold text-sm text-foreground placeholder:text-muted-foreground resize-none min-h-[220px]"
+                                                placeholder="Type any word, grammar rule, or feedback from your partner here..."
+                                                value={notesText}
+                                                onChange={(e) => setNotesText(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1.5 font-semibold">
+                                            <span className="flex items-center gap-1.5">
+                                                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                                Auto-saves to Feedback
+                                            </span>
+                                            <span>{notesText.length} chars</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {isCaptionsOpen && (
+                                    <div className="flex flex-col h-full space-y-4">
+                                        <div className="flex items-center justify-between border-b border-border pb-3">
+                                            <div className="flex items-center gap-2">
+                                                <MessageSquareText className="h-5 w-5 text-[#006D5B]" />
+                                                <h3 className="font-heading font-extrabold text-lg text-foreground">Live Captions</h3>
+                                            </div>
+                                            <Button 
+                                                variant="ghost" 
+                                                size="icon" 
+                                                className="h-8 w-8 rounded-full" 
+                                                onClick={() => setIsCaptionsOpen(false)}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        
+                                        {/* Transcript box */}
+                                        <div className="flex-1 overflow-y-auto space-y-3.5 pr-1 max-h-[350px] min-h-[250px] scrollbar-thin">
+                                            {captionsList.map((cap, idx) => (
+                                                <div key={idx} className={cn(
+                                                    "flex flex-col max-w-[85%] rounded-2xl px-3.5 py-2.5 text-xs font-semibold leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-200",
+                                                    cap.sender === "You" 
+                                                        ? "bg-[#006D5B]/10 text-slate-800 dark:text-teal-200 self-end ml-auto rounded-tr-none" 
+                                                        : "bg-zinc-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 self-start mr-auto rounded-tl-none"
+                                                )}>
+                                                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mb-1">
+                                                        <span className="font-black uppercase tracking-wider">{cap.sender}</span>
+                                                        <span>•</span>
+                                                        <span>{cap.time}</span>
+                                                    </div>
+                                                    <div>{cap.text}</div>
+                                                </div>
+                                            ))}
+                                            <div ref={captionsEndRef} />
+                                        </div>
+
+                                        {/* Controls */}
+                                        <div className="border-t border-border pt-4 flex flex-col gap-2">
+                                            {/* Toggle Speech-to-Text Button */}
+                                            <Button
+                                                onClick={handleToggleListening}
+                                                className={cn(
+                                                    "w-full h-10 font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 transition-all border-none cursor-pointer text-white",
+                                                    isListening 
+                                                        ? "bg-red-500 hover:bg-red-600 shadow-md shadow-red-500/10" 
+                                                        : "bg-[#006D5B] hover:bg-[#005a4b] shadow-md shadow-primary/10"
+                                                )}
+                                            >
+                                                <span className={cn(
+                                                    "h-2 w-2 rounded-full bg-white",
+                                                    isListening && "animate-ping"
+                                                )} />
+                                                {isListening ? "Turn Off Live Mic Transcribing" : "Turn On Live Mic Transcribing"}
+                                            </Button>
+                                            <p className="text-[10px] text-muted-foreground font-semibold text-center leading-normal">
+                                                Uses browser native speech recognition. Partner responses are simulated.
+                                            </p>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
-                        </div>
-
-                        {/* Name & Details */}
-                        <div className="space-y-3">
-                            <h2 className="text-4xl font-heading font-bold text-[#1a2b3b] dark:text-white">{partner.name}</h2>
-                            <div className="flex items-center justify-center gap-3">
-                                <div className="flex items-center gap-1 text-muted-foreground text-sm font-medium">
-                                    <MapPin className="h-4 w-4" />
-                                    Native: {partner.language}
-                                </div>
-                                <span className="px-3 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                                    Speaking Partner
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Audio Visualizer */}
-                        <div className="flex items-center justify-center gap-1.5 h-12 pt-4">
-                            {[...Array(12)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="w-1.5 bg-[#006D5B] rounded-full animate-visualizer"
-                                    style={{
-                                        height: `${10 + Math.random() * 30}px`,
-                                        animationDelay: `${i * 0.08}s`,
-                                        animationDuration: `${0.6 + Math.random() * 0.5}s`
-                                    }}
-                                />
-                            ))}
-                        </div>
+                        )}
                     </div>
                 )}
             </main>
 
-            {/* Bottom Control Bar (Only shown when searching or connected) */}
+            {/* Bottom Control Bar */}
             {(callState === "CONNECTED" || callState === "SEARCHING") && (
-                <footer className="z-10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-t border-muted/20 px-8 py-6 transition-all duration-300">
+                <footer className="z-10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-t border-muted/20 px-8 py-5 transition-all duration-300">
                     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                         {/* Left: Toggles */}
                         <div className="flex items-center justify-center md:justify-start gap-4">
@@ -664,17 +1061,17 @@ function LiveCallContent() {
                                         variant="outline"
                                         size="icon"
                                         onClick={handleToggleMute}
-                                        className={`h-12 w-12 rounded-full border-none transition-all ${isMuted ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'bg-[#006D5B]/5 text-[#1a2b3b] dark:text-white hover:bg-[#006D5B]/10'}`}
+                                        className={`h-11 w-11 rounded-full border-none transition-all cursor-pointer ${isMuted ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'bg-[#006D5B]/5 text-[#1a2b3b] dark:text-white hover:bg-[#006D5B]/10'}`}
                                     >
-                                        {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                                        {isMuted ? <MicOff className="h-4.5 w-4.5" /> : <Mic className="h-4.5 w-4.5" />}
                                     </Button>
                                     <Button
                                         variant="outline"
                                         size="icon"
                                         onClick={handleToggleVolume}
-                                        className={`h-12 w-12 rounded-full border-none transition-all ${isVolumeOff ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'bg-[#006D5B]/5 text-[#1a2b3b] dark:text-white hover:bg-[#006D5B]/10'}`}
+                                        className={`h-11 w-11 rounded-full border-none transition-all cursor-pointer ${isVolumeOff ? 'bg-destructive/10 text-destructive hover:bg-destructive/20' : 'bg-[#006D5B]/5 text-[#1a2b3b] dark:text-white hover:bg-[#006D5B]/10'}`}
                                     >
-                                        {isVolumeOff ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                                        {isVolumeOff ? <VolumeX className="h-4.5 w-4.5" /> : <Volume2 className="h-4.5 w-4.5" />}
                                     </Button>
                                 </>
                             )}
@@ -686,16 +1083,16 @@ function LiveCallContent() {
                                 <>
                                     <Button
                                         onClick={handleStartMatchmaking}
-                                        className="h-14 px-8 rounded-full bg-[#006D5B] hover:bg-[#005a4b] text-white font-bold gap-2 text-lg shadow-lg shadow-primary/20 transition-all active:scale-95"
+                                        className="h-12 px-7 rounded-full bg-[#006D5B] hover:bg-[#005a4b] text-white font-extrabold gap-2 text-sm shadow-md shadow-primary/10 transition-all active:scale-95 cursor-pointer border-none"
                                     >
                                         Next Partner
-                                        <ArrowRight className="h-5 w-5" />
+                                        <ArrowRight className="h-4 w-4" />
                                     </Button>
                                     <Button
                                         onClick={handleEndCallAndFeedback}
-                                        className="h-14 px-6 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold gap-2 shadow-lg shadow-red-600/30 transition-all active:scale-95 flex items-center justify-center"
+                                        className="h-12 px-6 rounded-full bg-red-600 hover:bg-red-700 text-white font-extrabold gap-2 shadow-md shadow-red-600/10 transition-all active:scale-95 flex items-center justify-center cursor-pointer border-none"
                                     >
-                                        <PhoneOff className="h-5 w-5 text-white" />
+                                        <PhoneOff className="h-4 w-4 text-white" />
                                         End Call
                                     </Button>
                                 </>
@@ -704,9 +1101,9 @@ function LiveCallContent() {
                                 <Button
                                     variant="destructive"
                                     onClick={handleLeaveCall}
-                                    className="h-14 px-8 rounded-full shadow-lg shadow-destructive/20 transition-all active:scale-95 font-bold gap-2 text-lg"
+                                    className="h-12 px-7 rounded-full shadow-md shadow-destructive/15 transition-all active:scale-95 font-extrabold gap-2 text-sm cursor-pointer border-none"
                                 >
-                                    <PhoneOff className="h-5 w-5 text-white" />
+                                    <PhoneOff className="h-4 w-4 text-white" />
                                     Cancel Matchmaking
                                 </Button>
                             )}
@@ -717,16 +1114,30 @@ function LiveCallContent() {
                             {callState === "CONNECTED" && (
                                 <>
                                     <button
-                                        className="flex flex-col items-center gap-1.5 transition-all text-muted-foreground hover:text-primary group"
+                                        onClick={() => {
+                                            setIsCaptionsOpen(prev => !prev)
+                                            setIsNotesOpen(false)
+                                        }}
+                                        className={cn(
+                                            "flex flex-col items-center gap-1.5 transition-all group cursor-pointer",
+                                            isCaptionsOpen ? "text-[#006D5B] dark:text-teal-400" : "text-muted-foreground hover:text-primary"
+                                        )}
                                     >
-                                        <MessageSquareText className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                                        <span className="text-[10px] font-bold uppercase tracking-widest">Captions</span>
+                                        <MessageSquareText className="h-4.5 w-4.5 group-hover:scale-110 transition-transform" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest">Captions</span>
                                     </button>
                                     <button
-                                        className="flex flex-col items-center gap-1.5 transition-all text-muted-foreground hover:text-primary group"
+                                        onClick={() => {
+                                            setIsNotesOpen(prev => !prev)
+                                            setIsCaptionsOpen(false)
+                                        }}
+                                        className={cn(
+                                            "flex flex-col items-center gap-1.5 transition-all group cursor-pointer",
+                                            isNotesOpen ? "text-[#006D5B] dark:text-teal-400" : "text-muted-foreground hover:text-primary"
+                                        )}
                                     >
-                                        <StickyNote className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                                        <span className="text-[10px] font-bold uppercase tracking-widest">Notes</span>
+                                        <StickyNote className="h-4.5 w-4.5 group-hover:scale-110 transition-transform" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest">Notes</span>
                                     </button>
                                 </>
                             )}
@@ -738,11 +1149,11 @@ function LiveCallContent() {
             {/* Animation Styles */}
             <style jsx global>{`
                 @keyframes visualizer {
-                  0%, 100% { height: 8px; }
-                  50% { height: 35px; }
+                  0%, 100% { height: 6px; }
+                  50% { height: 22px; }
                 }
                 .animate-visualizer {
-                  animation: visualizer 0.8s ease-in-out infinite;
+                  animation: visualizer 0.7s ease-in-out infinite;
                 }
             `}</style>
         </div>
