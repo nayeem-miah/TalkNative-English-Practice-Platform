@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BookMarked, GraduationCap } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { CourseThumbnail } from "@/components/ui/course-thumbnail"
+import { cleanTitle, stripMarkdown } from "@/lib/text"
 import { cn } from "@/lib/utils"
+import { Course } from "@/types/course"
 
 interface CourseCardProps {
-  course: any
+  course: Course
 }
 
 export function CourseCard({ course }: CourseCardProps) {
-  const thumbnailSrc = course.thumbnail || "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&auto=format&fit=crop&q=60"
-  const lessonsCount = course._count?.lessons ?? 0
+  // Use _count.lessons or fallback to lessons array length (if populated on homepage query)
+  const lessonsCount = course._count?.lessons ?? (course as any).lessons?.length ?? 0
   const levelColors: Record<string, string> = {
     BEGINNER: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20",
     INTERMEDIATE: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 border-blue-100 dark:border-blue-500/20",
@@ -22,18 +24,13 @@ export function CourseCard({ course }: CourseCardProps) {
   }
   const levelColor = levelColors[course.level?.toUpperCase()] || "bg-muted text-muted-foreground border-transparent"
 
+  const finalTitle = cleanTitle(course.title)
+
   return (
-    <Card className="overflow-hidden border border-border/80 hover:border-primary/30 shadow-sm hover:shadow-lg flex flex-col rounded-2xl bg-card transition-all duration-300 hover:-translate-y-1 group">
+    <Card className="overflow-hidden border border-border/80 hover:border-primary/30 shadow-sm hover:shadow-lg flex flex-col rounded-2xl bg-card transition-all duration-300 hover:-translate-y-1 group min-h-[420px]">
       {/* Media Thumbnail */}
       <div className="relative aspect-video w-full overflow-hidden bg-muted">
-        <Image
-          width={400}
-          height={250}
-          src={thumbnailSrc}
-          alt={course.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 animate-in fade-in-50 duration-500"
-          unoptimized
-        />
+        <CourseThumbnail title={finalTitle} level={course.level} thumbnail={course.thumbnail} />
 
         {/* Floating Badges */}
         <div className="absolute inset-0 p-3.5 flex justify-between items-start bg-gradient-to-b from-black/40 via-transparent to-transparent">
@@ -49,11 +46,12 @@ export function CourseCard({ course }: CourseCardProps) {
       {/* Content Section */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div className="space-y-2">
-          <h3 className="text-base font-extrabold text-foreground tracking-tight group-hover:text-primary transition-colors line-clamp-1">
-            {course.title}
+          {/* Card Title Clamped to Exactly 2 Lines with constant height */}
+          <h3 className="text-base font-extrabold text-foreground tracking-tight group-hover:text-primary transition-colors line-clamp-2 h-12 leading-snug">
+            {finalTitle}
           </h3>
-          <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed font-medium">
-            {course.description}
+          <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed font-medium min-h-[3.375rem]">
+            {course.description ? stripMarkdown(course.description) : ""}
           </p>
         </div>
 
@@ -65,19 +63,30 @@ export function CourseCard({ course }: CourseCardProps) {
               {lessonsCount} {lessonsCount === 1 ? "Lesson" : "Lessons"}
             </span>
             <span className="shrink-0 text-muted-foreground/40">•</span>
+
+            {/* Dynamic Learners display with New Badge fallback */}
             <span className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
               <GraduationCap className="w-3.5 h-3.5 text-muted-foreground/60" />
-              {course.studentsCount ?? 0} Learners
+              {(course.studentsCount ?? 0) > 0 ? (
+                <span>{course.studentsCount} Learners</span>
+              ) : (
+                <span className="text-emerald-600 dark:text-emerald-400 font-extrabold uppercase text-[9px] tracking-wider bg-emerald-500/10 px-1.5 py-0.5 rounded-md">New</span>
+              )}
             </span>
             <span className="shrink-0 text-muted-foreground/40">•</span>
-            <span className="text-foreground font-black text-xs truncate" title={course.price > 0 ? `$${course.price}` : "Free"}>
-              {course.price > 0 
-                ? new Intl.NumberFormat("en-US", { 
-                    style: "currency", 
+
+            {/* Consistent Price styling */}
+            <span className={cn(
+              "font-extrabold text-xs truncate",
+              course.price > 0 ? "text-foreground" : "text-emerald-600 dark:text-emerald-400"
+            )}>
+              {course.price > 0
+                ? new Intl.NumberFormat("en-US", {
+                    style: "currency",
                     currency: "USD",
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 2
-                  }).format(course.price) 
+                  }).format(course.price)
                 : "Free"}
             </span>
           </div>

@@ -6,6 +6,7 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { ComingSoonCard } from "@/components/ui/coming-soon-card"
 import { CourseCard } from "@/components/ui/course-card"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Input } from "@/components/ui/input"
@@ -59,7 +60,7 @@ export function CoursesClient() {
               placeholder="Search courses..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="pl-11 h-12 rounded-xl border-border bg-muted/10 transition-all focus:ring-primary/10"
+              className="pl-11 h-11 rounded-xl border-border bg-muted/10 transition-all focus:ring-primary/10"
             />
           </div>
 
@@ -71,9 +72,9 @@ export function CoursesClient() {
                 variant={levelFilter === lvl ? "default" : "outline"}
                 onClick={() => handleLevelChange(lvl)}
                 className={cn(
-                  "rounded-xl text-xs font-bold px-4 py-2 h-10 transition-all uppercase tracking-wider border-border/60",
+                  "rounded-xl text-xs font-extrabold px-4 h-11 transition-all duration-300 uppercase tracking-wider border-border/60 hover:scale-[1.02] active:scale-[0.98]",
                   levelFilter === lvl
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/10 border-none"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 border-none hover:bg-primary/90"
                     : "hover:bg-muted text-muted-foreground hover:text-foreground bg-background"
                 )}
               >
@@ -115,6 +116,12 @@ export function CoursesClient() {
               {courses.map((course: any) => (
                 <CourseCard key={course.id} course={course} />
               ))}
+              {/* Coming Soon placeholders to fill grid symmetry */}
+              {courses.length > 0 && courses.length % 3 !== 0 &&
+                Array.from({ length: 3 - (courses.length % 3) }).map((_, idx) => (
+                  <ComingSoonCard key={`placeholder-${idx}`} />
+                ))
+              }
             </div>
 
             {/* Premium Pagination controls */}

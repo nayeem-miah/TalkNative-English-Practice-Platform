@@ -1,6 +1,6 @@
-import * as React from "react"
+import { getCleanThumbnail } from "@/lib/text"
+import { Lock, Play } from "lucide-react"
 import Image from "next/image"
-import { Play, Lock } from "lucide-react"
 
 interface VideoPlayerProps {
   isEnrolled: boolean
@@ -19,7 +19,7 @@ export function VideoPlayer({
   activeVideoTitle,
   onEnrollClick,
 }: VideoPlayerProps) {
-  
+
   const getYouTubeEmbedUrl = (url?: string) => {
     if (!url) return ""
     let videoId = ""
@@ -62,21 +62,22 @@ export function VideoPlayer({
     <div className="overflow-hidden rounded-2xl border border-border bg-muted aspect-video relative group shadow-sm">
       <Image
         fill
-        src={thumbnail || "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&auto=format&fit=crop&q=60"}
+        src={getCleanThumbnail(thumbnail)}
         alt={courseTitle}
         className="object-cover group-hover:scale-105 transition-transform duration-500"
         unoptimized
       />
-      <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-6 space-y-4">
-        <div 
+      {/* Dark scrim with blur to cover underlying text and make lock overlay legible */}
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-md flex flex-col items-center justify-center text-center p-6 space-y-4">
+        <div
           onClick={onEnrollClick}
-          className="h-14 w-14 rounded-full bg-white/95 text-black flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 cursor-pointer"
+          className="h-14 w-14 rounded-full bg-white/95 text-black flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 cursor-pointer hover:bg-white"
         >
           <Lock className="w-5 h-5 text-primary" />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1.5 max-w-sm">
           <p className="text-white font-black text-sm uppercase tracking-widest">Syllabus Locked</p>
-          <p className="text-white/80 text-xs font-semibold">Please enroll in this course to access lessons and learning content.</p>
+          <p className="text-zinc-300 text-xs font-semibold leading-relaxed">Please enroll in this course to access lessons and learning content.</p>
         </div>
       </div>
     </div>
