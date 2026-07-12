@@ -62,7 +62,6 @@ export default function UsersPage() {
     { skip: !selectedUserId }
   )
 
-  console.log("get single users", userDetailsResponse )
   const userDetail = userDetailsResponse?.data || userDetailsResponse
 
   const [updateUserRole, { isLoading: isUpdatingRole }] = useUpdateUserRoleMutation()

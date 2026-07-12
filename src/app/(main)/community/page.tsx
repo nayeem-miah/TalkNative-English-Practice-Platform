@@ -1,4 +1,4 @@
-import CommunityFeed from "./components/CommunityFeed";
+import CommunityFeed from "./components/community-feed";
 
 export default function CommunityPage() {
   return <CommunityFeed />;

@@ -25,7 +25,7 @@ import { ImageIcon, Plus, Search, Users, X } from "lucide-react"
 import { toast } from "sonner"
 import { Post } from "@/types/community"
 import { useGetPostsQuery, useCreatePostMutation } from "@/redux/api/community-api"
-import { PostCard } from "./PostCard"
+import { PostCard } from "./post-card"
 
 export default function CommunityFeed() {
   const [mounted, setMounted] = React.useState(false)

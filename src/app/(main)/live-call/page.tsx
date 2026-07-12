@@ -128,7 +128,6 @@ function LiveCallContent() {
 
         let isMounted = true
         const socketUrl = process.env.NEXT_PUBLIC_BASE_API?.replace("/api/v1", "") || "http://localhost:8321"
-        console.log("Connecting to socket server:", socketUrl)
 
         const socket = io(socketUrl, {
             transports: ["websocket"],
@@ -139,13 +138,11 @@ function LiveCallContent() {
 
         socket.on("connect", () => {
             if (!isMounted) return
-            console.log("Socket connected successfully!")
             setSocketConnected(true)
         })
 
         socket.on("disconnect", () => {
             if (!isMounted) return
-            console.log("Socket disconnected!")
             setSocketConnected(false)
         })
 
@@ -154,12 +151,10 @@ function LiveCallContent() {
             try {
                 if (!isMounted) return
                 if (signal.sdp) {
-                    console.log("Received SDP signal:", signal.sdp)
                     await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp))
 
                     if (!isMounted) return
                     if (signal.sdp.type === "offer") {
-                        console.log("Creating answer...")
                         const answer = await pc.createAnswer()
                         await pc.setLocalDescription(answer)
                         if (!isMounted) return
@@ -171,7 +166,6 @@ function LiveCallContent() {
 
                     // Process any queued ICE candidates that arrived before the Remote Description was set
                     if (queuedCandidatesRef.current.length > 0) {
-                        console.log(`Processing ${queuedCandidatesRef.current.length} queued ICE candidates...`)
                         for (const cand of queuedCandidatesRef.current) {
                             try {
                                 if (!isMounted) return
@@ -183,9 +177,7 @@ function LiveCallContent() {
                         queuedCandidatesRef.current = []
                     }
                 } else if (signal.candidate) {
-                    console.log("Received ICE candidate:", signal.candidate)
                     if (!pc.remoteDescription || !pc.remoteDescription.type) {
-                        console.log("Remote description not set yet. Queueing ICE candidate.")
                         queuedCandidatesRef.current.push(signal.candidate)
                     } else {
                         await pc.addIceCandidate(new RTCIceCandidate(signal.candidate))
@@ -206,7 +198,6 @@ function LiveCallContent() {
             members: string[];
         }) => {
             if (!isMounted) return
-            console.log("Match found event received:", data)
             roomIdRef.current = data.roomId
             setPartner({
                 id: data.partnerId,
@@ -277,9 +268,7 @@ function LiveCallContent() {
                 // Connection and ICE state monitoring for debugging live calls
                 pc.onconnectionstatechange = () => {
                     if (!isMounted) return
-                    console.log("📡 WebRTC Connection State Change:", pc.connectionState)
                     if (pc.connectionState === "connected") {
-                        console.log("🏆 WebRTC PeerConnection successfully connected!")
                     } else if (pc.connectionState === "failed" || pc.connectionState === "disconnected") {
                         console.error("❌ WebRTC PeerConnection failed/disconnected!")
                     }
@@ -287,7 +276,6 @@ function LiveCallContent() {
 
                 pc.oniceconnectionstatechange = () => {
                     if (!isMounted) return
-                    console.log("📡 WebRTC ICE Connection State Change:", pc.iceConnectionState)
                 }
 
                 // Add local tracks to Peer Connection
@@ -298,7 +286,6 @@ function LiveCallContent() {
                 // Listen to remote tracks
                 pc.ontrack = (event) => {
                     if (!isMounted) return
-                    console.log("🎵 Remote track received:", event.track.kind, event.streams)
                     // Build remote stream from either streams[] or the track directly
                     const remoteStream = event.streams && event.streams[0]
                         ? event.streams[0]
@@ -317,7 +304,6 @@ function LiveCallContent() {
                             if (!isMounted) return
                             audioEl.play()
                                 .then(() => {
-                                    console.log("🔊 Remote audio playback started successfully!")
                                     setNeedsPlayRetry(false)
                                 })
                                 .catch(playErr => {
@@ -344,7 +330,6 @@ function LiveCallContent() {
 
                 // Process any buffered signals that arrived while getting userMedia permissions
                 if (pendingSignalsRef.current.length > 0) {
-                    console.log(`Processing ${pendingSignalsRef.current.length} buffered signals...`)
                     for (const sig of pendingSignalsRef.current) {
                         if (!isMounted) return
                         await processSignal(sig, pc)
@@ -355,7 +340,6 @@ function LiveCallContent() {
                 // If this user is the initiator, create the offer
                 const isInitiator = data.members[0] === user.id || data.members[0] === user._id
                 if (isInitiator) {
-                    console.log("Initiating WebRTC offer...")
                     const offer = await pc.createOffer()
                     if (!isMounted) return
                     await pc.setLocalDescription(offer)
@@ -379,7 +363,6 @@ function LiveCallContent() {
             if (!isMounted) return
             const pc = pcRef.current
             if (!pc) {
-                console.log("PC not ready, buffering signal:", data.signal)
                 pendingSignalsRef.current.push(data.signal)
                 return
             }
