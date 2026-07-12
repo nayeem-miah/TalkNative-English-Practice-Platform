@@ -18,6 +18,9 @@ export interface Post {
   content?: string;
   category: string;
   author: {
+    [x: string]: string | undefined;
+    id: string | undefined;
+    email: string | undefined;
     name: string;
     avatar?: string;
     profilePicture?: string;

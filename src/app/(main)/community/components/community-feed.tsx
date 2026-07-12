@@ -1,46 +1,30 @@
 /* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-
 import * as React from "react"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { useGetMeQuery } from "@/redux/api/auth-api"
 import { AnimatePresence } from "framer-motion"
-import { ImageIcon, Plus, Search, Users, X } from "lucide-react"
+import { Search, Users, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { Post } from "@/types/community"
 import { useGetPostsQuery, useCreatePostMutation } from "@/redux/api/community-api"
 import { PostCard } from "./post-card"
+import { CommunitySidebar } from "./community-sidebar"
+import { CreatePostModal } from "./create-post-modal"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export default function CommunityFeed() {
   const [mounted, setMounted] = React.useState(false)
   const [selectedCategory, setSelectedCategory] = React.useState("All")
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [showSuggestions, setShowSuggestions] = React.useState(false)
   const [sortBy, setSortBy] = React.useState("latest")
   const [openCommentsPostId, setOpenCommentsPostId] = React.useState<string | null>(null)
 
   // Create Post Modal State
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false)
-  const [newPostTitle, setNewPostTitle] = React.useState("")
-  const [newPostContent, setNewPostContent] = React.useState("")
-  const [newPostCategory, setNewPostCategory] = React.useState("Speaking")
-  const [newPostImage, setNewPostImage] = React.useState<string | null>(null)
-  const [selectedFile, setSelectedFile] = React.useState<File | null>(null)
   const [isPublishing, setIsPublishing] = React.useState(false)
 
   // Fetch logged in user info
@@ -59,60 +43,22 @@ export default function CommunityFeed() {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-      </div>
-    )
-  }
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("Image file is too large (max 10MB).")
-        return
-      }
-      setSelectedFile(file)
-      const previewUrl = URL.createObjectURL(file)
-      setNewPostImage(previewUrl)
-    }
-  }
-
-  // Handle Post Creation
-  const handleCreatePost = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newPostTitle.trim() || !newPostContent.trim()) {
-      return
-    }
-
+  // Handle Post Creation Action
+  const handlePublishPost = async (postData: { title: string; category: string; body: string; file: File | null }) => {
     setIsPublishing(true)
     const formData = new FormData()
     formData.append("data", JSON.stringify({
-      title: newPostTitle,
-      category: newPostCategory.toUpperCase(),
-      body: newPostContent
+      title: postData.title,
+      category: postData.category.toUpperCase(),
+      body: postData.body
     }))
 
-    if (selectedFile) {
-      formData.append("file", selectedFile)
+    if (postData.file) {
+      formData.append("file", postData.file)
     }
 
     try {
       await createPost(formData).unwrap()
-      
-      // Clean up local preview URL
-      if (newPostImage) {
-        URL.revokeObjectURL(newPostImage)
-      }
-
-      // Reset Form
-      setNewPostTitle("")
-      setNewPostContent("")
-      setNewPostCategory("Speaking")
-      setNewPostImage(null)
-      setSelectedFile(null)
       setCreateDialogOpen(false)
       toast.success("Published! 🎉")
     } catch {
@@ -123,10 +69,91 @@ export default function CommunityFeed() {
   }
 
   const rawPosts = postsResponse?.data || postsResponse?.result || postsResponse || []
-  
-  // Sort posts
+
+  // Dynamic top contributors calculations from fetched stream
+  const contributors = React.useMemo(() => {
+    const map: Record<string, { name: string; profilePicture?: string; role?: string; postCount: number; likesCount: number }> = {}
+    
+    rawPosts.forEach((post: any) => {
+      const authorId = post.author?.id || post.author?.email || post.author?.name
+      if (!authorId) return
+      
+      const likes = post._count?.likes ?? 0
+      
+      if (!map[authorId]) {
+        map[authorId] = {
+          name: post.author.name === "Nayeem Portfolio Assistant" ? "Nayeem Miah" : post.author.name || "Anonymous",
+          profilePicture: post.author.profilePicture || post.author.avatar,
+          role: post.author.role || "USER",
+          postCount: 1,
+          likesCount: likes
+        }
+      } else {
+        map[authorId].postCount += 1
+        map[authorId].likesCount += likes
+      }
+    })
+    
+    return Object.values(map)
+      .sort((a, b) => (b.postCount * 2 + b.likesCount) - (a.postCount * 2 + a.likesCount))
+      .slice(0, 5)
+  }, [rawPosts])
+
+  // Extract trending tags from actual loaded posts
+  const trendingTags = React.useMemo(() => {
+    const tagCounts: Record<string, number> = {}
+    rawPosts.forEach((post: any) => {
+      const text = `${post.title || ""} ${post.body || ""}`
+      const matches = text.match(/#\w+/g)
+      if (matches) {
+        matches.forEach((tag) => {
+          const cleanTag = tag.substring(1)
+          tagCounts[cleanTag] = (tagCounts[cleanTag] || 0) + 1
+        })
+      }
+    })
+
+    const tags = Object.keys(tagCounts)
+      .sort((a, b) => tagCounts[b] - tagCounts[a])
+      .slice(0, 6)
+
+    // Fallback: use active categories if no hashtags exist in texts
+    if (tags.length === 0) {
+      const activeCats = Array.from(new Set(rawPosts.map((p: any) => p.category).filter(Boolean))) as string[]
+      return activeCats.map((c) => c.charAt(0) + c.slice(1).toLowerCase())
+    }
+
+    return tags
+  }, [rawPosts])
+
+  // Dynamic search suggestions
+  const suggestions = React.useMemo(() => {
+    if (!searchQuery.trim()) return []
+    return rawPosts
+      .filter((post: any) =>
+        post.title?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .slice(0, 5)
+  }, [searchQuery, rawPosts])
+
+  // Get dynamic category counts
+  const getCategoryCount = (cat: string) => {
+    if (cat === "All") return rawPosts.length
+    return rawPosts.filter((p: any) => p.category?.toUpperCase() === cat.toUpperCase()).length
+  }
+
+  // Sorting logic
   const posts = [...rawPosts].sort((a, b) => {
     if (sortBy === "latest") {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    } else if (sortBy === "liked") {
+      return (b._count?.likes ?? 0) - (a._count?.likes ?? 0)
+    } else if (sortBy === "commented") {
+      return (b._count?.comments ?? 0) - (a._count?.comments ?? 0)
+    } else if (sortBy === "unanswered") {
+      const commA = a._count?.comments ?? 0
+      const commB = b._count?.comments ?? 0
+      if (commA !== commB) return commA - commB
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     } else {
       const scoreA = (a._count?.likes ?? 0) + (a._count?.comments ?? 0)
@@ -137,199 +164,184 @@ export default function CommunityFeed() {
 
   const categories = ["All", "Speaking", "Vocabulary", "Grammar", "Exams"]
 
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background pt-24 pb-16 animate-in fade-in duration-500">
-      <div className="max-w-3xl mx-auto px-6 space-y-10">
+      <div className="max-w-6xl mx-auto px-6 mt-6">
+        
+        {/* Two Column Layout Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          
+          {/* Main Feed Column */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Feed Header */}
+            <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 pb-5">
+              <div>
+                <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">Community Feed</h1>
+                <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5 font-medium">Discuss topics, share insights, and learn collaboratively.</p>
+              </div>
 
-        {/* Sleek Minimal Header */}
-        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 pb-6">
-          <div>
-            <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">Community</h1>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">Discuss learning, share insights, ask grammar notes.</p>
-          </div>
-
-          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-            <DialogTrigger
-              render={
-                <Button className="h-8 px-4 rounded-lg text-xs font-semibold bg-primary hover:bg-primary/95 text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-none border-none">
+              {/* Modular Create Post Dialog or Login Guard Button */}
+              {currentUser ? (
+                <CreatePostModal
+                  open={createDialogOpen}
+                  onOpenChange={setCreateDialogOpen}
+                  onPublish={handlePublishPost}
+                  isPublishing={isPublishing}
+                />
+              ) : (
+                <Button
+                  onClick={() => {
+                    toast.error("Please login to create a post!")
+                    setTimeout(() => {
+                      window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
+                    }, 800)
+                  }}
+                  className="h-8 px-4 rounded-lg text-xs font-bold bg-primary hover:bg-primary/95 text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-none border-none"
+                >
                   <Plus className="h-3.5 w-3.5" /> New Post
                 </Button>
-              }
-            />
-            <DialogContent className="sm:max-w-[480px] p-6 rounded-2xl border border-zinc-100 dark:border-zinc-900 shadow-xl bg-card">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold text-zinc-950 dark:text-zinc-50 tracking-tight">Create Post</DialogTitle>
-                <DialogDescription className="text-zinc-400 dark:text-zinc-500 text-xs mt-0.5">
-                  Publish reference lists, questions, or vocabulary notes for the community.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleCreatePost} className="space-y-4 pt-4">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Title</span>
+              )}
+            </div>
+
+            {/* Filter Pills & Live Search bar */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-900 pb-3 z-20">
+              <div className="flex flex-wrap gap-4">
+                {categories.map((cat) => {
+                  const isSelected = selectedCategory === cat
+                  const count = getCategoryCount(cat)
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat)}
+                      className={cn(
+                        "pb-2 text-xs font-extrabold relative transition-colors cursor-pointer hover:text-zinc-800 dark:hover:text-zinc-200 flex items-center gap-1",
+                        isSelected
+                          ? "text-primary border-b-2 border-primary -mb-[11px]"
+                          : "text-zinc-400 dark:text-zinc-500"
+                      )}
+                    >
+                      <span>{cat}</span>
+                      <span className="text-[10px] font-semibold opacity-75">({count})</span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="relative w-full sm:w-56 z-30">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
                   <input
-                    placeholder="e.g. 5 idioms for work conversations"
-                    value={newPostTitle}
-                    onChange={(e) => setNewPostTitle(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-zinc-200 focus:border-zinc-300 dark:border-zinc-800 dark:focus:border-zinc-700 bg-background text-xs font-semibold outline-none transition-all"
-                    required
+                    type="text"
+                    placeholder="Search posts..."
+                    value={searchQuery}
+                    onFocus={() => setShowSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-8 pr-3 py-1.5 text-xs border border-transparent hover:border-zinc-100 focus:border-zinc-200 dark:hover:border-zinc-900 dark:focus:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-lg w-full outline-none transition-all font-semibold"
                   />
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Category</span>
-                  <Select value={newPostCategory} onValueChange={(val) => setNewPostCategory(val || "Speaking")}>
-                    <SelectTrigger className="w-full h-9 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-background text-xs font-semibold outline-none focus:ring-0">
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-xl border border-zinc-150 dark:border-zinc-850 bg-card">
-                      <SelectItem value="Speaking">Speaking</SelectItem>
-                      <SelectItem value="Vocabulary">Vocabulary</SelectItem>
-                      <SelectItem value="Grammar">Grammar</SelectItem>
-                      <SelectItem value="Exams">Exams</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Body</span>
-                  <textarea
-                    placeholder="Share resources, tips, or ask questions..."
-                    value={newPostContent}
-                    onChange={(e) => setNewPostContent(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl border border-zinc-200 focus:border-zinc-300 dark:border-zinc-800 dark:focus:border-zinc-700 bg-background text-xs leading-relaxed outline-none transition-all resize-none min-h-[140px]"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Image Attachment (Optional)</span>
                   
-                  {isPublishing ? (
-                    <div className="flex flex-col items-center justify-center h-28 w-full border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50/5 dark:bg-zinc-900/10 gap-2">
-                      <div className="h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-                      <span className="text-[10px] font-semibold text-zinc-450 uppercase tracking-widest animate-pulse">Uploading Image...</span>
-                    </div>
-                  ) : newPostImage ? (
-                    <div className="relative group rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-background max-h-[160px] flex items-center justify-center">
-                      <img src={newPostImage} alt="Uploaded preview" className="w-full h-auto max-h-[160px] object-cover" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  {/* Live Suggestions Panel */}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div className="absolute right-0 top-full mt-2 w-full sm:w-64 bg-card border border-border/80 rounded-xl shadow-lg z-50 overflow-hidden divide-y divide-border/50">
+                      {suggestions.map((post: any) => (
                         <button
-                          type="button"
+                          key={`suggest-${post.id}`}
                           onClick={() => {
-                            setNewPostImage(null)
-                            setSelectedFile(null)
+                            setSearchQuery(post.title)
+                            setShowSuggestions(false)
                           }}
-                          className="h-8 w-8 rounded-lg bg-red-650 hover:bg-red-700 text-white flex items-center justify-center cursor-pointer transition-colors shadow border-none"
+                          className="w-full text-left px-3 py-2 hover:bg-muted text-[11px] font-semibold truncate text-foreground block cursor-pointer transition-colors"
                         >
-                          <X className="h-4 w-4" />
+                          {post.title}
                         </button>
-                      </div>
+                      ))}
                     </div>
-                  ) : (
-                    <label className="flex flex-col items-center justify-center h-28 w-full border-2 border-dashed border-zinc-150 hover:border-zinc-250 dark:border-zinc-850 dark:hover:border-zinc-750 rounded-xl bg-zinc-50/20 hover:bg-zinc-50/50 dark:bg-zinc-900/5 dark:hover:bg-zinc-900/20 cursor-pointer transition-all gap-1.5 p-4 group">
-                      <div className="h-8 w-8 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center border border-zinc-100 dark:border-zinc-800 text-zinc-450 group-hover:text-primary transition-colors">
-                        <ImageIcon className="h-4 w-4" />
-                      </div>
-                      <div className="text-center">
-                        <p className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Click to upload photo</p>
-                        <p className="text-[10px] font-semibold text-zinc-455 mt-0.5">PNG, JPG or WEBP up to 10MB</p>
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
-                      />
-                    </label>
                   )}
                 </div>
 
-                <div className="flex justify-end gap-2.5 pt-4 border-t border-zinc-100 dark:border-zinc-900/80 mt-6">
-                  <Button type="button" variant="ghost" onClick={() => setCreateDialogOpen(false)} className="rounded-xl px-4 h-9 font-bold text-xs hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer">
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={isPublishing} className="bg-primary hover:bg-primary/95 text-white rounded-xl px-5 h-9 font-bold text-xs cursor-pointer border-none shadow-md shadow-primary/10 transition-all disabled:opacity-50">
-                    {isPublishing ? "Publishing..." : "Publish"}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-zinc-50 dark:bg-zinc-900 border border-border/50 px-2 py-1.5 rounded-xl text-[11px] font-bold text-zinc-500 dark:text-zinc-400 outline-none focus:ring-0 cursor-pointer"
+                >
+                  <option value="latest">Latest</option>
+                  <option value="liked">Most Liked</option>
+                  <option value="commented">Most Commented</option>
+                  <option value="unanswered">Unanswered</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Posts Cards Stream */}
+            <div className="space-y-6">
+              {isPostsLoading ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-2">
+                  <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
+                  <span className="text-[11px] font-semibold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Loading Feed...</span>
+                </div>
+              ) : posts.length > 0 ? (
+                <AnimatePresence mode="popLayout">
+                  {posts.map((post: Post, idx) => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      currentUser={currentUser}
+                      index={idx}
+                      openCommentsPostId={openCommentsPostId}
+                      setOpenCommentsPostId={setOpenCommentsPostId}
+                    />
+                  ))}
+                </AnimatePresence>
+              ) : (
+                /* Dynamic empty state */
+                <div className="text-center py-16 bg-muted/10 border border-dashed border-border/80 rounded-3xl space-y-4 max-w-md mx-auto">
+                  <div className="p-4 rounded-full bg-muted/20 w-16 h-16 flex items-center justify-center mx-auto border border-border/50">
+                    <Users className="h-8 w-8 text-muted-foreground/50 animate-pulse" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-extrabold text-foreground">No discussions yet</h3>
+                    <p className="text-xs text-muted-foreground max-w-[240px] mx-auto font-medium">
+                      Be the first to share resources, ask questions, or start an English discussion!
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      if (!currentUser) {
+                        toast.error("Please login to create a post!")
+                        setTimeout(() => {
+                          window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`
+                        }, 800)
+                      } else {
+                        setCreateDialogOpen(true)
+                      }
+                    }}
+                    className="h-9 px-4 rounded-xl text-xs font-extrabold bg-primary hover:bg-primary/90 text-white cursor-pointer shadow-sm border-none"
+                  >
+                    Create Discussion
                   </Button>
                 </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Clean minimal categories & search */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-900 pb-3">
-          <div className="flex flex-wrap gap-4">
-            {categories.map((cat) => {
-              const isSelected = selectedCategory === cat
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`pb-2 text-xs font-semibold relative transition-colors cursor-pointer ${
-                    isSelected
-                      ? "text-primary border-b-2 border-primary -mb-[11px]"
-                      : "text-zinc-400 hover:text-zinc-800 dark:text-zinc-500 dark:hover:text-zinc-300"
-                  }`}
-                >
-                  {cat}
-                </button>
-              )
-            })}
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="relative w-full sm:w-48">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 py-1 text-xs border border-transparent hover:border-zinc-100 focus:border-zinc-200 dark:hover:border-zinc-900 dark:focus:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-lg w-full outline-none transition-all font-semibold"
-              />
-            </div>
-
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-transparent text-[11px] font-bold text-zinc-400 dark:text-zinc-500 border-none outline-none focus:ring-0 cursor-pointer"
-            >
-              <option value="latest">Latest</option>
-              <option value="trending">Trending</option>
-            </select>
+          {/* Right Column: Premium Sidebar */}
+          <div className="lg:col-span-1">
+            <CommunitySidebar
+              trendingTags={trendingTags}
+              contributors={contributors}
+              onTagClick={setSearchQuery}
+            />
           </div>
-        </div>
 
-        {/* Post feed list - borderless minimal design */}
-        <div className="space-y-8">
-          {isPostsLoading ? (
-            <div className="flex flex-col items-center justify-center py-16 gap-2">
-              <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
-              <span className="text-[11px] font-semibold text-zinc-450 dark:text-zinc-500 uppercase tracking-widest">Loading Feed...</span>
-            </div>
-          ) : posts.length > 0 ? (
-            <AnimatePresence mode="popLayout">
-              {posts.map((post: Post, index) => (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  currentUser={currentUser}
-                  index={index}
-                  openCommentsPostId={openCommentsPostId}
-                  setOpenCommentsPostId={setOpenCommentsPostId}
-                />
-              ))}
-            </AnimatePresence>
-          ) : (
-            <div className="text-center py-12">
-              <Users className="h-8 w-8 text-zinc-300 dark:text-zinc-700 mx-auto mb-2" />
-              <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">No posts found</h3>
-              <p className="text-[11px] text-zinc-400 mt-0.5">
-                Try another filter or search term.
-              </p>
-            </div>
-          )}
         </div>
 
       </div>

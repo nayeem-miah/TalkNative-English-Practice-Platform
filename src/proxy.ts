@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 const AUTH_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password", "/verify-user"]
 
 /** Routes that require authentication */
-const PROTECTED_ROUTES = ["/dashboard", "/profile", "/history", "/live-call", "/feedback", "/community", "/payment"]
+const PROTECTED_ROUTES = ["/dashboard", "/profile", "/history", "/live-call", "/feedback", "/payment"]
 
 /** Admin-only routes */
 const ADMIN_ROUTES = ["/admin"]
