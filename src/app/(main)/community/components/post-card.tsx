@@ -197,13 +197,14 @@ export function PostCard({
     ? "Nayeem Miah"
     : post.author?.name || "Anonymous"
 
-  // Check if this post is mine
+  // Check if this post is mine or if I am an admin
   const isMyPost = !!(
     currentUser &&
-    post.author &&
-    (post.author.id === currentUser.id ||
-      post.author.email === currentUser.email ||
-      post.author.name === currentUser.name)
+    (currentUser.role?.toUpperCase() === "ADMIN" ||
+      (post.author &&
+        (post.author.id === currentUser.id ||
+          post.author.email === currentUser.email ||
+          post.author.name === currentUser.name)))
   )
 
   // Role custom styling
@@ -429,7 +430,7 @@ export function PostCard({
             <Button
               type="button"
               onClick={handleDelete}
-              className="bg-red-650 rounded-xl px-5 h-9 font-bold text-xs cursor-pointer border-none shadow-md shadow-red-600/10 transition-all"
+              className=" bg-red-500 hover:bg-red-700 rounded-xl px-5 h-9 font-bold text-xs cursor-pointer border-none shadow-md shadow-red-600/10 transition-all"
             >
               Delete
             </Button>
