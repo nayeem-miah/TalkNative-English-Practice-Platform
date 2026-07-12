@@ -1,19 +1,18 @@
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
 import { useAuth } from "@/hooks/use-auth"
-import { Eye, EyeOff, Lock, Mail } from "lucide-react"
+import { Eye, EyeOff, Lock, Mail, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
 import { PageLoader } from "@/components/shared/page-loader"
+import { TalkNativeLogo } from "@/components/shared/logo"
+import { setCookie } from "@/utils/cookie"
 
 function LoginContent() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -34,11 +33,7 @@ function LoginContent() {
   }, [mounted, isAuthLoading, isLoggedIn, redirectTo])
 
   if (!mounted || isAuthLoading || isLoggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <PageLoader message={isLoggedIn ? "Redirecting..." : "Verifying session..."} />
-      </div>
-    )
+    return <PageLoader message={isLoggedIn ? "Redirecting..." : "Verifying session..."} />
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,24 +58,32 @@ function LoginContent() {
         const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || res?.refreshToken
 
         if (accessToken) {
-          try { localStorage.setItem("accessToken", accessToken) } catch {}
+          try { 
+            localStorage.setItem("accessToken", accessToken);
+            setCookie("accessToken", accessToken);
+          } catch {}
         }
         if (refreshToken) {
-          try { localStorage.setItem("refreshToken", refreshToken) } catch {}
+          try { 
+            localStorage.setItem("refreshToken", refreshToken);
+            setCookie("refreshToken", refreshToken);
+          } catch {}
         }
 
         toast.success("Logged in successfully!", { id: toastId })
         window.location.href = redirectTo
       }
-    } catch (err: any) {
-      const errorMessage = err?.data?.message || "Invalid email or password"
+    } catch (err) {
+      const error = err as { data?: { message?: string } }
+      const errorMessage = error?.data?.message || "Invalid email or password"
       if (errorMessage.toLowerCase().includes("verify") || errorMessage.toLowerCase().includes("verification")) {
         toast.info("Account not verified. Sending OTP and redirecting...", { id: toastId })
         try {
           await resendOtp({ email: formData.email }).unwrap()
           router.push(`/verify-user?email=${formData.email}`)
-        } catch (otpErr: any) {
-          toast.error(otpErr?.data?.message || "Failed to send verification code", { id: toastId })
+        } catch (otpErr) {
+          const error = otpErr as { data?: { message?: string } }
+          toast.error(error?.data?.message || "Failed to send verification code", { id: toastId })
           setTimeout(() => {
             router.push(`/verify-user?email=${formData.email}`)
           }, 2000)
@@ -105,136 +108,141 @@ function LoginContent() {
         const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || res?.refreshToken
 
         if (accessToken) {
-          try { localStorage.setItem("accessToken", accessToken) } catch {}
+          try { 
+            localStorage.setItem("accessToken", accessToken);
+            setCookie("accessToken", accessToken);
+          } catch {}
         }
         if (refreshToken) {
-          try { localStorage.setItem("refreshToken", refreshToken) } catch {}
+          try { 
+            localStorage.setItem("refreshToken", refreshToken);
+            setCookie("refreshToken", refreshToken);
+          } catch {}
         }
 
         toast.success("Logged in successfully!", { id: toastId })
         window.location.href = redirectTo
       }
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Invalid credentials", { id: toastId })
+    } catch (err) {
+      const error = err as { data?: { message?: string } }
+      toast.error(error?.data?.message || "Invalid credentials", { id: toastId })
     }
   }
 
   return (
-    <div className="w-full max-w-md space-y-8">
-      <Card className="border border-border/60 bg-card shadow-sm rounded-3xl p-4">
-        <CardHeader className="text-center space-y-1">
-          <CardTitle className="text-2xl font-heading font-bold">Welcome back</CardTitle>
-          <CardDescription>Please enter your details to sign in.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground ml-1">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="pl-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
+    <div className="w-full max-w-md mx-auto space-y-8">
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <TalkNativeLogo className="h-14 w-auto text-primary" />
+        <div className="text-center space-y-2 mt-2">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Welcome Back</h1>
+          <p className="text-sm text-slate-500">Log in to access your account and continue</p>
+        </div>
+      </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between ml-1">
-                <label className="text-sm font-bold text-foreground">Password</label>
-                <Link
-                  href="/forgot-password"
-                  className={cn(
-                    "text-xs font-bold text-primary hover:underline",
-                    isLoading && "pointer-events-none opacity-50"
-                  )}
-                >
-                  Forgot Password?
-                </Link>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="pl-11 pr-11 h-12 rounded-xl bg-muted/30 border-muted focus:ring-primary/20"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  disabled={isLoading}
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 mt-2"
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1">
+          <div className="relative group">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors duration-200" />
+            <Input
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className="pl-12 h-14 rounded-full bg-transparent border-slate-200 placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all duration-200 text-base"
               disabled={isLoading}
-            >
-              {isLoading ? "Signing In..." : "Sign In"}
-            </Button>
-          </form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-muted" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-4 text-muted-foreground font-semibold">Demo Login</span>
-            </div>
+            />
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Button
+        <div className="space-y-1">
+          <div className="relative group">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors duration-200" />
+            <Input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleInputChange}
+              className="pl-12 pr-12 h-14 rounded-full bg-transparent border-slate-200 placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all duration-200 text-base"
+              disabled={isLoading}
+            />
+            <button
               type="button"
-              variant="outline"
-              onClick={() => handleDemoLogin("nayeem5113a@gmail.com")}
-              className="h-11 rounded-xl text-xs font-bold border border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
               disabled={isLoading}
             >
-              👤 Normal User
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleDemoLogin("admin@gmail.com")}
-              className="h-11 rounded-xl text-xs font-bold border border-primary/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
-              disabled={isLoading}
-            >
-              🛡️ Admin User
-            </Button>
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
           </div>
+          <div className="flex justify-end pt-1 pr-2">
+            <Link
+              href="/forgot-password"
+              className={cn(
+                "text-sm font-medium text-primary hover:text-primary/80 transition-colors",
+                isLoading && "pointer-events-none opacity-50"
+              )}
+            >
+              Forgot Password?
+            </Link>
+          </div>
+        </div>
 
-          <p className="text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link href="/register" className="text-primary font-bold hover:underline">Join TalkNative</Link>
-          </p>
-        </CardContent>
-      </Card>
+        <Button
+          type="submit"
+          className="w-full h-14 rounded-full text-base font-medium shadow-none mt-2 transition-all active:scale-[0.98] duration-200 flex items-center justify-center gap-2 bg-[#0d5c53] hover:bg-[#0a4a42] text-white"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Signing In...
+            </>
+          ) : (
+            "Log In"
+          )}
+        </Button>
+      </form>
+
+      <div className="flex items-center justify-center gap-2 text-sm text-slate-500 pt-2">
+        <span>You don&apos;t have an account?</span>
+        <Link href="/register" className="text-primary font-medium hover:underline">
+          Sign up
+        </Link>
+      </div>
+
+      {/* Demo Users Section */}
+      <div className="pt-6 border-t border-slate-100">
+        <p className="text-xs text-center text-slate-400 mb-3 uppercase tracking-wider font-semibold">Demo Accounts</p>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleDemoLogin("nayeem5113a@gmail.com")}
+            className="h-10 rounded-full text-xs font-medium border-slate-200 hover:bg-slate-50 transition-all duration-200"
+            disabled={isLoading}
+          >
+            👤 Normal User
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleDemoLogin("admin@gmail.com")}
+            className="h-10 rounded-full text-xs font-medium border-slate-200 hover:bg-slate-50 transition-all duration-200"
+            disabled={isLoading}
+          >
+            🛡️ Admin User
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
 
 export function LoginClient() {
   return (
-    <React.Suspense fallback={
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <PageLoader message="Preparing Login Screen..." />
-      </div>
-    }>
+    <React.Suspense fallback={<PageLoader message="Preparing Login Screen..." />}>
       <LoginContent />
     </React.Suspense>
   )

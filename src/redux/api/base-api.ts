@@ -23,7 +23,7 @@ export const baseApi = createApi({
         // The deployed Render backend expects the RAW token directly in the authorization header
         // without the 'Bearer ' prefix (its middleware directly verifies req.headers.authorization).
         const cleanToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-        headers.set("authorization", cleanToken);
+        headers.set("authorization", `Bearer ${cleanToken}`);
       }
       return headers;
     },

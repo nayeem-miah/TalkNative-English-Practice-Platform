@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { removeCookie } from "@/utils/cookie";
+import { removeCookie, setCookie } from "@/utils/cookie";
 import { baseApi } from "./base-api";
 
 export const authApi = baseApi.injectEndpoints({
@@ -40,13 +40,14 @@ export const authApi = baseApi.injectEndpoints({
           const accessToken = resData?.result?.accessToken || resData?.accessToken || data?.accessToken;
           const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || data?.refreshToken;
 
-          // Save to localStorage as fallback for base-api prepareHeaders
-          // (backend sets httpOnly cookie which JS cannot read,
-          //  and also sets accessToken_js which JS CAN read)
+          // Save token to cookie so Next.js middleware (proxy.ts) can read it
+          // and also to localStorage as fallback for base-api prepareHeaders
           if (accessToken && typeof window !== "undefined") {
+            try { setCookie("accessToken", accessToken); } catch {}
             try { localStorage.setItem("accessToken", accessToken); } catch {}
           }
           if (refreshToken && typeof window !== "undefined") {
+            try { setCookie("refreshToken", refreshToken); } catch {}
             try { localStorage.setItem("refreshToken", refreshToken); } catch {}
           }
         } catch {}
