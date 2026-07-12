@@ -22,8 +22,8 @@ export function Safety() {
   return (
     <section className="py-24 bg-background">
       <div className="container px-4 md:px-8 mx-auto">
-        <div className="bg-card text-card-foreground rounded-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 border border-border/80 shadow-md">
-          <div className="p-8 md:p-16 space-y-12">
+        <div className="bg-card text-card-foreground rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 border border-border/70 shadow-[0_15px_40px_rgba(0,0,0,0.03)] dark:shadow-[0_15px_40px_rgba(0,0,0,0.3)]">
+          <div className="p-8 md:p-12 lg:p-16 space-y-12">
             <div className="space-y-4">
               <span className="text-xs font-bold uppercase tracking-wider text-primary">Security First</span>
               <h2 className="text-3xl md:text-4xl font-heading font-semibold text-foreground leading-tight tracking-tight">
@@ -36,13 +36,13 @@ export function Safety() {
 
             <div className="space-y-6">
               {safetyFeatures.map((feature, index) => (
-                <div key={index} className="flex items-start gap-4">
-                  <div className="mt-1 h-9 w-9 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
-                    <feature.icon className="h-4 w-4" />
+                <div key={index} className="flex items-start gap-4 group/item">
+                  <div className="mt-1 h-9 w-9 shrink-0 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20 group-hover/item:bg-primary group-hover/item:text-primary-foreground group-hover/item:scale-105 transition-all duration-300">
+                    <feature.icon className="h-4 w-4 transition-transform group-hover/item:rotate-12 duration-300" />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-foreground font-semibold text-base">{feature.title}</h4>
-                    <p className="text-muted-foreground text-xs leading-relaxed">{feature.description}</p>
+                    <h4 className="text-foreground font-bold text-base transition-colors group-hover/item:text-primary">{feature.title}</h4>
+                    <p className="text-muted-foreground text-xs leading-relaxed font-medium">{feature.description}</p>
                   </div>
                 </div>
               ))}
@@ -76,8 +76,8 @@ export function Safety() {
                       <span className="font-semibold text-primary">Enabled</span>
                     </div>
                   </div>
-                  <div className="pt-3 border-t border-border/50 flex items-center justify-center gap-2 text-xs font-bold text-primary">
-                    <Shield className="h-4 w-4 text-primary" />
+                  <div className="pt-3 border-t border-border/50 flex items-center justify-center gap-2 text-xs font-black text-primary select-none">
+                    <Shield className="h-4 w-4 text-primary animate-pulse" />
                     TalkNative SafeTunnel™
                   </div>
                 </div>

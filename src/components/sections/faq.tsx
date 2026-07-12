@@ -92,27 +92,29 @@ export function Faq() {
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
-          {categories.map((cat) => {
-            const isActive = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  setActiveCategory(cat.id);
-                  setOpenQuestion(null);
-                }}
-                className={`h-9 px-4 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 border focus:outline-none ${
-                  isActive
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/10"
-                    : "bg-card text-muted-foreground hover:text-foreground border-border/80 dark:border-zinc-800"
-                }`}
-              >
-                <cat.icon className="h-3.5 w-3.5" />
-                {cat.label}
-              </button>
-            );
-          })}
+        <div className="flex justify-center mb-12">
+          <div className="bg-zinc-100/80 dark:bg-zinc-900/60 p-1.5 rounded-full inline-flex flex-wrap items-center justify-center gap-1 border border-border/40 max-w-full overflow-x-auto">
+            {categories.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setActiveCategory(cat.id);
+                    setOpenQuestion(null);
+                  }}
+                  className={`h-9 px-5 rounded-full text-xs font-bold transition-all duration-200 flex items-center gap-2 focus:outline-none select-none ${
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-sm shadow-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-zinc-200/50 dark:hover:bg-zinc-800/40"
+                  }`}
+                >
+                  <cat.icon className="h-3.5 w-3.5" />
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* FAQ Accordion Double Column Grid */}
@@ -129,10 +131,10 @@ export function Faq() {
                 return (
                   <div
                     key={index}
-                    className={`border rounded-xl bg-card transition-all duration-200 overflow-hidden ${
+                    className={`border rounded-xl bg-card transition-all duration-300 overflow-hidden ${
                       isOpen
-                        ? "border-primary shadow-sm shadow-primary/5 bg-primary/[0.01]"
-                        : "border-border/80 dark:border-zinc-800 hover:border-border"
+                        ? "border-primary shadow-[0_8px_30px_rgba(13,92,83,0.06)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] bg-primary/[0.01]"
+                        : "border-border/80 dark:border-zinc-800 hover:border-primary/20 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 hover:-translate-y-[1px]"
                     }`}
                   >
                     <button

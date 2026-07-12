@@ -47,13 +47,12 @@ export function HeroContent() {
       </motion.div>
 
       <motion.h1
-        className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.15] text-foreground"
+        className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] text-foreground font-sans"
         initial={mounted ? { opacity: 0, y: 20 } : false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        Speak English fluently, <br className="hidden md:block" />
-        one conversation at a time.
+        Speak English confidently.
       </motion.h1>
 
       <motion.p
@@ -76,7 +75,7 @@ export function HeroContent() {
           <>
             <Button
               size="lg"
-              className="h-11 px-8 text-sm font-semibold rounded-full shadow-sm hover:opacity-95 active:scale-[0.98] transition-all"
+              className="h-14 px-8 text-base font-bold rounded-full shadow-lg shadow-primary/20 hover:shadow-xl active:scale-[0.98] transition-all bg-primary hover:bg-primary/95 text-primary-foreground cursor-pointer"
               onClick={() => window.location.href = "/dashboard"}
             >
               Go to Dashboard
@@ -84,7 +83,7 @@ export function HeroContent() {
             <Button
               size="lg"
               variant="outline"
-              className="h-11 px-8 text-sm font-semibold rounded-full border border-border/80 hover:bg-muted/50 active:scale-[0.98] transition-all"
+              className="h-14 px-8 text-base font-bold rounded-full border border-border/80 hover:bg-muted/50 active:scale-[0.98] transition-all text-foreground cursor-pointer"
               onClick={() => window.location.href = "/live-call"}
             >
               Join Call
@@ -94,7 +93,7 @@ export function HeroContent() {
           <>
             <Button
               size="lg"
-              className="h-11 px-8 text-sm font-semibold rounded-full shadow-sm hover:opacity-95 active:scale-[0.98] transition-all"
+              className="h-14 px-8 text-base font-bold rounded-full shadow-lg shadow-primary/20 hover:shadow-xl active:scale-[0.98] transition-all bg-primary hover:bg-primary/95 text-primary-foreground cursor-pointer"
               onClick={() => window.location.href = "/live-call"}
             >
               Get Started
@@ -102,7 +101,7 @@ export function HeroContent() {
             <Button
               size="lg"
               variant="outline"
-              className="h-11 px-8 text-sm font-semibold rounded-full border border-border/80 hover:bg-muted/50 active:scale-[0.98] transition-all"
+              className="h-14 px-8 text-base font-bold rounded-full border border-border/80 hover:bg-muted/50 active:scale-[0.98] transition-all text-foreground cursor-pointer"
               onClick={() => window.location.href = "/login"}
             >
               Login

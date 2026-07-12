@@ -21,7 +21,10 @@ export function useAuth(): UseAuthReturn {
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
-    setMounted(true)
+    const timer = setTimeout(() => {
+      setMounted(true)
+    }, 0)
+    return () => clearTimeout(timer)
   }, [])
 
   const { data: userResponse, isLoading } = useGetMeQuery(undefined, {

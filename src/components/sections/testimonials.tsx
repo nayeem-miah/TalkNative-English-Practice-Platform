@@ -13,7 +13,7 @@ const testimonials = [
     level: "Intermediate",
     nativeLanguage: "Japanese",
     feedback: "TalkNative has completely transformed my speaking confidence. Connecting with real learners in seconds is amazing, and I get feedback immediately.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Kenji",
   },
   {
     name: "Sofia Rodriguez",
@@ -21,7 +21,7 @@ const testimonials = [
     level: "Advanced",
     nativeLanguage: "Portuguese",
     feedback: "I love the 15-minute calls! They fit perfectly into my busy schedule, and the built-in topic prompts really help to keep the conversation structured.",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Sofia",
   },
   {
     name: "Ahmed Mansour",
@@ -29,7 +29,7 @@ const testimonials = [
     level: "Intermediate",
     nativeLanguage: "Arabic",
     feedback: "The AI moderation and safety features give me total peace of mind. It's a safe, friendly space where you can focus entirely on fluent practice.",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Ahmed",
   },
   {
     name: "Lukas Weber",
@@ -37,7 +37,7 @@ const testimonials = [
     level: "Advanced",
     nativeLanguage: "German",
     feedback: "As a busy professional, I needed something flexible. The instant matching connects me with intelligent partners worldwide whenever I have a spare slot.",
-    image: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Lukas",
   },
   {
     name: "Priya Sharma",
@@ -45,7 +45,7 @@ const testimonials = [
     level: "Advanced",
     nativeLanguage: "Hindi",
     feedback: "Meeting diverse partners has broadened my vocabulary. I went from hesitating in meetings to leading them with complete clarity and confidence.",
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Priya",
   },
   {
     name: "Min-jun Kim",
@@ -53,7 +53,7 @@ const testimonials = [
     level: "Intermediate",
     nativeLanguage: "Korean",
     feedback: "The UI is clean and formal. The practice calls feel secure and safe. Highly recommend this platform to anyone trying to speak natural English.",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Minjun",
   },
   {
     name: "Chloe Dubois",
@@ -61,7 +61,7 @@ const testimonials = [
     level: "Upper-Intermediate",
     nativeLanguage: "French",
     feedback: "Absolutely love the AI speech metrics. Getting actionable insights into my speaking flow after calls has boosted my pronunciation dramatically.",
-    image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Chloe",
   },
   {
     name: "Mateo Gomez",
@@ -69,7 +69,7 @@ const testimonials = [
     level: "Intermediate",
     nativeLanguage: "Spanish",
     feedback: "I was shy at first, but the community is supportive. The icebreaker prompts really help bridge any conversation gaps in the first few minutes.",
-    image: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Mateo",
   },
   {
     name: "Elena Rossi",
@@ -77,7 +77,7 @@ const testimonials = [
     level: "Advanced",
     nativeLanguage: "Italian",
     feedback: "A perfect solution for maintaining fluency. I can converse with native-level speakers or fellow learners with identical language interests.",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Elena",
   },
   {
     name: "David Nguyen",
@@ -85,7 +85,7 @@ const testimonials = [
     level: "Lower-Intermediate",
     nativeLanguage: "Vietnamese",
     feedback: "Best language app I've used. Instant calls are fast, clean, and extremely helpful. My conversational vocabulary has grown so much in a month.",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=David",
   },
   {
     name: "Emily Smith",
@@ -93,7 +93,7 @@ const testimonials = [
     level: "Fluent",
     nativeLanguage: "English",
     feedback: "I volunteer here to help others while learning their native languages! It is mutually rewarding, safe, and builds amazing global connections.",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Emily",
   },
   {
     name: "Carlos Silva",
@@ -101,7 +101,7 @@ const testimonials = [
     level: "Intermediate",
     nativeLanguage: "Spanish",
     feedback: "Excellent security features! I feel very secure talking on this platform. The reporting tool works instantly and ensures a highly respectful community.",
-    image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Carlos",
   },
   {
     name: "Zofia Wisniewska",
@@ -109,7 +109,7 @@ const testimonials = [
     level: "Upper-Intermediate",
     nativeLanguage: "Polish",
     feedback: "The 15-minute call duration is perfect. I can easily do a session during my morning coffee break. The connection quality is always stable.",
-    image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Zofia",
   },
   {
     name: "Can Yilmaz",
@@ -117,7 +117,7 @@ const testimonials = [
     level: "Intermediate",
     nativeLanguage: "Turkish",
     feedback: "Great platform with dynamic matching. The level verification ensures that you are paired with serious learners. I practice every single day.",
-    image: "https://images.unsplash.com/photo-1500048993953-d23a436266cf?q=80&w=150&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Can",
   },
   {
     name: "Camila Bianchi",
@@ -125,7 +125,7 @@ const testimonials = [
     level: "Advanced",
     nativeLanguage: "Spanish",
     feedback: "Highly recommended for corporate learners. The focus on business English guides alongside live calls provides a complete practicing suite.",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop",
+    image: "https://api.dicebear.com/7.x/lorelei/svg?seed=Camila",
   },
 ];
 
@@ -227,16 +227,12 @@ export function Testimonials() {
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {[...Array(maxIndex + 1)].map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveIndex(idx)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  safeActiveIndex === idx ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                }`}
-              />
-            ))}
+          {/* Premium Progress Bar */}
+          <div className="w-40 h-1 bg-muted dark:bg-zinc-800 rounded-full overflow-hidden relative">
+            <div 
+              className="absolute left-0 top-0 bottom-0 bg-primary rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${((safeActiveIndex + 1) / (maxIndex + 1)) * 100}%` }}
+            />
           </div>
 
           <Button

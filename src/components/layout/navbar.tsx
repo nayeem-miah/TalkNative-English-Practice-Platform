@@ -181,13 +181,19 @@ export function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className={cn(buttonVariants({ variant: "ghost" }), "text-sm font-semibold")}
+                  className={cn(
+                    buttonVariants({ variant: "outline" }),
+                    "h-9 px-5 text-sm font-semibold rounded-full border-primary/20 hover:border-primary/50 hover:bg-primary/5 text-foreground transition-all duration-200"
+                  )}
                 >
                   Login
                 </Link>
                 <Link
                   href="/live-call"
-                  className={cn(buttonVariants(), "h-9 px-5 text-sm font-semibold rounded-full")}
+                  className={cn(
+                    buttonVariants(),
+                    "h-9 px-5 text-sm font-semibold rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow transition-all duration-200"
+                  )}
                 >
                   Practice Now
                 </Link>

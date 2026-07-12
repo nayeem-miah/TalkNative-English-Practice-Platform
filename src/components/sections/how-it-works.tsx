@@ -40,27 +40,32 @@ export function HowItWorks() {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <Card key={index} className="border border-border/80 dark:border-zinc-800 shadow-sm bg-card hover:border-primary/30 transition-all duration-200 rounded-xl relative overflow-hidden group">
-              <CardHeader className="flex flex-col items-start p-6 pb-2">
-                <div className="flex justify-between items-center w-full">
-                  <div className="p-3 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+        <div className="relative">
+          {/* Desktop Dotted Connection Path */}
+          <div className="absolute top-1/2 left-[12%] right-[12%] h-0.5 border-t-2 border-dashed border-primary/20 -translate-y-1/2 -z-10 hidden md:block" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {steps.map((step, index) => (
+              <Card key={index} className="border border-border/80 dark:border-zinc-800 shadow-sm bg-card hover:border-primary/30 hover:shadow-lg transition-all duration-300 rounded-2xl relative overflow-hidden group hover:-translate-y-1">
+                {/* Large stylish background numeral watermark */}
+                <div className="absolute -right-4 -bottom-6 text-8xl font-black text-slate-100 dark:text-zinc-900/40 select-none pointer-events-none transition-all duration-300 group-hover:text-primary/5 group-hover:scale-105 font-sans leading-none">
+                  {step.number}
+                </div>
+
+                <CardHeader className="flex flex-col items-start p-6 pb-2 relative z-10">
+                  <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                     <step.icon className="h-5 w-5" />
                   </div>
-                  <span className="text-2xl font-black text-muted-foreground/20 group-hover:text-primary/20 transition-colors select-none font-sans">
-                    {step.number}
-                  </span>
-                </div>
-                <CardTitle className="font-heading text-lg font-semibold mt-4">{step.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 pt-2">
-                <CardDescription className="text-xs leading-relaxed text-muted-foreground text-left">
-                  {step.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
+                  <CardTitle className="font-heading text-lg font-extrabold mt-4 text-foreground">{step.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 pt-2 relative z-10">
+                  <CardDescription className="text-xs leading-relaxed text-muted-foreground text-left font-medium">
+                    {step.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </section>

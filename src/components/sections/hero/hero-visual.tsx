@@ -35,7 +35,7 @@ export function HeroVisual() {
       transition={{ duration: 0.7, delay: 0.4 }}
     >
       {/* Live Matching Dashboard Card */}
-      <div className="relative z-10 w-full max-w-[480px] aspect-[4/3] rounded-3xl border border-border/60 bg-card shadow-xl p-5 md:p-6 flex flex-col justify-between overflow-hidden">
+      <div className="relative z-10 w-full max-w-[480px] aspect-[4/3] rounded-3xl border border-border/50 bg-card shadow-[0_20px_50px_rgba(13,92,83,0.12)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-5 md:p-6 flex flex-col justify-between overflow-hidden hover:translate-y-[-6px] transition-all duration-300 hover:shadow-[0_25px_60px_rgba(13,92,83,0.18)] dark:hover:shadow-[0_25px_60px_rgba(0,0,0,0.6)]">
 
         {/* Header bar: System Status */}
         <div className="flex items-center justify-between border-b border-border/40 pb-3.5">
