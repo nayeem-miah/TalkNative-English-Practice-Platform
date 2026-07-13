@@ -16,8 +16,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
-import { useGetUserByIdQuery, useGetallUsrsQuery, useUpdateUserRoleMutation, useUpdateUserStatusMutation } from "@/redux/api/auth-api"
+import { useGetUserByIdQuery, useGetallUsrsQuery, useUpdateUserRoleMutation, useUpdateUserStatusMutation, useDeleteUserMutation } from "@/redux/api/auth-api"
 import {
   BadgeCheck,
   ChevronLeft,
@@ -32,7 +39,8 @@ import {
   Shield,
   UserCheck,
   UserX,
-  Users
+  Users,
+  Trash2
 } from "lucide-react"
 import * as React from "react"
 import { toast } from "sonner"
@@ -48,6 +56,9 @@ export default function UsersPage() {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false)
   const [roleConfirmData, setRoleConfirmData] = React.useState<{ userId: string; name: string; currentRole: string; newRole: "ADMIN" | "USER" } | null>(null)
   const [statusConfirmData, setStatusConfirmData] = React.useState<{ userId: string; name: string; currentStatus: string; newStatus: "ACTIVE" | "SUSPENDED" } | null>(null)
+
+  // Bulk Actions State
+  const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([])
 
   const { data: usersResponse, isLoading } = useGetallUsrsQuery({
     page: currentPage,
@@ -66,12 +77,42 @@ export default function UsersPage() {
 
   const [updateUserRole, { isLoading: isUpdatingRole }] = useUpdateUserRoleMutation()
   const [updateUserStatus, { isLoading: isUpdatingStatus }] = useUpdateUserStatusMutation()
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation()
 
   const responseData = usersResponse?.data || usersResponse
   const users = responseData?.data || []
   const meta = responseData?.meta
   const totalUsersCount = meta?.total ?? 0
   const totalPage = meta?.totalPage ?? 1
+
+  // Reset selection on page, search or filter change
+  React.useEffect(() => {
+    setSelectedUserIds([])
+  }, [currentPage, searchTerm, statusFilter])
+
+  const handleBulkDelete = async () => {
+    if (window.confirm(`Are you sure you want to delete ${selectedUserIds.length} selected user(s)?`)) {
+      try {
+        await Promise.all(selectedUserIds.map(id => deleteUser(id).unwrap()))
+        toast.success("Selected users deleted successfully")
+        setSelectedUserIds([])
+      } catch (err: any) {
+        toast.error(err?.data?.message || "Failed to delete selected users")
+      }
+    }
+  }
+
+  const handleBulkSuspend = async () => {
+    if (window.confirm(`Are you sure you want to suspend ${selectedUserIds.length} selected user(s)?`)) {
+      try {
+        await Promise.all(selectedUserIds.map(id => updateUserStatus({ userId: id, status: "SUSPENDED" }).unwrap()))
+        toast.success("Selected users suspended successfully")
+        setSelectedUserIds([])
+      } catch (err: any) {
+        toast.error(err?.data?.message || "Failed to suspend selected users")
+      }
+    }
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
@@ -83,19 +124,23 @@ export default function UsersPage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <Filter className="w-3.5 h-3.5 text-muted-foreground/60" />
-            <select
+            <Select
               value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value)
+              onValueChange={(val) => {
+                setStatusFilter(val || "ALL")
                 setCurrentPage(1)
               }}
-              className="h-10 text-xs font-semibold rounded-xl border border-border bg-background px-4 py-1 cursor-pointer outline-none hover:bg-muted transition-all"
             >
-              <option value="ALL">All Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="INACTIVE">Inactive</option>
-              <option value="SUSPENDED">Suspended</option>
-            </select>
+              <SelectTrigger className="h-10 text-xs font-semibold rounded-xl border border-border bg-background px-4 py-1 cursor-pointer focus-visible:ring-0 min-w-[120px]">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border border-border bg-card z-50">
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="INACTIVE">Inactive</SelectItem>
+                <SelectItem value="SUSPENDED">Suspended</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
@@ -167,17 +212,31 @@ export default function UsersPage() {
           <table className="w-full">
             <thead>
               <tr className="text-left border-b border-border bg-muted/30">
-                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">User Identity</th>
-                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Role</th>
-                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Onboarding</th>
-                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Account State</th>
-                <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Management</th>
+                <th className="w-12 px-6 py-5">
+                  <input
+                    type="checkbox"
+                    checked={users.length > 0 && selectedUserIds.length === users.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedUserIds(users.map((u: any) => u.id || u._id))
+                      } else {
+                        setSelectedUserIds([])
+                      }
+                    }}
+                    className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-primary focus:ring-primary accent-primary cursor-pointer transition-all"
+                  />
+                </th>
+                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">User Identity</th>
+                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Role</th>
+                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Onboarding</th>
+                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Account State</th>
+                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Management</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="py-20 text-center">
+                  <td colSpan={6} className="py-20 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <div className="h-9 w-9 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
                       <p className="text-muted-foreground font-bold mt-4">Retrieving users...</p>
@@ -186,7 +245,7 @@ export default function UsersPage() {
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-20 text-center">
+                  <td colSpan={6} className="py-20 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <Users className="h-10 w-10 text-muted-foreground/50 mb-3" />
                       <p className="text-foreground font-bold">No users found</p>
@@ -203,10 +262,25 @@ export default function UsersPage() {
                         year: "numeric",
                       })
                     : "N/A"
+                  const uId = user.id || user._id
 
                   return (
-                    <tr key={user.id || user._id} className="group hover:bg-muted/20 transition-colors cursor-default">
-                      <td className="px-8 py-6">
+                    <tr key={uId} className="group hover:bg-muted/25 transition-colors cursor-default">
+                      <td className="w-12 px-6 py-6">
+                        <input
+                          type="checkbox"
+                          checked={selectedUserIds.includes(uId)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedUserIds([...selectedUserIds, uId])
+                            } else {
+                              setSelectedUserIds(selectedUserIds.filter((id) => id !== uId))
+                            }
+                          }}
+                          className="h-4 w-4 rounded border-zinc-300 dark:border-zinc-700 text-primary focus:ring-primary accent-primary cursor-pointer transition-all"
+                        />
+                      </td>
+                      <td className="px-6 py-6">
                         <div className="flex items-center gap-4">
                           <Avatar className="h-11 w-11 rounded-xl border border-border shadow-sm">
                             <AvatarImage src={user.profilePicture || ""} className="object-cover" />
@@ -220,7 +294,7 @@ export default function UsersPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-6 py-6">
                         <Badge variant="outline" className={cn(
                           "text-[9px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-tighter shadow-sm",
                           (user.role || "USER") === "ADMIN"
@@ -230,10 +304,10 @@ export default function UsersPage() {
                           {user.role || "USER"}
                         </Badge>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-6 py-6">
                         <span className="text-xs font-bold text-muted-foreground/60 tracking-tighter uppercase">{joinedDate}</span>
                       </td>
-                      <td className="px-8 py-6">
+                      <td className="px-6 py-6">
                         <Badge variant="outline" className={cn(
                           "text-[9px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-tighter shadow-sm",
                           (user.status || "ACTIVE") === "ACTIVE" ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20" :
@@ -243,65 +317,82 @@ export default function UsersPage() {
                           {user.status || "ACTIVE"}
                         </Badge>
                       </td>
-                      <td className="px-8 py-6 text-right">
+                      <td className="px-6 py-6 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-10 w-10 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 transition-all"
-                            onClick={() => {
-                              setSelectedUserId(user.id || user._id)
-                              setIsDetailsOpen(true)
-                            }}
-                            title="View Details"
-                          >
-                            <Eye className="h-4.5 w-4.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-10 w-10 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:text-purple-600 transition-all"
-                            disabled={isUpdatingRole}
-                            onClick={() => {
-                              const newRole = user.role === "ADMIN" ? "USER" : "ADMIN"
-                              setRoleConfirmData({
-                                userId: user.id || user._id,
-                                name: user.name || "User",
-                                currentRole: user.role || "USER",
-                                newRole,
-                              })
-                            }}
-                            title={user.role === "ADMIN" ? "Demote to USER" : "Promote to ADMIN"}
-                          >
-                            <Shield className="h-4.5 w-4.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className={cn(
-                              "h-10 w-10 rounded-xl transition-all",
-                              (user.status || "ACTIVE") === "SUSPENDED"
-                                ? "hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600"
-                                : "hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600"
-                            )}
-                            disabled={isUpdatingStatus}
-                            onClick={() => {
-                              const newStatus = (user.status || "ACTIVE") === "SUSPENDED" ? "ACTIVE" : "SUSPENDED"
-                              setStatusConfirmData({
-                                userId: user.id || user._id,
-                                name: user.name || "User",
-                                currentStatus: user.status || "ACTIVE",
-                                newStatus,
-                              })
-                            }}
-                            title={(user.status || "ACTIVE") === "SUSPENDED" ? "Unsuspend User" : "Suspend User"}
-                          >
-                            {(user.status || "ACTIVE") === "SUSPENDED" ? (
-                              <UserCheck className="h-4.5 w-4.5" />
-                            ) : (
-                              <UserX className="h-4.5 w-4.5" />
-                            )}
-                          </Button>
+                          {/* Tooltip wrapper for View Details */}
+                          <div className="relative group/tooltip">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-10 w-10 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 transition-all"
+                              onClick={() => {
+                                setSelectedUserId(user.id || user._id)
+                                setIsDetailsOpen(true)
+                              }}
+                            >
+                              <Eye className="h-4.5 w-4.5" />
+                            </Button>
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 text-[9px] font-black tracking-wider uppercase text-white bg-zinc-950 dark:bg-zinc-800 rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-md z-30">
+                              View Details
+                            </span>
+                          </div>
+
+                          {/* Tooltip wrapper for Change Role */}
+                          <div className="relative group/tooltip">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-10 w-10 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:text-purple-600 transition-all"
+                              disabled={isUpdatingRole}
+                              onClick={() => {
+                                const newRole = user.role === "ADMIN" ? "USER" : "ADMIN"
+                                setRoleConfirmData({
+                                  userId: user.id || user._id,
+                                  name: user.name || "User",
+                                  currentRole: user.role || "USER",
+                                  newRole,
+                                })
+                              }}
+                            >
+                              <Shield className="h-4.5 w-4.5" />
+                            </Button>
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 text-[9px] font-black tracking-wider uppercase text-white bg-zinc-950 dark:bg-zinc-800 rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-md z-30">
+                              {user.role === "ADMIN" ? "Demote Role" : "Promote to Admin"}
+                            </span>
+                          </div>
+
+                          {/* Tooltip wrapper for Suspend / Active */}
+                          <div className="relative group/tooltip">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={cn(
+                                "h-10 w-10 rounded-xl transition-all",
+                                (user.status || "ACTIVE") === "SUSPENDED"
+                                  ? "hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600"
+                                  : "hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600"
+                              )}
+                              disabled={isUpdatingStatus}
+                              onClick={() => {
+                                const newStatus = (user.status || "ACTIVE") === "SUSPENDED" ? "ACTIVE" : "SUSPENDED"
+                                setStatusConfirmData({
+                                  userId: user.id || user._id,
+                                  name: user.name || "User",
+                                  currentStatus: user.status || "ACTIVE",
+                                  newStatus,
+                                })
+                              }}
+                            >
+                              {(user.status || "ACTIVE") === "SUSPENDED" ? (
+                                <UserCheck className="h-4.5 w-4.5" />
+                              ) : (
+                                <UserX className="h-4.5 w-4.5" />
+                              )}
+                            </Button>
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2.5 py-1 text-[9px] font-black tracking-wider uppercase text-white bg-zinc-950 dark:bg-zinc-800 rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-md z-30">
+                              {(user.status || "ACTIVE") === "SUSPENDED" ? "Unsuspend" : "Suspend Account"}
+                            </span>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -317,6 +408,46 @@ export default function UsersPage() {
           </p>
         </div>
       </Card>
+
+      {/* Bulk Actions Floating Banner */}
+      {selectedUserIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-2xl px-6 py-4 flex items-center justify-between gap-8 min-w-[320px] sm:min-w-[480px] animate-in slide-in-from-bottom-4 duration-300">
+          <div className="flex items-center gap-3">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-extrabold text-primary">
+              {selectedUserIds.length}
+            </span>
+            <p className="text-xs font-bold text-foreground">Accounts Selected</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 px-4 text-xs font-bold rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-500 border-zinc-200 dark:border-zinc-800 transition-all cursor-pointer"
+              disabled={isUpdatingStatus}
+              onClick={handleBulkSuspend}
+            >
+              <UserX className="h-3.5 w-3.5 mr-1.5" /> Suspend
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="h-9 px-4 text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
+              disabled={isDeleting}
+              onClick={handleBulkDelete}
+            >
+              <Trash2 className="h-3.5 w-3.5 mr-1.5" /> Delete
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 px-3 text-xs font-bold rounded-xl hover:bg-muted text-muted-foreground transition-all cursor-pointer"
+              onClick={() => setSelectedUserIds([])}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
       
       <PaginationControls
         currentPage={currentPage}

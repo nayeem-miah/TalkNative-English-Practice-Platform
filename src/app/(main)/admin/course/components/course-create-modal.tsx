@@ -12,6 +12,13 @@ import { Sparkles, Upload } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 import { useCreateCourseMutation } from "@/redux/api/course-api"
 import { CropImageModal } from "./crop-image-modal"
@@ -22,7 +29,7 @@ const courseSchema = z.object({
   description: z.string().min(1, "Description is required"),
   level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]),
   type: z.enum(["PAID", "FREE"]),
-  price: z.number().min(0, "Price must be 0 or more"),
+  price: z.number().min(0, "Price must be 0 or more").max(10000, "Price cannot exceed $10,000"),
   file: z.any().nullable()
 }).refine(data => {
   if (data.type === "PAID") {
@@ -30,7 +37,7 @@ const courseSchema = z.object({
   }
   return true;
 }, {
-  message: "Price must be greater than $0",
+  message: "Price must be greater than $0 and maximum $10,000",
   path: ["price"]
 })
 
@@ -195,25 +202,27 @@ export function CourseCreateModal({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="create-level" className="text-sm font-semibold">Level</Label>
-                <select
-                  id="create-level"
+                <Select
                   value={newCourse.level}
-                  onChange={(e) => setNewCourse((prev: any) => ({ ...prev, level: e.target.value }))}
-                  className="flex h-11 w-full items-center justify-between rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none focus:ring-2 focus:ring-primary"
+                  onValueChange={(val) => setNewCourse((prev: any) => ({ ...prev, level: val }))}
                 >
-                  <option value="BEGINNER">BEGINNER</option>
-                  <option value="INTERMEDIATE">INTERMEDIATE</option>
-                  <option value="ADVANCED">ADVANCED</option>
-                </select>
+                  <SelectTrigger className="h-11 w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none cursor-pointer focus-visible:ring-0">
+                    <SelectValue placeholder="Select Level" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border border-border bg-card z-[60]">
+                    <SelectItem value="BEGINNER">BEGINNER</SelectItem>
+                    <SelectItem value="INTERMEDIATE">INTERMEDIATE</SelectItem>
+                    <SelectItem value="ADVANCED">ADVANCED</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="create-type" className="text-sm font-semibold">Type</Label>
-                <select
-                  id="create-type"
+                <Select
                   value={newCourse.type}
-                  onChange={(e) => {
-                    const newType = e.target.value
+                  onValueChange={(val) => {
+                    const newType = val || "FREE"
                     setNewCourse((prev: any) => ({
                       ...prev,
                       type: newType,
@@ -221,11 +230,15 @@ export function CourseCreateModal({
                     }))
                     if (errors.price && newType === "FREE") setErrors((prev) => ({ ...prev, price: "" }))
                   }}
-                  className="flex h-11 w-full items-center justify-between rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="PAID">PAID</option>
-                  <option value="FREE">FREE</option>
-                </select>
+                  <SelectTrigger className="h-11 w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm shadow-sm outline-none cursor-pointer focus-visible:ring-0">
+                    <SelectValue placeholder="Select Type" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border border-border bg-card z-[60]">
+                    <SelectItem value="PAID">PAID</SelectItem>
+                    <SelectItem value="FREE">FREE</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -240,10 +253,14 @@ export function CourseCreateModal({
                     id="create-price"
                     type="number"
                     min="0"
+                    max="10000"
+                    step="0.01"
                     placeholder="e.g. 29.99"
                     value={newCourse.price || ""}
                     onChange={(e) => {
-                      setNewCourse((prev: any) => ({ ...prev, price: parseFloat(e.target.value) || 0 }))
+                      const val = parseFloat(e.target.value);
+                      const rounded = isNaN(val) ? 0 : Math.round(val * 100) / 100;
+                      setNewCourse((prev: any) => ({ ...prev, price: rounded }))
                       if (errors.price) setErrors((prev) => ({ ...prev, price: "" }))
                     }}
                     className={cn("h-11 rounded-xl", errors.price && "border-destructive focus-visible:ring-destructive")}

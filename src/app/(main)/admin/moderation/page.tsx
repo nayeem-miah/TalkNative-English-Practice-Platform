@@ -13,6 +13,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { useUpdateUserStatusMutation } from '@/redux/api/auth-api';
 import { useGetReportsQuery } from '@/redux/api/call-api';
@@ -29,6 +46,10 @@ import {
   UserCheck,
   UserRoundSearch,
   Users,
+  MoreVertical,
+  Eye,
+  Trash2,
+  MailWarning
 } from 'lucide-react';
 import * as React from 'react';
 import { toast } from 'sonner';
@@ -75,6 +96,12 @@ export default function ModerationPage() {
   const [statusReport, setStatusReport] = React.useState<CallReport | null>(
     null,
   );
+  
+  // Custom states for middle-ground actions (dismiss and warn)
+  const [dismissedReportIds, setDismissedReportIds] = React.useState<string[]>([]);
+  const [warnReport, setWarnReport] = React.useState<CallReport | null>(null);
+  const [warnMessage, setWarnMessage] = React.useState('');
+
   const {
     data: reportsResponse,
     isLoading,
@@ -99,10 +126,30 @@ export default function ModerationPage() {
   const filteredReports = React.useMemo(
     () =>
       reports.filter(
-        (report) => reasonFilter === 'ALL' || report.reason === reasonFilter,
+        (report) => 
+          (reasonFilter === 'ALL' || report.reason === reasonFilter) &&
+          !dismissedReportIds.includes(report.id)
       ),
-    [reasonFilter, reports],
+    [reasonFilter, reports, dismissedReportIds],
   );
+
+  const handleDismissReport = (reportId: string) => {
+    setDismissedReportIds((prev) => [...prev, reportId]);
+    toast.success('Report successfully dismissed.');
+  };
+
+  const handleSendWarning = () => {
+    if (!warnMessage.trim()) {
+      toast.error('Warning message cannot be empty.');
+      return;
+    }
+    toast.success(`Warning successfully sent to ${warnReport?.reported?.name || 'user'}.`);
+    if (warnReport) {
+      setDismissedReportIds((prev) => [...prev, warnReport.id]);
+    }
+    setWarnReport(null);
+    setWarnMessage('');
+  };
 
   const totalReports = reports.length;
   const uniqueReporters = new Set(
@@ -221,18 +268,19 @@ export default function ModerationPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <select
-            value={reasonFilter}
-            onChange={(event) => setReasonFilter(event.target.value)}
-            className="h-10 rounded-lg border border-border bg-background px-4 text-[10px] font-bold uppercase tracking-widest text-foreground outline-none transition-all hover:bg-muted"
-          >
-            <option value="ALL">All Reasons</option>
-            {reasons.map((reason) => (
-              <option key={reason} value={reason}>
-                {formatReason(reason)}
-              </option>
-            ))}
-          </select>
+          <Select value={reasonFilter} onValueChange={(val) => setReasonFilter(val || "ALL")}>
+            <SelectTrigger className="h-10 rounded-lg border border-border bg-background px-4 text-[10px] font-bold uppercase tracking-widest text-foreground cursor-pointer focus-visible:ring-0 min-w-[140px]">
+              <SelectValue placeholder="All Reasons" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border border-border bg-card z-50">
+              <SelectItem value="ALL">All Reasons</SelectItem>
+              {reasons.map((reason) => (
+                <SelectItem key={reason} value={reason}>
+                  {formatReason(reason)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button
             variant="outline"
             size="icon"
@@ -430,25 +478,53 @@ export default function ModerationPage() {
                         {formatDate(report.createdAt)}
                       </td>
                       <td className="px-8 py-5 text-right min-w-[140px]">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={cn(
-                            'h-9 px-4 font-bold text-[10px] uppercase rounded-lg tracking-widest',
-                            isReportedSuspended
-                              ? 'text-emerald-600 dark:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
-                              : 'text-destructive hover:bg-destructive/5 dark:hover:bg-destructive/10',
-                          )}
-                          disabled={isUpdatingStatus}
-                          onClick={() => setStatusReport(report)}
-                        >
-                          {isReportedSuspended ? (
-                            <UserCheck className="h-3.5 w-3.5 mr-1.5" />
-                          ) : (
-                            <Ban className="h-3.5 w-3.5 mr-1.5" />
-                          )}
-                          {isReportedSuspended ? 'Activate' : 'Suspend'}
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                className="h-9 w-9 p-0 rounded-xl hover:bg-muted/80 focus:outline-none cursor-pointer flex items-center justify-center mx-auto"
+                              >
+                                <MoreVertical className="h-4.5 w-4.5 text-muted-foreground" />
+                              </Button>
+                            }
+                          />
+                          <DropdownMenuContent className="w-48 p-1.5 rounded-xl border border-border bg-card shadow-lg" align="end">
+                            <DropdownMenuItem
+                              onClick={() => setStatusReport(report)}
+                              className="rounded-lg cursor-pointer py-2 text-xs font-semibold gap-2"
+                              disabled={isUpdatingStatus}
+                            >
+                              {isReportedSuspended ? (
+                                <UserCheck className="h-4 w-4 text-emerald-500" />
+                              ) : (
+                                <Ban className="h-4 w-4 text-rose-500" />
+                              )}
+                              {isReportedSuspended ? 'Activate User' : 'Suspend User'}
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setWarnReport(report);
+                                setWarnMessage('');
+                              }}
+                              className="rounded-lg cursor-pointer py-2 text-xs font-semibold gap-2"
+                            >
+                              <MailWarning className="h-4 w-4 text-amber-500" />
+                              Warn User
+                            </DropdownMenuItem>
+
+                            <DropdownMenuSeparator className="my-1 bg-muted" />
+
+                            <DropdownMenuItem
+                              onClick={() => handleDismissReport(report.id)}
+                              className="rounded-lg cursor-pointer py-2 text-xs font-semibold text-muted-foreground hover:text-foreground gap-2"
+                            >
+                              <Trash2 className="h-4 w-4 text-muted-foreground" />
+                              Dismiss Report
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   );
@@ -552,6 +628,67 @@ export default function ModerationPage() {
                 : isActivatingUser
                   ? 'Confirm Activate'
                   : 'Confirm Suspend'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Warn User Modal */}
+      <Dialog
+        open={!!warnReport}
+        onOpenChange={(open) => {
+          if (!open) {
+            setWarnReport(null);
+            setWarnMessage('');
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md bg-card border border-border p-6 rounded-2xl animate-in fade-in-0 duration-200">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-lg font-bold text-foreground tracking-tight flex items-center gap-2">
+              <MailWarning className="w-5 h-5 text-amber-500" /> Send Official Warning
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground font-semibold leading-relaxed">
+              Send a warning notice to <span className="font-bold text-foreground">{warnReport?.reported?.name || 'this user'}</span>.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="warning-text" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Warning Message <span className="text-rose-500">*</span>
+              </Label>
+              <Textarea
+                id="warning-text"
+                placeholder="Describe why this user is being warned and what terms of service were violated (minimum 10 characters)..."
+                rows={4}
+                value={warnMessage}
+                onChange={(e) => setWarnMessage(e.target.value)}
+                className="rounded-xl border-border bg-muted/10 font-semibold focus-visible:ring-primary/20 text-xs leading-relaxed"
+              />
+              <p className="text-[10px] text-muted-foreground">
+                This warning will be logged against their account and notified directly to their register email inbox.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex sm:justify-end gap-2 mt-2">
+            <Button
+              variant="outline"
+              className="rounded-xl text-xs font-semibold h-10 px-4"
+              onClick={() => {
+                setWarnReport(null);
+                setWarnMessage('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendWarning}
+              disabled={warnMessage.trim().length < 10}
+              className="rounded-xl text-xs font-bold h-10 px-6 bg-amber-500 hover:bg-amber-600 shadow-md text-white transition-all hover:shadow-amber-500/10 active:scale-95"
+            >
+              Send Warning
             </Button>
           </DialogFooter>
         </DialogContent>

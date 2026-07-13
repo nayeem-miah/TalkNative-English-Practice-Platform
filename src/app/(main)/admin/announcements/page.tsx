@@ -10,6 +10,13 @@ import * as React from "react"
 
 import { useCreateAnnouncementMutation, useDeleteAnnouncementMutation, useGetAnnouncementsQuery, useUpdateAnnouncementMutation } from "@/redux/api/announcement-api"
 import { Loader2 } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function AdminAnnouncementsPage() {
   const { data: apiData, isLoading } = useGetAnnouncementsQuery(undefined)
@@ -172,27 +179,29 @@ export default function AdminAnnouncementsPage() {
                 <div className="flex flex-col sm:flex-row flex-wrap sm:items-center gap-6 sm:gap-8 pt-2">
                   <div className="flex items-center gap-3 shrink-0">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Category</label>
-                    <select
-                      value={newType}
-                      onChange={(e) => setNewType(e.target.value)}
-                      className="h-10 px-4 rounded-xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 w-full sm:w-auto"
-                    >
-                      <option value="FEATURE_UPDATE">Feature Update</option>
-                      <option value="SYSTEM_ALERT">System Alert</option>
-                      <option value="PROMOTION">Promotion/Offer</option>
-                    </select>
+                    <Select value={newType} onValueChange={(val) => setNewType(val || "FEATURE_UPDATE")}>
+                      <SelectTrigger className="h-10 px-4 rounded-xl border border-border bg-background text-sm font-medium focus-visible:ring-0 w-full sm:w-[160px] cursor-pointer">
+                        <SelectValue placeholder="Category" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border border-border bg-card z-[60]">
+                        <SelectItem value="FEATURE_UPDATE">Feature Update</SelectItem>
+                        <SelectItem value="SYSTEM_ALERT">System Alert</SelectItem>
+                        <SelectItem value="PROMOTION">Promotion/Offer</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0">
                     <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Status</label>
-                    <select
-                      value={newStatus}
-                      onChange={(e) => setNewStatus(e.target.value)}
-                      className="h-10 px-4 rounded-xl border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 w-full sm:w-auto"
-                    >
-                      <option value="PUBLISHED">Published</option>
-                      <option value="DRAFT">Draft</option>
-                    </select>
+                    <Select value={newStatus} onValueChange={(val) => setNewStatus(val || "PUBLISHED")}>
+                      <SelectTrigger className="h-10 px-4 rounded-xl border border-border bg-background text-sm font-medium focus-visible:ring-0 w-full sm:w-[140px] cursor-pointer">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border border-border bg-card z-[60]">
+                        <SelectItem value="PUBLISHED">Published</SelectItem>
+                        <SelectItem value="DRAFT">Draft</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-1 shrink-0">

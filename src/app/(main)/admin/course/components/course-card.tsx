@@ -92,7 +92,11 @@ export function CourseCard({
           {course.title}
         </CardTitle>
         <CardDescription className="line-clamp-2 text-xs mt-1 min-h-[32px]">
-          {course.description}
+          {(course.description || "")
+            .replace(/[#*`~_]/g, "")
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+            .replace(/^[-\s]*[-+*]\s+/gm, "")
+            .trim()}
         </CardDescription>
       </CardHeader>
 
@@ -104,7 +108,11 @@ export function CourseCard({
           <span>{studentsCount} {studentsCount === 1 ? "Learner" : "Learners"}</span>
           <span>•</span>
           <span className="text-foreground font-bold">
-            {course.price > 0 ? `$${course.price}` : "Free"}
+            {course.price > 0 
+              ? course.price > 1000000 
+                ? `$${course.price.toExponential(2)}` 
+                : `$${course.price.toFixed(2)}` 
+              : "Free"}
           </span>
         </div>
       </CardContent>

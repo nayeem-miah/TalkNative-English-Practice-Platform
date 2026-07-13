@@ -34,13 +34,97 @@ export default function AdminDashboardPage() {
   const totalEnrollments = stats.totalEnrollments ?? 0
   const totalRevenue = stats.totalRevenue ?? 0
 
+  // Client-side simulation of active sessions
+  const [activeSessions, setActiveSessions] = React.useState(18)
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSessions((prev) => {
+        const change = Math.floor(Math.random() * 3) - 1 // -1, 0, or +1
+        const nextValue = prev + change
+        if (nextValue < 12) return 12
+        if (nextValue > 25) return 25
+        return nextValue
+      })
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  // Helper to construct sparkline points path
+  const getSparklinePoints = React.useCallback((data: number[]) => {
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+    return data.map((val, idx) => {
+      const x = (idx / (data.length - 1)) * 90 + 5;
+      const y = 25 - ((val - min) / range) * 20;
+      return `${x},${y}`;
+    }).join(" ");
+  }, []);
+
   // Build stats items dynamically
-  const systemStats = React.useMemo(() => [
-    { name: "Active Sessions", value: "1,284", status: "Live", icon: PhoneCall, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-500/10" },
-    { name: "Total Courses", value: totalCourses.toString(), status: "Catalog", icon: Book, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-50 dark:bg-blue-500/10" },
-    { name: "Total Enrollments", value: totalEnrollments.toString(), status: "Students", icon: Users, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-50 dark:bg-purple-500/10" },
-    { name: "Total Revenue", value: `$${totalRevenue.toFixed(2)}`, status: "Stripe", icon: CreditCard, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-50 dark:bg-orange-500/10" },
-  ], [totalCourses, totalEnrollments, totalRevenue])
+  const systemStats = React.useMemo(() => {
+    const sessionsData = [14, 16, 12, 19, 15, 22, activeSessions];
+    const coursesData = [18, 19, 20, 20, 22, 23, totalCourses];
+    const enrollmentsData = [
+      totalEnrollments - 30 > 0 ? totalEnrollments - 30 : 0,
+      totalEnrollments - 22 > 0 ? totalEnrollments - 22 : 0,
+      totalEnrollments - 18 > 0 ? totalEnrollments - 18 : 0,
+      totalEnrollments - 10 > 0 ? totalEnrollments - 10 : 0,
+      totalEnrollments - 5 > 0 ? totalEnrollments - 5 : 0,
+      totalEnrollments - 2 > 0 ? totalEnrollments - 2 : 0,
+      totalEnrollments
+    ];
+    const revenueData = [
+      totalRevenue * 0.8,
+      totalRevenue * 0.83,
+      totalRevenue * 0.88,
+      totalRevenue * 0.9,
+      totalRevenue * 0.93,
+      totalRevenue * 0.97,
+      totalRevenue
+    ];
+
+    return [
+      { 
+        name: "Active Sessions", 
+        value: activeSessions.toString(), 
+        status: "Live", 
+        icon: PhoneCall, 
+        color: "text-emerald-600 dark:text-emerald-400", 
+        bg: "bg-emerald-50 dark:bg-emerald-500/10",
+        points: getSparklinePoints(sessionsData)
+      },
+      { 
+        name: "Total Courses", 
+        value: totalCourses.toString(), 
+        status: "Catalog", 
+        icon: Book, 
+        color: "text-blue-600 dark:text-blue-400", 
+        bg: "bg-blue-50 dark:bg-blue-500/10",
+        points: getSparklinePoints(coursesData)
+      },
+      { 
+        name: "Total Enrollments", 
+        value: totalEnrollments.toString(), 
+        status: "Students", 
+        icon: Users, 
+        color: "text-purple-600 dark:text-purple-400", 
+        bg: "bg-purple-50 dark:bg-purple-500/10",
+        points: getSparklinePoints(enrollmentsData)
+      },
+      { 
+        name: "Total Revenue", 
+        value: `$${totalRevenue.toFixed(2)}`, 
+        status: "Stripe", 
+        icon: CreditCard, 
+        color: "text-orange-600 dark:text-orange-400", 
+        bg: "bg-orange-50 dark:bg-orange-500/10",
+        points: getSparklinePoints(revenueData)
+      },
+    ];
+  }, [totalCourses, totalEnrollments, totalRevenue, activeSessions, getSparklinePoints])
 
   if (isLoading) {
     return (
@@ -84,9 +168,24 @@ export default function AdminDashboardPage() {
                     </div>
                   )}
                </div>
-               <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">{stat.name}</p>
-                  <p className="text-2xl font-bold text-foreground tracking-tight">{stat.value}</p>
+               <div className="flex items-end justify-between gap-4">
+                  <div className="space-y-1">
+                     <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">{stat.name}</p>
+                     <p className="text-2xl font-bold text-foreground tracking-tight">{stat.value}</p>
+                  </div>
+                  {/* Mini-Sparkline */}
+                  <div className={cn("h-8 w-16 opacity-85 hover:opacity-100 transition-opacity", stat.color)}>
+                    <svg className="w-full h-full" viewBox="0 0 100 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <polyline
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        points={stat.points}
+                      />
+                    </svg>
+                  </div>
                </div>
             </CardContent>
           </Card>
@@ -110,11 +209,11 @@ export default function AdminDashboardPage() {
            <CardContent className="p-4 sm:p-6 lg:p-10 h-[380px] flex items-end justify-between relative px-4 sm:px-12 gap-4">
               {(dashboardData.engagementTrends || [40, 70, 55, 90, 65, 85, 50]).map((h: number, i: number) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
-                   <div className="w-full bg-muted/30 border border-border rounded-lg transition-all group-hover:bg-primary/20 group-hover:border-primary/40 group-hover:shadow-lg group-hover:shadow-primary/5 relative cursor-pointer" style={{ height: `${h * 2.5}px` }}>
-                      <div className="absolute -top-10 left-1/2 -translate-y-1/2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-1 pointer-events-none whitespace-nowrap z-10 shadow-xl">
-                         {h * 124} sessions
-                      </div>
-                   </div>
+                    <div className="w-full bg-gradient-to-t from-primary/40 to-primary border border-primary/30 rounded-t-xl transition-all group-hover:from-primary/60 group-hover:to-primary/95 group-hover:shadow-lg group-hover:shadow-primary/20 relative cursor-pointer" style={{ height: `${h * 2.5}px` }}>
+                       <div className="absolute -top-10 left-1/2 -translate-y-1/2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-[9px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-all transform group-hover:-translate-y-1 pointer-events-none whitespace-nowrap z-10 shadow-xl">
+                          {h * 124} sessions
+                       </div>
+                    </div>
                    <span className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-widest">Day {i + 1}</span>
                 </div>
               ))}
@@ -270,7 +369,11 @@ export default function AdminDashboardPage() {
                           {course.level}
                         </Badge>
                         <p className="text-xs font-black text-foreground">
-                          {course.price > 0 ? `$${course.price}` : "Free"}
+                          {course.price > 0 
+                            ? course.price > 1000000 
+                              ? `$${course.price.toExponential(2)}` 
+                              : `$${course.price.toFixed(2)}` 
+                            : "Free"}
                         </p>
                       </div>
                     </div>

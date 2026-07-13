@@ -4,6 +4,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 import { ArrowRight, Flag, LayoutDashboard, Loader2, Star } from "lucide-react"
 import Image from "next/image"
 import * as React from "react"
@@ -178,6 +179,10 @@ function FeedbackContent() {
       toast.error("You must be logged in to report a user!")
       return
     }
+    if (reportDesc.trim().length < 10) {
+      toast.error("Please provide a more detailed description (minimum 10 characters).")
+      return
+    }
 
     try {
       await createReport({
@@ -349,9 +354,15 @@ function FeedbackContent() {
                 required
                 value={reportDesc}
                 onChange={(e) => setReportDesc(e.target.value)}
-                placeholder="Please describe the conversation or behavior in detail..."
-                className="min-h-[100px] rounded-xl bg-[#f8faff] dark:bg-zinc-800/50 border-none focus-visible:ring-primary/20 resize-none p-4 transition-colors text-xs font-semibold"
+                placeholder="Please describe the conversation or behavior in detail (minimum 10 characters)..."
+                className="min-h-[100px] rounded-xl bg-[#f8faff] dark:bg-zinc-800/50 border border-muted/20 dark:border-zinc-700/50 focus-visible:ring-primary/20 resize-none p-4 transition-colors text-xs font-semibold"
               />
+              <div className="flex justify-between items-center text-[10px] text-muted-foreground px-1">
+                <span>Provide a clear explanation of what occurred.</span>
+                <span className={cn("font-bold", reportDesc.trim().length < 10 ? "text-rose-500" : "text-emerald-500")}>
+                  {reportDesc.trim().length}/10 characters min
+                </span>
+              </div>
             </div>
 
             {/* Action Buttons */}
@@ -369,7 +380,7 @@ function FeedbackContent() {
               </Button>
               <Button
                 type="submit"
-                disabled={isReportingSubmitting}
+                disabled={isReportingSubmitting || reportDesc.trim().length < 10}
                 className="flex-1 h-12 rounded-xl bg-destructive hover:bg-destructive/90 text-white font-bold gap-2 cursor-pointer border-none"
               >
                 {isReportingSubmitting ? (

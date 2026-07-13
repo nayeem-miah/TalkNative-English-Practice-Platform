@@ -21,6 +21,8 @@ export default function AdminSupportPage() {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [messages, setMessages] = React.useState<any[]>([])
   
+  // Draft replies mapped by ticket ID
+  const [drafts, setDrafts] = React.useState<Record<string, string>>({})
   const [inputValue, setInputValue] = React.useState("")
   const [socket, setSocket] = React.useState<Socket | null>(null)
   const [isOtherTyping, setIsOtherTyping] = React.useState(false)
@@ -104,6 +106,14 @@ export default function AdminSupportPage() {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
+  const handleSelectTicket = (ticket: any) => {
+    if (activeTicket?.id) {
+      setDrafts((prev) => ({ ...prev, [activeTicket.id]: inputValue }));
+    }
+    setActiveTicket(ticket);
+    setInputValue(drafts[ticket.id] || "");
+  };
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
     if (!inputValue.trim() || !activeTicket || !adminId) return
@@ -118,6 +128,11 @@ export default function AdminSupportPage() {
 
       socket.emit("sendMessage", msgPayload)
       setInputValue("")
+      setDrafts((prev) => {
+        const copy = { ...prev };
+        delete copy[activeTicket.id];
+        return copy;
+      });
     }
   }
 
@@ -164,38 +179,62 @@ export default function AdminSupportPage() {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto divide-y divide-border/50">
-            {filteredTickets.map((ticket: any) => (
-              <button
-                key={ticket.id}
-                onClick={() => setActiveTicket(ticket)}
-                className={cn(
-                  "w-full p-4 flex items-start gap-3 text-left transition-colors hover:bg-muted/50",
-                  activeTicket?.id === ticket.id ? "bg-primary/5 border-l-2 border-l-primary" : "border-l-2 border-l-transparent"
-                )}
-              >
-                <div className="relative">
-                  <Avatar className="h-10 w-10 border border-border">
-                    <AvatarImage src={ticket.user?.profilePicture || ""} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-bold">{ticket.user?.name?.charAt(0) || "U"}</AvatarFallback>
-                  </Avatar>
-                  <div className={cn(
-                    "absolute bottom-0 right-0 h-2.5 w-2.5 border-2 border-card rounded-full",
-                    ticket.status === "OPEN" ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
-                  )} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-bold text-foreground truncate pr-2">{ticket.user?.name || "Unknown User"}</p>
-                    {ticket.unreadCount > 0 && (
-                      <span className="flex-shrink-0 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                        {ticket.unreadCount}
-                      </span>
-                    )}
+            {filteredTickets.map((ticket: any) => {
+              const hasDraft = !!drafts[ticket.id];
+              return (
+                <button
+                  key={ticket.id}
+                  onClick={() => handleSelectTicket(ticket)}
+                  className={cn(
+                    "w-full p-4 flex items-start gap-3 text-left transition-colors hover:bg-muted/50",
+                    activeTicket?.id === ticket.id 
+                      ? "bg-primary/10 border-l-2 border-l-primary" 
+                      : ticket.unreadCount > 0 
+                        ? "bg-primary/5 border-l-2 border-l-transparent hover:bg-primary/10" 
+                        : "border-l-2 border-l-transparent"
+                  )}
+                >
+                  <div className="relative">
+                    <Avatar className="h-10 w-10 border border-border">
+                      <AvatarImage src={ticket.user?.profilePicture || ""} />
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold">{ticket.user?.name?.charAt(0) || "U"}</AvatarFallback>
+                    </Avatar>
+                    <div className={cn(
+                      "absolute bottom-0 right-0 h-2.5 w-2.5 border-2 border-card rounded-full",
+                      ticket.status === "OPEN" ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-600"
+                    )} />
                   </div>
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">{ticket.lastMessage || "No messages yet"}</p>
-                </div>
-              </button>
-            ))}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className={cn(
+                        "text-sm truncate pr-2 flex items-center gap-1.5",
+                        ticket.unreadCount > 0 ? "font-black text-primary" : "font-bold text-foreground"
+                      )}>
+                        {ticket.unreadCount > 0 && <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0 animate-pulse" />}
+                        <span>{ticket.user?.name || "Unknown User"}</span>
+                      </p>
+                      {ticket.unreadCount > 0 && (
+                        <span className="flex-shrink-0 bg-primary text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded-full">
+                          {ticket.unreadCount}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate mt-0.5 flex items-center gap-1">
+                      {hasDraft ? (
+                        <>
+                          <span className="text-[9px] text-amber-600 dark:text-amber-400 font-extrabold bg-amber-50 dark:bg-amber-950/40 border border-amber-200/50 dark:border-amber-900/50 px-1 py-0.2 rounded-md uppercase tracking-wider shrink-0 scale-95">DRAFT</span>
+                          <span className="italic text-foreground/80">{drafts[ticket.id]}</span>
+                        </>
+                      ) : (
+                        <span className={cn(ticket.unreadCount > 0 && "font-semibold text-foreground")}>
+                          {ticket.lastMessage || "No messages yet"}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
           </div>
         </Card>
 

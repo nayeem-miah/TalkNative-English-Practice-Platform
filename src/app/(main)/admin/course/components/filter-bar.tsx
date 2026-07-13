@@ -3,6 +3,13 @@
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { ArrowUpDown, Filter, Search } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface FilterBarProps {
   searchTerm: string
@@ -43,42 +50,45 @@ export function FilterBar({
         {/* Status filter */}
         <div className="flex items-center gap-1.5">
           <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-10 text-xs font-semibold rounded-xl border border-input bg-background px-3 py-1 cursor-pointer outline-none"
-          >
-            <option value="ALL">All Status</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="DRAFT">Draft</option>
-          </select>
+          <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val || "ALL")}>
+            <SelectTrigger className="h-10 text-xs font-semibold rounded-xl border border-input bg-background px-3 py-1 min-w-[110px] cursor-pointer focus-visible:ring-0">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border border-border bg-card z-50">
+              <SelectItem value="ALL">All Status</SelectItem>
+              <SelectItem value="PUBLISHED">Published</SelectItem>
+              <SelectItem value="DRAFT">Draft</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Level filter */}
-        <select
-          value={levelFilter}
-          onChange={(e) => setLevelFilter(e.target.value)}
-          className="h-10 text-xs font-semibold rounded-xl border border-input bg-background px-3 py-1 cursor-pointer outline-none"
-        >
-          <option value="ALL">All Levels</option>
-          <option value="BEGINNER">Beginner</option>
-          <option value="INTERMEDIATE">Intermediate</option>
-          <option value="ADVANCED">Advanced</option>
-        </select>
+        <Select value={levelFilter} onValueChange={(val) => setLevelFilter(val || "ALL")}>
+          <SelectTrigger className="h-10 text-xs font-semibold rounded-xl border border-input bg-background px-3 py-1 min-w-[110px] cursor-pointer focus-visible:ring-0">
+            <SelectValue placeholder="All Levels" />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl border border-border bg-card z-50">
+            <SelectItem value="ALL">All Levels</SelectItem>
+            <SelectItem value="BEGINNER">Beginner</SelectItem>
+            <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
+            <SelectItem value="ADVANCED">Advanced</SelectItem>
+          </SelectContent>
+        </Select>
 
         {/* Sort selection */}
         <div className="flex items-center gap-1.5">
           <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="h-10 text-xs font-semibold rounded-xl border border-input bg-background px-3 py-1 cursor-pointer outline-none"
-          >
-            <option value="NEWEST">Newest Updated</option>
-            <option value="OLDEST">Oldest Updated</option>
-            <option value="MOST_STUDENTS">Most Students</option>
-            <option value="HIGHEST_REVENUE">Highest Revenue</option>
-          </select>
+          <Select value={sortBy} onValueChange={(val) => setSortBy(val || "NEWEST")}>
+            <SelectTrigger className="h-10 text-xs font-semibold rounded-xl border border-input bg-background px-3 py-1 min-w-[140px] cursor-pointer focus-visible:ring-0">
+              <SelectValue placeholder="Sort By" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border border-border bg-card z-50">
+              <SelectItem value="NEWEST">Newest Updated</SelectItem>
+              <SelectItem value="OLDEST">Oldest Updated</SelectItem>
+              <SelectItem value="MOST_STUDENTS">Most Students</SelectItem>
+              <SelectItem value="HIGHEST_REVENUE">Highest Revenue</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </Card>

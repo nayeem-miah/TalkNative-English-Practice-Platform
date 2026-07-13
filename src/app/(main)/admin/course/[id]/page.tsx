@@ -138,6 +138,14 @@ export default function CourseDetailsPage() {
             <Badge className="rounded-full px-3 border border-border bg-background text-foreground text-[10px] font-bold tracking-wide uppercase select-none">
               {course.level}
             </Badge>
+            <Badge
+              className={cn(
+                "rounded-full px-3 text-white border-none select-none font-bold text-[10px] tracking-wide uppercase",
+                course.type === "PAID" ? "bg-indigo-600 hover:bg-indigo-600" : "bg-emerald-600 hover:bg-emerald-600"
+              )}
+            >
+              {course.type || "FREE"}
+            </Badge>
           </div>
 
           <div className="flex gap-3 shrink-0">
@@ -159,11 +167,11 @@ export default function CourseDetailsPage() {
       </div>
 
       {/* Description Section (Full Width) */}
-      <div className="border border-border/50 bg-muted/10 p-6 rounded-2xl shadow-sm relative">
+      <div className="border border-border/50 bg-card p-6 rounded-2xl shadow-sm relative">
         <div className={cn(
           "transition-all duration-300",
           !isDescExpanded && course.description && course.description.length > 250
-            ? "max-h-24 overflow-hidden pb-4"
+            ? "max-h-24 overflow-hidden pb-8"
             : "max-h-[3000px]"
         )}>
           <MarkdownRenderer text={course.description} />
@@ -173,7 +181,7 @@ export default function CourseDetailsPage() {
           <div className={cn(
             "flex justify-center",
             !isDescExpanded
-              ? "absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background via-background/90 to-transparent flex items-end pb-2"
+              ? "absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-card via-card/95 to-transparent flex items-end pb-3"
               : "mt-4"
           )}>
             <Button

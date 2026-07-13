@@ -5,6 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { useGetAllEnrollmentsQuery } from "@/redux/api/enrollment-api"
 import {
@@ -16,7 +23,8 @@ import {
   Filter,
   Gift,
   GraduationCap,
-  Search
+  Search,
+  ShieldAlert
 } from "lucide-react"
 import * as React from "react"
 import { toast } from "sonner"
@@ -78,16 +86,23 @@ export default function AdminEnrollmentPage() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <Filter className="w-3.5 h-3.5 text-muted-foreground/60" />
-            <select
+            <Select
               value={statusFilter}
-              onChange={handleFilterChange}
-              className="h-10 text-xs font-semibold rounded-xl border border-border bg-background px-4 py-1 cursor-pointer outline-none hover:bg-muted transition-all"
+              onValueChange={(val) => {
+                setStatusFilter(val || "ALL")
+                setCurrentPage(1)
+              }}
             >
-              <option value="ALL">All Payment Statuses</option>
-              <option value="PAID">Paid</option>
-              <option value="FREE">Free</option>
-              <option value="PENDING">Pending</option>
-            </select>
+              <SelectTrigger className="h-10 text-xs font-semibold rounded-xl border border-border bg-background px-4 py-1 cursor-pointer focus-visible:ring-0 min-w-[160px]">
+                <SelectValue placeholder="All Payment Statuses" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border border-border bg-card z-50">
+                <SelectItem value="ALL">All Payment Statuses</SelectItem>
+                <SelectItem value="PAID">Paid</SelectItem>
+                <SelectItem value="FREE">Free</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -224,8 +239,13 @@ export default function AdminEnrollmentPage() {
                           <p className="font-bold text-foreground text-sm tracking-tight truncate" title={enrollment.course?.title}>
                             {enrollment.course?.title || "Unknown Course"}
                           </p>
-                          <Badge variant="outline" className="text-[8px] font-black px-1.5 py-0.2 rounded bg-muted/65 text-muted-foreground border-transparent uppercase tracking-wider">
-                            {enrollment.course?.type || "FREE"}
+                          <Badge variant="outline" className={cn(
+                            "text-[8px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider gap-1",
+                            (enrollment.course?.type || "FREE") === "PAID" 
+                              ? "bg-indigo-50/60 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border-indigo-200/50 dark:border-indigo-900/50" 
+                              : "bg-emerald-50/60 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-900/50"
+                          )}>
+                            Course: {enrollment.course?.type || "FREE"}
                           </Badge>
                         </div>
                       </td>
@@ -270,6 +290,16 @@ export default function AdminEnrollmentPage() {
                               <Copy className="w-3 h-3" />
                             )}
                           </button>
+                        ) : isPaid ? (
+                          <div className="flex items-center gap-1.5 text-rose-500 font-extrabold text-xs">
+                            <span>N/A</span>
+                            <div className="relative group/warn cursor-pointer">
+                              <ShieldAlert className="w-4 h-4 text-rose-500 animate-pulse" />
+                              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 text-[9px] font-bold tracking-normal text-white bg-rose-600 rounded-md opacity-0 group-hover/warn:opacity-100 transition-opacity pointer-events-none whitespace-normal w-44 text-center shadow-lg z-30 leading-snug">
+                                WARNING: Paid enrollment is missing Transaction ID!
+                              </span>
+                            </div>
+                          </div>
                         ) : (
                           <span className="text-muted-foreground/60 italic text-xs font-semibold">N/A</span>
                         )}
