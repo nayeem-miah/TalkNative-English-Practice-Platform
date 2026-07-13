@@ -99,6 +99,7 @@ function LiveCallContent() {
         { sender: "Partner", text: "Hello! Nice to meet you. Let's practice English!", time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }
     ])
     const [isListening, setIsListening] = React.useState(false)
+    const [isSpeechSupported, setIsSpeechSupported] = React.useState(false)
 
     const recognitionRef = React.useRef<any>(null)
     const captionsEndRef = React.useRef<HTMLDivElement | null>(null)
@@ -109,6 +110,7 @@ function LiveCallContent() {
 
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
         if (SpeechRecognition) {
+            setIsSpeechSupported(true)
             const rec = new SpeechRecognition()
             rec.continuous = true
             rec.interimResults = false
@@ -125,12 +127,29 @@ function LiveCallContent() {
                             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                         }
                     ])
+
+                    // Emit to partner dynamically using signaling channel
+                    if (socketRef.current && roomIdRef.current) {
+                        socketRef.current.emit("signal", {
+                            roomId: roomIdRef.current,
+                            signal: { type: "caption", text: latestResult.trim() }
+                        })
+                    }
                 }
             }
 
             rec.onerror = (event: any) => {
                 console.error("Speech recognition error:", event.error)
                 setIsListening(false)
+                if (event.error === 'not-allowed') {
+                    toast.error("Microphone permission denied for speech-to-text. Ensure you are on HTTPS or localhost.")
+                } else if (event.error === 'network') {
+                    toast.error("Speech recognition network error. Please check your internet connection.")
+                } else if (event.error === 'no-speech') {
+                    // Ignore silent errors
+                } else {
+                    toast.error(`Speech recognition error: ${event.error}`)
+                }
             }
 
             rec.onend = () => {
@@ -138,6 +157,8 @@ function LiveCallContent() {
             }
 
             recognitionRef.current = rec
+        } else {
+            setIsSpeechSupported(false)
         }
     }, [])
 
@@ -178,34 +199,6 @@ function LiveCallContent() {
         }
     }, [captionsList])
 
-    // Simulated Partner dialog responses to make captions feel alive
-    React.useEffect(() => {
-        if (callState !== "CONNECTED" || !isCaptionsOpen) return
-
-        const partnerPhrases = [
-            "I agree with that. Learning English by speaking is the fastest way.",
-            "Where are you calling from? I would love to know more about your country.",
-            "That makes a lot of sense. Could you explain it one more time?",
-            "I am practicing for my IELTS exam. What about you?",
-            "I try to practice English for at least 30 minutes every single day.",
-            "Your pronunciation is very clear!",
-            "Thank you for sharing that experience with me."
-        ]
-
-        const interval = setInterval(() => {
-            const randomPhrase = partnerPhrases[Math.floor(Math.random() * partnerPhrases.length)]
-            setCaptionsList(prev => [
-                ...prev,
-                {
-                    sender: "Partner",
-                    text: randomPhrase,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                }
-            ])
-        }, 15000)
-
-        return () => clearInterval(interval)
-    }, [callState, isCaptionsOpen])
 
     // Reset panel state when call finishes
     React.useEffect(() => {
@@ -549,6 +542,20 @@ function LiveCallContent() {
         // WebRTC Signaling Relay Handler
         socket.on("signal", async (data: { from: string; signal: any }) => {
             if (!isMounted) return
+
+            // Handle captions sent by partner
+            if (data.signal && data.signal.type === "caption") {
+                setCaptionsList(prev => [
+                    ...prev,
+                    {
+                        sender: "Partner",
+                        text: data.signal.text,
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    }
+                ])
+                return
+            }
+
             const pc = pcRef.current
             if (!pc) {
                 pendingSignalsRef.current.push(data.signal)
@@ -1026,16 +1033,26 @@ function LiveCallContent() {
                                                 onClick={handleToggleListening}
                                                 className={cn(
                                                     "w-full h-10 font-extrabold text-xs rounded-xl flex items-center justify-center gap-2 transition-all border-none cursor-pointer text-white",
-                                                    isListening 
-                                                        ? "bg-red-500 hover:bg-red-600 shadow-md shadow-red-500/10" 
-                                                        : "bg-[#006D5B] hover:bg-[#005a4b] shadow-md shadow-primary/10"
+                                                    !isSpeechSupported
+                                                        ? "bg-zinc-400 dark:bg-zinc-700 cursor-not-allowed"
+                                                        : isListening 
+                                                            ? "bg-red-500 hover:bg-red-650 shadow-md shadow-red-500/10" 
+                                                            : "bg-[#006D5B] hover:bg-[#005a4b] shadow-md shadow-primary/10"
                                                 )}
+                                                disabled={!isSpeechSupported}
                                             >
-                                                <span className={cn(
-                                                    "h-2 w-2 rounded-full bg-white",
-                                                    isListening && "animate-ping"
-                                                )} />
-                                                {isListening ? "Turn Off Live Mic Transcribing" : "Turn On Live Mic Transcribing"}
+                                                {isSpeechSupported && (
+                                                    <span className={cn(
+                                                        "h-2 w-2 rounded-full bg-white",
+                                                        isListening && "animate-ping"
+                                                    )} />
+                                                )}
+                                                {!isSpeechSupported 
+                                                    ? "Speech Recognition Unsupported" 
+                                                    : isListening 
+                                                        ? "Turn Off Live Mic Transcribing" 
+                                                        : "Turn On Live Mic Transcribing"
+                                                }
                                             </Button>
                                             <p className="text-[10px] text-muted-foreground font-semibold text-center leading-normal">
                                                 Uses browser native speech recognition. Partner responses are simulated.

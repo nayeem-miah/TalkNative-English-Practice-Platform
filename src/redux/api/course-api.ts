@@ -3,16 +3,19 @@ import { baseApi } from "./base-api";
 
 export const courseApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCourses: builder.query<any, { page?: number; limit?: number; level?: string; searchTerm?: string }>({
+    getCourses: builder.query<any, { page?: number; limit?: number; level?: string; searchTerm?: string } | void>({
       query: (params) => {
         const queryParams = new URLSearchParams();
-        if (params.page) queryParams.append("page", params.page.toString());
-        if (params.limit) queryParams.append("limit", params.limit.toString());
-        if (params.level && params.level !== "ALL") queryParams.append("level", params.level);
-        if (params.searchTerm) queryParams.append("searchTerm", params.searchTerm);
+        if (params) {
+          if (params.page) queryParams.append("page", params.page.toString());
+          if (params.limit) queryParams.append("limit", params.limit.toString());
+          if (params.level && params.level !== "ALL") queryParams.append("level", params.level);
+          if (params.searchTerm) queryParams.append("searchTerm", params.searchTerm);
+        }
 
+        const queryString = queryParams.toString();
         return {
-          url: `/courses?${queryParams.toString()}`,
+          url: queryString ? `/courses?${queryString}` : "/courses",
           method: "GET",
         };
       },

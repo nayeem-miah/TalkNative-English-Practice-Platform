@@ -47,8 +47,12 @@ export function RegisterClient() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name.trim() || !formData.email || !formData.password || !formData.confirmPassword) {
       return toast.error("Please fill in all fields")
+    }
+
+    if (formData.name.trim().split(/\s+/).length < 2) {
+      return toast.error("Please enter your full name (first name and last name)")
     }
 
     if (formData.password.length < 6) {

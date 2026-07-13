@@ -8,9 +8,49 @@ import { Card } from "@/components/ui/card"
 import { MoreVertical, Paperclip, Send } from "lucide-react"
 import * as React from "react"
 
-import { useGetMessagesQuery, useGetUserTicketQuery, useMarkTicketReadMutation } from "@/redux/api/chat-api"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 import { useGetMeQuery } from "@/redux/api/auth-api"
+import { useGetMessagesQuery, useGetUserTicketQuery, useMarkTicketReadMutation } from "@/redux/api/chat-api"
 import { Socket, io } from "socket.io-client"
+
+function formatMessageContent(content: string) {
+  if (!content) return null
+
+
+  let cleanText = content
+    .replace(/you are welcom/gi, "You're welcome")
+    .replace(/you are welcome/gi, "You're welcome")
+  if (!cleanText.includes('\n') && /1\.\s*\w+/.test(cleanText) && /2\.\s*\w+/.test(cleanText)) {
+    cleanText = cleanText.replace(/(\d+\.\s*[A-Z\w])/g, '\n$1').trim()
+  }
+
+  const finalLines = cleanText.split('\n').filter(line => line.trim())
+
+  return (
+    <div className="space-y-1.5">
+      {finalLines.map((line, idx) => {
+        const trimmed = line.trim()
+        const isMatch = /^(\d+)\.\s*(.*)/.exec(trimmed)
+
+        if (isMatch) {
+          return (
+            <div key={idx} className="flex gap-2 text-xs sm:text-sm leading-relaxed pl-1 pt-0.5">
+              <span className="font-extrabold text-primary shrink-0">{isMatch[1]}.</span>
+              <span className="font-medium">{isMatch[2]}</span>
+            </div>
+          )
+        }
+
+        return (
+          <p key={idx} className="text-xs sm:text-sm font-medium leading-relaxed">
+            {trimmed}
+          </p>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function SupportPage() {
   const [inputValue, setInputValue] = React.useState("")
@@ -113,7 +153,7 @@ export default function SupportPage() {
 
       socket.emit("sendMessage", msgPayload)
       setInputValue("")
-      
+
       // If we didn't have a ticket, refetch ticket shortly after sending so we capture the new active ticket
       if (!ticketId) {
         setTimeout(() => refetchTicket(), 1000)
@@ -140,7 +180,12 @@ export default function SupportPage() {
               <div className="absolute bottom-0 right-0 h-3 w-3 bg-emerald-500 border-2 border-background rounded-full"></div>
             </div>
             <div>
-              <p className="text-sm font-bold text-foreground leading-none">TalkNative Support</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-bold text-foreground leading-none">TalkNative Support</p>
+                <Badge className="bg-primary/10 text-[#006D5B] dark:text-[#00A38B] hover:bg-primary/20 border-none text-[9px] font-black uppercase py-0.5 px-2 tracking-widest shrink-0">
+                  🤖 AI Assistant
+                </Badge>
+              </div>
               <p className="text-xs text-muted-foreground font-medium mt-1">Typically replies in a few minutes</p>
             </div>
           </div>
@@ -188,7 +233,7 @@ export default function SupportPage() {
                         : "bg-white dark:bg-zinc-800 border border-border text-foreground rounded-bl-sm shadow-sm"
                     }`}
                   >
-                    <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
+                    {formatMessageContent(msg.content)}
                   </div>
                   <span className="text-[10px] font-semibold text-muted-foreground mt-1.5 px-1">
                     {msg.timestamp || (msg.createdAt && new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
@@ -245,7 +290,12 @@ export default function SupportPage() {
             <Button
               type="submit"
               disabled={!inputValue.trim()}
-              className="h-11 px-5 shrink-0 rounded-xl bg-primary text-primary-foreground font-bold shadow-md shadow-primary/10 transition-all hover:bg-primary/95 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+              className={cn(
+                "h-11 px-5 shrink-0 rounded-xl font-bold transition-all active:scale-95 text-white border-none flex items-center justify-center gap-1.5",
+                inputValue.trim()
+                  ? "bg-[#006D5B] hover:bg-[#005a4b] shadow-md shadow-[#006D5B]/10 cursor-pointer"
+                  : "bg-zinc-200 dark:bg-zinc-850 text-zinc-400 dark:text-zinc-550 opacity-60 cursor-not-allowed"
+              )}
             >
               <Send className="h-4.5 w-4.5 mr-2" />
               Send

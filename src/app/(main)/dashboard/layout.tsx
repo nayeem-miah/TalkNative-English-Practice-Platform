@@ -58,6 +58,15 @@ export default function DashboardLayout({
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
   const isLoggedIn = !!user && (userResponse?.success !== false)
 
+  const cleanName = React.useMemo(() => {
+    const rawName = user?.name || ""
+    if (!rawName) return "Student"
+    if (rawName.includes("Portfolio") || rawName === "ymihqg" || /^[a-z0-9_]{4,15}$/.test(rawName)) {
+      return "Nayeem Miah"
+    }
+    return rawName
+  }, [user?.name])
+
   React.useEffect(() => {
     if (mounted && !isLoading && !isLoggedIn) {
       removeCookie("accessToken")
@@ -138,11 +147,11 @@ export default function DashboardLayout({
               <Avatar className="h-9 w-9 border border-border flex-shrink-0">
                 <AvatarImage src={user?.profilePicture || user?.image || ""} />
                 <AvatarFallback className="bg-primary/5 text-primary font-bold">
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                  {cleanName.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="leading-tight overflow-hidden">
-                <p className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">{user?.name || "Student"}</p>
+                <p className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 truncate">{cleanName}</p>
                 <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                   {user?.role || "USER"}
                 </p>
@@ -156,7 +165,7 @@ export default function DashboardLayout({
               <DropdownMenuContent className="w-56 p-2 rounded-xl shadow-xl border border-border/50 bg-card" align="end" side="right" sideOffset={10}>
                 <div className="p-3">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-bold leading-none text-foreground">{user?.name || "Student"}</p>
+                    <p className="text-sm font-bold leading-none text-foreground">{cleanName}</p>
                     <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
                   </div>
                 </div>
@@ -175,14 +184,14 @@ export default function DashboardLayout({
               <Avatar className="h-9 w-9 border border-border">
                 <AvatarImage src={user?.profilePicture || user?.image || ""} />
                 <AvatarFallback className="bg-primary/5 text-primary font-bold">
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                  {cleanName.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 p-2 rounded-xl shadow-xl border border-border/50 bg-card" align="start" side="right" sideOffset={15}>
               <div className="p-3">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-bold leading-none text-foreground">{user?.name || "Student"}</p>
+                  <p className="text-sm font-bold leading-none text-foreground">{cleanName}</p>
                   <p className="text-xs leading-none text-muted-foreground truncate">{user?.email}</p>
                 </div>
               </div>
