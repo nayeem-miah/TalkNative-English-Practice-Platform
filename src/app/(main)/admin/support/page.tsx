@@ -6,11 +6,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { CheckCircle2, MoreVertical, Paperclip, Search, Send } from "lucide-react"
+import { CheckCircle2, Paperclip, Search, Send } from "lucide-react"
 import * as React from "react"
 
 import { useGetMeQuery } from "@/redux/api/auth-api"
-import { useGetMessagesQuery, useGetTicketsQuery, useResolveTicketMutation, useMarkTicketReadMutation } from "@/redux/api/chat-api"
+import { useGetMessagesQuery, useGetTicketsQuery, useMarkTicketReadMutation, useResolveTicketMutation } from "@/redux/api/chat-api"
 import { Socket, io } from "socket.io-client"
 
 export default function AdminSupportPage() {
@@ -20,13 +20,13 @@ export default function AdminSupportPage() {
   const [activeTicket, setActiveTicket] = React.useState<any>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [messages, setMessages] = React.useState<any[]>([])
-  
+
   // Draft replies mapped by ticket ID
   const [drafts, setDrafts] = React.useState<Record<string, string>>({})
   const [inputValue, setInputValue] = React.useState("")
   const [socket, setSocket] = React.useState<Socket | null>(null)
   const [isOtherTyping, setIsOtherTyping] = React.useState(false)
-  
+
   const endOfMessagesRef = React.useRef<HTMLDivElement>(null)
   const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
@@ -156,10 +156,6 @@ export default function AdminSupportPage() {
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Support Inbox</h1>
           <p className="text-sm text-muted-foreground font-medium">Manage and respond to user support requests.</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
-           <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-           <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest">3 Active Tickets</span>
-        </div>
       </div>
 
       <div className="flex-1 flex gap-6 overflow-hidden">
@@ -187,10 +183,10 @@ export default function AdminSupportPage() {
                   onClick={() => handleSelectTicket(ticket)}
                   className={cn(
                     "w-full p-4 flex items-start gap-3 text-left transition-colors hover:bg-muted/50",
-                    activeTicket?.id === ticket.id 
-                      ? "bg-primary/10 border-l-2 border-l-primary" 
-                      : ticket.unreadCount > 0 
-                        ? "bg-primary/5 border-l-2 border-l-transparent hover:bg-primary/10" 
+                    activeTicket?.id === ticket.id
+                      ? "bg-primary/10 border-l-2 border-l-primary"
+                      : ticket.unreadCount > 0
+                        ? "bg-primary/5 border-l-2 border-l-transparent hover:bg-primary/10"
                         : "border-l-2 border-l-transparent"
                   )}
                 >
@@ -267,9 +263,6 @@ export default function AdminSupportPage() {
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" onClick={handleResolve} className="h-8 text-xs font-semibold">
                     <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Resolve
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground">
-                    <MoreVertical className="h-4.5 w-4.5" />
                   </Button>
                 </div>
               </div>
