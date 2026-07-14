@@ -69,10 +69,6 @@ export default function AdminEnrollmentPage() {
     setCurrentPage(1)
   }
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value)
-    setCurrentPage(1)
-  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-10 space-y-10 animate-in fade-in duration-500">
@@ -241,8 +237,8 @@ export default function AdminEnrollmentPage() {
                           </p>
                           <Badge variant="outline" className={cn(
                             "text-[8px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider gap-1",
-                            (enrollment.course?.type || "FREE") === "PAID" 
-                              ? "bg-indigo-50/60 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border-indigo-200/50 dark:border-indigo-900/50" 
+                            (enrollment.course?.type || "FREE") === "PAID"
+                              ? "bg-indigo-50/60 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border-indigo-200/50 dark:border-indigo-900/50"
                               : "bg-emerald-50/60 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-900/50"
                           )}>
                             Course: {enrollment.course?.type || "FREE"}
