@@ -6,6 +6,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useGetMyCoursesQuery } from "@/redux/api/enrollment-api"
 import { ArrowRight, Book, BookOpen, Filter, Search } from "lucide-react"
 import Link from "next/link"
@@ -113,16 +120,17 @@ export default function MyCoursesPage() {
 
         <div className="flex items-center gap-2 flex-shrink-0">
           <Filter className="w-4 h-4 text-zinc-400" />
-          <select
-            value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value)}
-            className="h-11 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold cursor-pointer outline-none hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors"
-          >
-            <option value="ALL">All Levels</option>
-            <option value="BEGINNER">Beginner</option>
-            <option value="INTERMEDIATE">Intermediate</option>
-            <option value="ADVANCED">Advanced</option>
-          </select>
+          <Select value={selectedLevel} onValueChange={(val) => setSelectedLevel(val || "ALL")}>
+            <SelectTrigger className="h-11 min-w-[130px] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 text-sm font-semibold cursor-pointer outline-none hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors flex items-center justify-between gap-2">
+              <SelectValue placeholder="All Levels" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border border-zinc-150 dark:border-zinc-850 bg-card z-50">
+              <SelectItem value="ALL">All Levels</SelectItem>
+              <SelectItem value="BEGINNER">Beginner</SelectItem>
+              <SelectItem value="INTERMEDIATE">Intermediate</SelectItem>
+              <SelectItem value="ADVANCED">Advanced</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
