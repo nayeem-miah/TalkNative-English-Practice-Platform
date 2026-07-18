@@ -92,7 +92,7 @@ export function Footer() {
           <div>
             <h4 className="font-extrabold mb-6 text-white uppercase text-xs tracking-widest">Support</h4>
             <ul className="space-y-4 text-sm text-zinc-400 font-medium">
-              <li><Link href="#" className="hover:text-emerald-400 transition-colors">Contact Support</Link></li>
+              <li><Link href="/contact" className="hover:text-emerald-400 transition-colors">Contact Support</Link></li>
               <li><Link href="#" className="hover:text-emerald-400 transition-colors">Help Center</Link></li>
               <li><Link href="#" className="hover:text-emerald-400 transition-colors">Safety Guides</Link></li>
               <li><Link href="#" className="hover:text-emerald-400 transition-colors">Community</Link></li>
