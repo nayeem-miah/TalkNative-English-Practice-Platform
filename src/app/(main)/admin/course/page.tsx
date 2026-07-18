@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { Plus, Edit, ExternalLink, MoreVertical, Trash2 } from "lucide-react"
-import { useState } from "react"
-import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+import { Edit, ExternalLink, MoreVertical, Plus, Trash2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { cn } from "@/lib/utils"
+import { useState } from "react"
+import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogTrigger } from "@/components/ui/dialog"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 
-// Modular Sub-components
+
 import { CourseCreateModal } from "./components/course-create-modal"
 import { CourseUpdateModal } from "./components/course-update-modal"
 import { DeleteConfirmModal } from "./components/delete-confirm-modal"
@@ -28,15 +28,15 @@ import { FilterBar } from "./components/filter-bar"
 import { StatsOverview } from "./components/stats-overview"
 import { Course } from "./types"
 
-// RTK Query API Hooks
+
+import { EmptyState } from "@/components/ui/empty-state"
+import { LoadingState } from "@/components/ui/loading-state"
+import { PaginationControls } from "@/components/ui/pagination-controls"
 import {
   useDeleteCourseMutation,
   useGetCoursesQuery,
   useUpdateCourseMutation
 } from "@/redux/api/course-api"
-import { LoadingState } from "@/components/ui/loading-state"
-import { EmptyState } from "@/components/ui/empty-state"
-import { PaginationControls } from "@/components/ui/pagination-controls"
 
 export default function AdminCoursePage() {
   // RTK Query hooks
@@ -45,11 +45,11 @@ export default function AdminCoursePage() {
   const [levelFilter, setLevelFilter] = useState("ALL")
   const [sortBy, setSortBy] = useState("NEWEST")
 
-  // Pagination State
+
   const [currentPage, setCurrentPage] = useState(1)
   const limit = 6
 
-  // Reset page to 1 on filter/sort changes
+
   const handleSetSearchTerm = (val: string) => {
     setSearchTerm(val)
     setCurrentPage(1)
@@ -67,7 +67,7 @@ export default function AdminCoursePage() {
     setCurrentPage(1)
   }
 
-  // Fetch paginated courses list
+
   const { data: coursesResponse, isLoading } = useGetCoursesQuery({
     page: currentPage,
     limit: limit,
@@ -79,7 +79,7 @@ export default function AdminCoursePage() {
   const [updateCourse] = useUpdateCourseMutation()
   const [deleteCourse] = useDeleteCourseMutation()
 
-  // Modals & Popups state
+
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [selectedCourseForEdit, setSelectedCourseForEdit] = useState<Course | null>(null)
@@ -88,10 +88,10 @@ export default function AdminCoursePage() {
   const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
 
 
-  // Course data (Paginated Page)
+
   const courses: Course[] = coursesResponse?.data || []
 
-  // Global Statistics from backend
+
   const stats = coursesResponse?.stats
   const totalCoursesCount = coursesResponse?.meta?.total ?? 0
   const totalCourses = stats?.totalCourses ?? 0
@@ -117,7 +117,7 @@ export default function AdminCoursePage() {
 
     const formData = new FormData()
     formData.append("title", targetCourse.title)
-    formData.append("description", targetCourse.description)
+    formData.append("description", targetCourse.description || "")
     formData.append("level", targetCourse.level)
     formData.append("type", targetCourse.type)
     formData.append("price", targetCourse.price.toString())
@@ -149,7 +149,6 @@ export default function AdminCoursePage() {
     setCourseToDelete(null)
   }
 
-  // Filter & Sort Logic (Local filter on status after fetching)
   const filteredCourses = courses
     .filter(course => {
       const matchesStatus =
@@ -178,7 +177,7 @@ export default function AdminCoursePage() {
   return (
     <div className="p-6 md:p-8 space-y-8">
 
-      {/* Header and Create Button */}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -202,7 +201,7 @@ export default function AdminCoursePage() {
         </Dialog>
       </div>
 
-      {/* Summary Statistics Panel */}
+
       <StatsOverview
         totalCourses={totalCourses}
         publishedCourses={publishedCourses}
@@ -211,7 +210,7 @@ export default function AdminCoursePage() {
         totalRevenue={totalRevenue}
       />
 
-      {/* Filter and Search Bar Container */}
+
       <FilterBar
         searchTerm={searchTerm}
         setSearchTerm={handleSetSearchTerm}
@@ -223,7 +222,7 @@ export default function AdminCoursePage() {
         setSortBy={handleSetSortBy}
       />
 
-      {/* Redesigned Course Cards Grid */}
+
       {isLoading ? (
         <LoadingState message="Retrieving courses..." className="border rounded-3xl bg-muted/5 border-border/40 min-h-[300px] p-16" />
       ) : filteredCourses.length === 0 ? (
@@ -373,7 +372,7 @@ export default function AdminCoursePage() {
         </div>
       )}
 
-      {/* Safety Delete Guard Modal */}
+
       <DeleteConfirmModal
         open={isDeleteConfirmOpen}
         onOpenChange={setIsDeleteConfirmOpen}
@@ -381,7 +380,7 @@ export default function AdminCoursePage() {
         onConfirm={handleConfirmDelete}
       />
 
-      {/* Edit/Update Course Modal */}
+
       <CourseUpdateModal
         open={isUpdateOpen}
         onOpenChange={setIsUpdateOpen}

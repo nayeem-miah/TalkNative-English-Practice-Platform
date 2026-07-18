@@ -1,17 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "./base-api";
+import {
+  ApiResponse,
+  Announcement,
+  CreateAnnouncementInput,
+  UpdateAnnouncementInput,
+} from "@/types";
 
 export const announcementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAnnouncements: builder.query<any, void>({
+    getAnnouncements: builder.query<ApiResponse<Announcement[]>, void>({
       query: () => "/announcements",
       providesTags: ["Announcement"],
     }),
-    getAnnouncementFeed: builder.query<any, void>({
+    getAnnouncementFeed: builder.query<ApiResponse<Announcement[]>, void>({
       query: () => "/announcements/feed",
       providesTags: ["Announcement"],
     }),
-    createAnnouncement: builder.mutation<any, any>({
+    createAnnouncement: builder.mutation<ApiResponse<Announcement>, CreateAnnouncementInput>({
       query: (data) => ({
         url: "/announcements",
         method: "POST",
@@ -19,7 +24,7 @@ export const announcementApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Announcement"],
     }),
-    updateAnnouncement: builder.mutation<any, { id: string; data: any }>({
+    updateAnnouncement: builder.mutation<ApiResponse<Announcement>, UpdateAnnouncementInput>({
       query: ({ id, data }) => ({
         url: `/announcements/${id}`,
         method: "PATCH",
@@ -27,7 +32,7 @@ export const announcementApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Announcement"],
     }),
-    deleteAnnouncement: builder.mutation<any, string>({
+    deleteAnnouncement: builder.mutation<ApiResponse<any>, string>({
       query: (id) => ({
         url: `/announcements/${id}`,
         method: "DELETE",

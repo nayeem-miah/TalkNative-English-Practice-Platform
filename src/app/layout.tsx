@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/providers/theme-provider";
-import { cn } from "@/lib/utils";
 import { LayoutWrapper } from "@/components/layout/layout-wrapper";
 import { ReduxProvider } from "@/components/providers/redux-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { cn } from "@/lib/utils";
+import type { Metadata } from "next";
+import { Inter, Outfit } from "next/font/google";
 import { Toaster } from "sonner";
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],

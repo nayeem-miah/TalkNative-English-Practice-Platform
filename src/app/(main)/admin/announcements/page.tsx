@@ -12,7 +12,7 @@ import { DeleteConfirmModal } from "./components/DeleteConfirmModal"
 
 export default function AdminAnnouncementsPage() {
   const { data: apiData, isLoading } = useGetAnnouncementsQuery(undefined)
-  const announcements = apiData?.data || apiData?.result || []
+  const announcements = apiData?.data || (apiData as any)?.result || []
 
   const [createAnnouncement, { isLoading: isCreating }] = useCreateAnnouncementMutation()
   const [updateAnnouncement, { isLoading: isUpdating }] = useUpdateAnnouncementMutation()

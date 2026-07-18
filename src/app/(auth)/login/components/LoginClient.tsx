@@ -1,18 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import { TalkNativeLogo } from "@/components/shared/logo"
+import { PageLoader } from "@/components/shared/page-loader"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useAuth } from "@/hooks/use-auth"
 import { cn } from "@/lib/utils"
 import { useLoginMutation, useResendOtpMutation } from "@/redux/api/auth-api"
-import { useAuth } from "@/hooks/use-auth"
-import { Eye, EyeOff, Lock, Mail, Loader2 } from "lucide-react"
+import { setCookie } from "@/utils/cookie"
+import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import * as React from "react"
 import { toast } from "sonner"
-import { PageLoader } from "@/components/shared/page-loader"
-import { TalkNativeLogo } from "@/components/shared/logo"
-import { setCookie } from "@/utils/cookie"
 
 function LoginContent() {
   const [showPassword, setShowPassword] = React.useState(false)
@@ -54,17 +55,17 @@ function LoginContent() {
       const res = await login(formData).unwrap()
       if (res?.success) {
         const resData = res?.data || res
-        const accessToken = resData?.result?.accessToken || resData?.accessToken || res?.accessToken
-        const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || res?.refreshToken
+        const accessToken = resData?.result?.accessToken || resData?.accessToken || (res as any)?.accessToken
+        const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || (res as any)?.refreshToken
 
         if (accessToken) {
-          try { 
+          try {
             localStorage.setItem("accessToken", accessToken);
             setCookie("accessToken", accessToken);
           } catch {}
         }
         if (refreshToken) {
-          try { 
+          try {
             localStorage.setItem("refreshToken", refreshToken);
             setCookie("refreshToken", refreshToken);
           } catch {}
@@ -104,17 +105,17 @@ function LoginContent() {
       const res = await login(credentials).unwrap()
       if (res?.success) {
         const resData = res?.data || res
-        const accessToken = resData?.result?.accessToken || resData?.accessToken || res?.accessToken
-        const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || res?.refreshToken
+        const accessToken = resData?.result?.accessToken || resData?.accessToken || (res as any)?.accessToken
+        const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || (res as any)?.refreshToken
 
         if (accessToken) {
-          try { 
+          try {
             localStorage.setItem("accessToken", accessToken);
             setCookie("accessToken", accessToken);
           } catch {}
         }
         if (refreshToken) {
-          try { 
+          try {
             localStorage.setItem("refreshToken", refreshToken);
             setCookie("refreshToken", refreshToken);
           } catch {}

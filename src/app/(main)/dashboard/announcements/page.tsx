@@ -15,7 +15,7 @@ import { toast } from "sonner"
 
 export default function UserAnnouncementsPage() {
   const { data: apiData, isLoading } = useGetAnnouncementFeedQuery(undefined)
-  const announcements = apiData?.data || apiData?.result || []
+  const announcements = apiData?.data || (apiData as any)?.result || []
 
   const [activeFilter, setActiveFilter] = React.useState("ALL") // "ALL", "URGENT", "SYSTEM", "PROMO"
   const [readIds, setReadIds] = React.useState<string[]>([])

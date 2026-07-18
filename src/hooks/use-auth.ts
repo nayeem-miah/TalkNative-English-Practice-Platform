@@ -12,11 +12,7 @@ interface UseAuthReturn {
   mounted: boolean
 }
 
-/**
- * Shared authentication hook.
- * Wraps useGetMeQuery and exposes derived auth state.
- * Use this instead of calling useGetMeQuery directly in every component.
- */
+
 export function useAuth(): UseAuthReturn {
   const [mounted, setMounted] = React.useState(false)
 

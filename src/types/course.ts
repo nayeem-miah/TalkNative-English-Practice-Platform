@@ -1,5 +1,5 @@
 export type CourseLevel = "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
-export type CourseType = "FREE" | "PREMIUM"
+export type CourseType = "FREE" | "PREMIUM" | "PAID"
 
 export interface Lesson {
   id: string

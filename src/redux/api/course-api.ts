@@ -1,9 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  ApiPaginatedResponse,
+  ApiResponse,
+  Course,
+  CourseReview,
+  CreateCourseReviewInput,
+  GetCoursesParams,
+  UpdateCourseInput,
+} from "@/types";
 import { baseApi } from "./base-api";
 
 export const courseApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCourses: builder.query<any, { page?: number; limit?: number; level?: string; searchTerm?: string } | void>({
+    getCourses: builder.query<ApiPaginatedResponse<Course>, GetCoursesParams | void>({
       query: (params) => {
         const queryParams = new URLSearchParams();
         if (params) {
@@ -21,7 +30,7 @@ export const courseApi = baseApi.injectEndpoints({
       },
       providesTags: ["Course"],
     }),
-    createCourse: builder.mutation<any, FormData>({
+    createCourse: builder.mutation<ApiResponse<Course>, FormData>({
       query: (formData) => ({
         url: "/courses",
         method: "POST",
@@ -29,7 +38,7 @@ export const courseApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Course"],
     }),
-    updateCourse: builder.mutation<any, { id: string; formData: FormData }>({
+    updateCourse: builder.mutation<ApiResponse<Course>, UpdateCourseInput>({
       query: ({ id, formData }) => ({
         url: `/courses/${id}`,
         method: "PATCH",
@@ -37,28 +46,28 @@ export const courseApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Course"],
     }),
-    deleteCourse: builder.mutation<any, string>({
+    deleteCourse: builder.mutation<ApiResponse<any>, string>({
       query: (id) => ({
         url: `/courses/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Course"],
     }),
-    getCourseById: builder.query<any, string>({
+    getCourseById: builder.query<ApiResponse<Course>, string>({
       query: (id) => ({
         url: `/courses/${id}`,
         method: "GET",
       }),
       providesTags: (result, error, id) => [{ type: "Course", id }],
     }),
-    getReviews: builder.query<any, string>({
+    getReviews: builder.query<ApiResponse<CourseReview[]>, string>({
       query: (courseId) => ({
         url: `/courses/${courseId}/reviews`,
         method: "GET",
       }),
       providesTags: (result, error, courseId) => [{ type: "Course", id: courseId }],
     }),
-    createReview: builder.mutation<any, { courseId: string; rating: number; comment: string }>({
+    createReview: builder.mutation<ApiResponse<CourseReview>, CreateCourseReviewInput>({
       query: ({ courseId, rating, comment }) => ({
         url: `/courses/${courseId}/reviews`,
         method: "POST",

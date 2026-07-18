@@ -69,7 +69,7 @@ function VerifyUserContent() {
 
     const toastId = toast.loading("Verifying your account...")
     try {
-      const res = await verifyEmail({ email, code }).unwrap()
+      const res = await verifyEmail({ email, otp: code, code }).unwrap()
       if (res?.success) {
         toast.success("Account verified successfully!", { id: toastId })
         router.push("/login")

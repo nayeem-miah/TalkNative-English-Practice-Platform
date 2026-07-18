@@ -1,7 +1,7 @@
 export interface Course {
   id: string
   title: string
-  description: string
+  description?: string
   level: string
   price: number
   type: string

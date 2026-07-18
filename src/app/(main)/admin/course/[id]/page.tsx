@@ -141,7 +141,7 @@ export default function CourseDetailsPage() {
             <Badge
               className={cn(
                 "rounded-full px-3 text-white border-none select-none font-bold text-[10px] tracking-wide uppercase",
-                course.type === "PAID" ? "bg-indigo-600 hover:bg-indigo-600" : "bg-emerald-600 hover:bg-emerald-600"
+                course.type === "PAID" || (course.type as string) === "PREMIUM" ? "bg-indigo-600 hover:bg-indigo-600" : "bg-emerald-600 hover:bg-emerald-600"
               )}
             >
               {course.type || "FREE"}
@@ -174,7 +174,7 @@ export default function CourseDetailsPage() {
             ? "max-h-24 overflow-hidden pb-8"
             : "max-h-[3000px]"
         )}>
-          <MarkdownRenderer text={course.description} />
+          <MarkdownRenderer text={course.description || ""} />
         </div>
 
         {course.description && course.description.length > 250 && (

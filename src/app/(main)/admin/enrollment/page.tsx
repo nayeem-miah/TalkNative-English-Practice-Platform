@@ -29,7 +29,6 @@ import {
 import * as React from "react"
 import { toast } from "sonner"
 
-// Reusable states
 import { EmptyState } from "@/components/ui/empty-state"
 import { LoadingState } from "@/components/ui/loading-state"
 import { PaginationControls } from "@/components/ui/pagination-controls"
@@ -49,9 +48,9 @@ export default function AdminEnrollmentPage() {
     paymentStatus: statusFilter,
   })
 
-  const responseData = enrollmentResponse?.data || enrollmentResponse
-  const enrollments = responseData?.data || []
-  const meta = responseData?.meta
+  const responseData: any = enrollmentResponse?.data || enrollmentResponse
+  const enrollments = Array.isArray(responseData) ? responseData : responseData?.data || []
+  const meta = responseData?.meta || (enrollmentResponse as any)?.meta
   const totalEnrollments = meta?.total ?? 0
   const totalPage = meta?.totalPage ?? 1
 
@@ -63,7 +62,7 @@ export default function AdminEnrollmentPage() {
     setTimeout(() => setCopiedId(null), 2000)
   }
 
-  // Handle page resets when filters change
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
     setCurrentPage(1)
@@ -112,7 +111,7 @@ export default function AdminEnrollmentPage() {
         </div>
       </div>
 
-      {/* Stats Section */}
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="border-border/60 shadow-sm">
           <CardContent className="p-6 flex items-center gap-4">

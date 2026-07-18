@@ -68,7 +68,7 @@ export function CourseDetailsClient({ initialCourse, courseId }: CourseDetailsCl
   const [enrollFree, { isLoading: isEnrollingFree }] = useEnrollFreeMutation()
   const [createCheckoutSession, { isLoading: isCreatingSession }] = useCreateCheckoutSessionMutation()
 
-  const course = courseResponse?.data || courseResponse || initialCourse
+  const course: any = courseResponse?.data || (courseResponse as any)?.result || courseResponse || initialCourse
   const isLoading = isQueryLoading && !course
   const cleanedTitle = course ? cleanTitle(course.title) : ""
 
@@ -240,8 +240,9 @@ export function CourseDetailsClient({ initialCourse, courseId }: CourseDetailsCl
     } else {
       try {
         const response = await createCheckoutSession({ courseId: course.id }).unwrap()
-        if (response?.data?.checkoutUrl) {
-          window.location.href = response.data.checkoutUrl
+        const checkoutUrl = response?.data?.checkoutUrl || response?.data?.url
+        if (checkoutUrl) {
+          window.location.href = checkoutUrl
         } else {
           toast.error("Checkout URL not received.")
         }

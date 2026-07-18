@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
   // Query dashboard statistics and overview lists from the backend single endpoint
   const { data: overviewResponse, isLoading } = useGetAdminDashboardOverviewQuery()
 
-  const dashboardData = overviewResponse?.data || {}
+  const dashboardData: any = overviewResponse?.data || {}
   const stats = dashboardData.stats || {}
   const recentEnrollments = dashboardData.recentEnrollments || []
   const activeCourses = dashboardData.activeCourses || []

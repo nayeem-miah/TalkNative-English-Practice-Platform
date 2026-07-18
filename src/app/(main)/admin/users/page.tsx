@@ -28,10 +28,11 @@ import {
 import * as React from "react"
 import { toast } from "sonner"
 
-import { UserStats } from "./components/UserStats"
-import { UserDetailsModal } from "./components/UserDetailsModal"
+import { User } from "@/types"
 import { RoleConfirmModal } from "./components/RoleConfirmModal"
 import { StatusConfirmModal } from "./components/StatusConfirmModal"
+import { UserDetailsModal } from "./components/UserDetailsModal"
+import { UserStats } from "./components/UserStats"
 
 export default function UsersPage() {
   const [currentPage, setCurrentPage] = React.useState(1)
@@ -56,14 +57,20 @@ export default function UsersPage() {
     { skip: !selectedUserId }
   )
 
-  const userDetail = userDetailsResponse?.data || userDetailsResponse
+  const userDetail = (userDetailsResponse as any)?.data || userDetailsResponse
 
   const [updateUserRole, { isLoading: isUpdatingRole }] = useUpdateUserRoleMutation()
   const [updateUserStatus, { isLoading: isUpdatingStatus }] = useUpdateUserStatusMutation()
 
-  const responseData = usersResponse?.data || usersResponse
-  const users = responseData?.data || []
-  const meta = responseData?.meta
+  const rawData: any = usersResponse
+  const users: User[] = Array.isArray(rawData?.data)
+    ? rawData.data
+    : Array.isArray(rawData?.data?.data)
+    ? rawData.data.data
+    : Array.isArray(rawData)
+    ? rawData
+    : []
+  const meta = rawData?.meta || rawData?.data?.meta
   const totalUsersCount = meta?.total ?? 0
   const totalPage = meta?.totalPage ?? 1
 

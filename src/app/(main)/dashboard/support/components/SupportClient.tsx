@@ -26,11 +26,11 @@ export default function SupportClient() {
 
   // Fetch current user
   const { data: userData } = useGetMeQuery()
-  const user = userData?.data || userData?.result
+  const user = (userData as any)?.data || (userData as any)?.result
 
   // Fetch active ticket for the user
   const { data: ticketData, refetch: refetchTicket } = useGetUserTicketQuery()
-  const ticket = ticketData?.data || ticketData?.result
+  const ticket = (ticketData as any)?.data || (ticketData as any)?.result
   const ticketId = ticket?.id
 
   // Fetch message history if ticket exists
@@ -48,8 +48,8 @@ export default function SupportClient() {
   React.useEffect(() => {
     if (historyData?.data) {
       setMessages(historyData.data)
-    } else if (historyData?.result) {
-      setMessages(historyData.result)
+    } else if ((historyData as any)?.result) {
+      setMessages((historyData as any).result)
     }
   }, [historyData])
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -24,7 +25,7 @@ export function HeroContent() {
 
   // Derive dynamic learners count with fallback
   const totalUsers = React.useMemo(() => {
-    return allUsersResponse?.data?.meta?.total || allUsersResponse?.meta?.total || allUsersResponse?.data?.result?.length || 50000
+    return allUsersResponse?.meta?.total || (allUsersResponse as any)?.data?.meta?.total || (allUsersResponse as any)?.data?.result?.length || 50000
   }, [allUsersResponse])
 
   React.useEffect(() => {

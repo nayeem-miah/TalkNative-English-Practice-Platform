@@ -1,37 +1,38 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import * as React from "react";
-import { Users, Clock, Globe, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetallUsrsQuery } from "@/redux/api/auth-api";
+import { Clock, Globe, Star, Users } from "lucide-react";
+import * as React from "react";
 
 function AnimatedCounter({ value }: { value: string }) {
   const [displayValue, setDisplayValue] = React.useState("0");
 
   React.useEffect(() => {
     const cleanStr = value.replace(/,/g, "").replace(/\+/g, "");
-    
+
     if (value.includes("/")) {
       const parts = value.split("/");
       const targetVal = parseFloat(parts[0].trim());
       const maxVal = parts[1].trim();
-      
+
       const start = 0;
       const duration = 1200;
       const startTime = performance.now();
-      
+
       const animate = (now: number) => {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const ease = progress * (2 - progress);
         const current = start + ease * (targetVal - start);
         setDisplayValue(`${current.toFixed(1)} / ${maxVal}`);
-        
+
         if (progress < 1) {
           requestAnimationFrame(animate);
         }
       };
-      
+
       requestAnimationFrame(animate);
     } else {
       const targetVal = parseInt(cleanStr, 10);
@@ -39,23 +40,23 @@ function AnimatedCounter({ value }: { value: string }) {
         setTimeout(() => setDisplayValue(value), 0);
         return;
       }
-      
+
       const start = 0;
       const duration = 1500;
       const startTime = performance.now();
-      
+
       const animate = (now: number) => {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const ease = progress * (2 - progress);
         const current = Math.floor(start + ease * (targetVal - start));
         setDisplayValue(current.toLocaleString() + (value.includes("+") ? "+" : ""));
-        
+
         if (progress < 1) {
           requestAnimationFrame(animate);
         }
       };
-      
+
       requestAnimationFrame(animate);
     }
   }, [value]);
@@ -78,14 +79,14 @@ export function FeaturesStats() {
   });
 
   const totalUsers = React.useMemo(() => {
-    return allUsersResponse?.data?.meta?.total || allUsersResponse?.meta?.total || allUsersResponse?.data?.result?.length || 50000;
+    return allUsersResponse?.meta?.total || (allUsersResponse as any)?.data?.meta?.total || (allUsersResponse as any)?.data?.result?.length || 50000;
   }, [allUsersResponse]);
 
   const stats = React.useMemo(() => {
     // Dynamic calculations based on user base
     const activeLearnersStr = totalUsers.toLocaleString() + "+";
     const minutesPracticedStr = (totalUsers * 24).toLocaleString() + "+";
-    
+
     // Growth-based countries representation (capped at standard maximums)
     const countriesCount = Math.min(195, Math.max(120, Math.floor(totalUsers / 350)));
     const countriesStr = countriesCount + "+";

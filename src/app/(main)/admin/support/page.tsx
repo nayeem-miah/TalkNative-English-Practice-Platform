@@ -15,7 +15,7 @@ import { Socket, io } from "socket.io-client"
 
 export default function AdminSupportPage() {
   const { data: ticketsData, refetch: refetchTickets } = useGetTicketsQuery()
-  const tickets = ticketsData?.data || ticketsData?.result || []
+  const tickets = ticketsData?.data || (ticketsData as any)?.result || []
 
   const [activeTicket, setActiveTicket] = React.useState<any>(null)
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -31,7 +31,7 @@ export default function AdminSupportPage() {
   const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null)
 
   const { data: userData } = useGetMeQuery()
-  const adminId = userData?.data?.id || userData?.result?.id
+  const adminId = userData?.data?.id || (userData as any)?.result?.id
 
   const { data: historyData } = useGetMessagesQuery(activeTicket?.id, { skip: !activeTicket?.id })
   const [resolveTicket] = useResolveTicketMutation()
@@ -48,8 +48,8 @@ export default function AdminSupportPage() {
   React.useEffect(() => {
     if (historyData?.data) {
       setMessages(historyData.data)
-    } else if (historyData?.result) {
-      setMessages(historyData.result)
+    } else if ((historyData as any)?.result) {
+      setMessages((historyData as any).result)
     } else {
       setMessages([])
     }
@@ -79,7 +79,7 @@ export default function AdminSupportPage() {
 
     newSocket.on("newMessage", (msg) => {
       setMessages(prev => [...prev, msg])
-      setIsOtherTyping(false) // stop typing when message received
+      setIsOtherTyping(false)
       refetchTickets()
     })
 
@@ -160,7 +160,7 @@ export default function AdminSupportPage() {
 
       <div className="flex-1 flex gap-6 overflow-hidden">
 
-        {/* Left Sidebar - User List */}
+
         <Card className="w-80 flex flex-col border border-zinc-200 dark:border-zinc-800 shadow-sm rounded-2xl bg-card overflow-hidden shrink-0 hidden lg:flex">
           <div className="p-4 border-b border-border bg-muted/20">
             <div className="relative">
@@ -267,7 +267,7 @@ export default function AdminSupportPage() {
                 </div>
               </div>
 
-              {/* Chat Messages Area */}
+
               <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-zinc-50/50 dark:bg-zinc-900/10">
                 {messages.length > 0 ? (
                   <div className="flex justify-center">
@@ -313,7 +313,7 @@ export default function AdminSupportPage() {
                 <div ref={endOfMessagesRef} />
               </div>
 
-              {/* Typing Indicator */}
+
               {isOtherTyping && (
                 <div className="flex items-end gap-2 justify-start animate-in fade-in duration-300 absolute bottom-24 left-6 z-10">
                   <div className="bg-white dark:bg-zinc-800 border border-border text-foreground rounded-2xl rounded-bl-sm shadow-sm px-4 py-3.5 flex items-center gap-1.5">

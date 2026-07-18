@@ -1,19 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import * as React from "react"
-import { useGetMeQuery } from "@/redux/api/auth-api"
-import { AnimatePresence } from "framer-motion"
-import { Search, Users, Plus } from "lucide-react"
-import { toast } from "sonner"
-import { Post } from "@/types/community"
-import { useGetPostsQuery, useCreatePostMutation } from "@/redux/api/community-api"
-import { PostCard } from "./post-card"
-import { CommunitySidebar } from "./community-sidebar"
-import { CreatePostModal } from "./create-post-modal"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useGetMeQuery } from "@/redux/api/auth-api"
+import { useCreatePostMutation, useGetPostsQuery } from "@/redux/api/community-api"
+import { Post } from "@/types/community"
+import { AnimatePresence } from "framer-motion"
+import { Plus, Search, Users } from "lucide-react"
+import * as React from "react"
+import { toast } from "sonner"
+import { CommunitySidebar } from "./community-sidebar"
+import { CreatePostModal } from "./create-post-modal"
+import { PostCard } from "./post-card"
 
 export default function CommunityFeed() {
   const [mounted, setMounted] = React.useState(false)
@@ -73,13 +74,13 @@ export default function CommunityFeed() {
   // Dynamic top contributors calculations from fetched stream
   const contributors = React.useMemo(() => {
     const map: Record<string, { name: string; profilePicture?: string; role?: string; postCount: number; likesCount: number }> = {}
-    
+
     rawPosts.forEach((post: any) => {
       const authorId = post.author?.id || post.author?.email || post.author?.name
       if (!authorId) return
-      
+
       const likes = post._count?.likes ?? 0
-      
+
       if (!map[authorId]) {
         map[authorId] = {
           name: post.author.name === "Nayeem Portfolio Assistant" ? "Nayeem Miah" : post.author.name || "Anonymous",
@@ -93,7 +94,7 @@ export default function CommunityFeed() {
         map[authorId].likesCount += likes
       }
     })
-    
+
     return Object.values(map)
       .sort((a, b) => (b.postCount * 2 + b.likesCount) - (a.postCount * 2 + a.likesCount))
       .slice(0, 5)
@@ -175,13 +176,13 @@ export default function CommunityFeed() {
   return (
     <div className="min-h-screen bg-background pt-24 pb-16 animate-in fade-in duration-500">
       <div className="max-w-6xl mx-auto px-6 mt-6">
-        
+
         {/* Two Column Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          
+
           {/* Main Feed Column */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             {/* Feed Header */}
             <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-900 pb-5">
               <div>
@@ -248,7 +249,7 @@ export default function CommunityFeed() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-8 pr-3 py-1.5 text-xs border border-transparent hover:border-zinc-100 focus:border-zinc-200 dark:hover:border-zinc-900 dark:focus:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-lg w-full outline-none transition-all font-semibold"
                   />
-                  
+
                   {/* Live Suggestions Panel */}
                   {showSuggestions && suggestions.length > 0 && (
                     <div className="absolute right-0 top-full mt-2 w-full sm:w-64 bg-card border border-border/80 rounded-xl shadow-lg z-50 overflow-hidden divide-y divide-border/50">

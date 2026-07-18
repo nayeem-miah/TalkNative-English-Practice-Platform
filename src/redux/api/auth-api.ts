@@ -1,10 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  ApiPaginatedResponse,
+  ApiResponse,
+  ForgotPasswordInput,
+  GetUsersParams,
+  LoginInput,
+  LoginResponseData,
+  RegisterInput,
+  ResendOtpInput,
+  ResetPasswordInput,
+  UpdateProfileInput,
+  UpdateUserRoleInput,
+  UpdateUserStatusInput,
+  User,
+  VerifyEmailInput,
+} from "@/types";
 import { removeCookie, setCookie } from "@/utils/cookie";
 import { baseApi } from "./base-api";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    register: builder.mutation<any, any>({
+    register: builder.mutation<ApiResponse<User>, RegisterInput>({
       query: (data) => ({
         url: "/users",
         method: "POST",
@@ -12,21 +28,21 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    verifyEmail: builder.mutation<any, any>({
+    verifyEmail: builder.mutation<ApiResponse<any>, VerifyEmailInput>({
       query: (data) => ({
         url: "/auth/verify-email",
         method: "POST",
         body: data,
       }),
     }),
-    resendOtp: builder.mutation<any, any>({
+    resendOtp: builder.mutation<ApiResponse<any>, ResendOtpInput>({
       query: (data) => ({
         url: "/auth/resend-otp",
         method: "POST",
         body: data,
       }),
     }),
-    login: builder.mutation<any, any>({
+    login: builder.mutation<ApiResponse<LoginResponseData>, LoginInput>({
       query: (data) => ({
         url: "/auth/login",
         method: "POST",
@@ -37,8 +53,8 @@ export const authApi = baseApi.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           const resData = data?.data || data;
-          const accessToken = resData?.result?.accessToken || resData?.accessToken || data?.accessToken;
-          const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || data?.refreshToken;
+          const accessToken = resData?.result?.accessToken || resData?.accessToken || (data as any)?.accessToken;
+          const refreshToken = resData?.result?.refreshToken || resData?.refreshToken || (data as any)?.refreshToken;
 
           // Save token to cookie so Next.js middleware (proxy.ts) can read it
           // and also to localStorage as fallback for base-api prepareHeaders
@@ -53,7 +69,7 @@ export const authApi = baseApi.injectEndpoints({
         } catch {}
       },
     }),
-    logout: builder.mutation<any, void>({
+    logout: builder.mutation<ApiResponse<void>, void>({
       query: () => ({
         url: "/auth/logout",
         method: "POST",
@@ -75,11 +91,11 @@ export const authApi = baseApi.injectEndpoints({
         }
       },
     }),
-    getMe: builder.query<any, void>({
+    getMe: builder.query<ApiResponse<User>, void>({
       query: () => "/users/me",
       providesTags: ["User"],
     }),
-    updateProfile: builder.mutation<any, any>({
+    updateProfile: builder.mutation<ApiResponse<User>, UpdateProfileInput | FormData>({
       query: (data) => ({
         url: "/users/update-profile",
         method: "PATCH",
@@ -87,27 +103,27 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    forgotPassword: builder.mutation<any, any>({
+    forgotPassword: builder.mutation<ApiResponse<any>, ForgotPasswordInput>({
       query: (data) => ({
         url: "/auth/forgot-password",
         method: "POST",
         body: data,
       }),
     }),
-    resetPassword: builder.mutation<any, any>({
+    resetPassword: builder.mutation<ApiResponse<any>, ResetPasswordInput>({
       query: ({ token, ...data }) => ({
         url: `/auth/reset-password?token=${token}`,
         method: "POST",
         body: data,
       }),
     }),
-    getallUsrs: builder.query<any, { page?: number; limit?: number; searchTerm?: string; status?: string }>({
+    getallUsrs: builder.query<ApiPaginatedResponse<User>, GetUsersParams>({
       query: (params) => {
         const queryParams = new URLSearchParams();
-        if (params.page) queryParams.append("page", params.page.toString());
-        if (params.limit) queryParams.append("limit", params.limit.toString());
-        if (params.searchTerm) queryParams.append("searchTerm", params.searchTerm);
-        if (params.status && params.status !== "ALL") queryParams.append("status", params.status);
+        if (params?.page) queryParams.append("page", params.page.toString());
+        if (params?.limit) queryParams.append("limit", params.limit.toString());
+        if (params?.searchTerm) queryParams.append("searchTerm", params.searchTerm);
+        if (params?.status && params.status !== "ALL") queryParams.append("status", params.status);
         return {
           url: `/users?${queryParams.toString()}`,
           method: "GET",
@@ -116,12 +132,12 @@ export const authApi = baseApi.injectEndpoints({
       providesTags: ["User"],
     }),
 
-    // ger user by id
-    getUserById: builder.query({
+    // get user by id
+    getUserById: builder.query<ApiResponse<User>, string>({
       query: (id) => `/users/${id}`,
       providesTags: ["User"],
-    }) ,
-    updateUserRole: builder.mutation<any, { userId: string; role: "ADMIN" | "USER" }>({
+    }),
+    updateUserRole: builder.mutation<ApiResponse<User>, UpdateUserRoleInput>({
       query: ({ userId, role }) => ({
         url: `/users/role/${userId}`,
         method: "PATCH",
@@ -129,7 +145,7 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    updateUserStatus: builder.mutation<any, { userId: string; status: "ACTIVE" | "INACTIVE" | "SUSPENDED" }>({
+    updateUserStatus: builder.mutation<ApiResponse<User>, UpdateUserStatusInput>({
       query: ({ userId, status }) => ({
         url: `/users/status/${userId}`,
         method: "PATCH",
@@ -137,7 +153,7 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
-    deleteUser: builder.mutation<any, string>({
+    deleteUser: builder.mutation<ApiResponse<any>, string>({
       query: (id) => ({
         url: `/users/${id}`,
         method: "DELETE",

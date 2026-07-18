@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  ApiResponse,
+  CreateLessonInput,
+  Lesson,
+  UpdateLessonInput,
+} from "@/types";
 import { baseApi } from "./base-api";
 
 export const lessonApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getLessonsByCourse: builder.query<any, string>({
+    getLessonsByCourse: builder.query<ApiResponse<Lesson[]>, string>({
       query: (courseId) => ({
         url: `/lessons/course/${courseId}`,
         method: "GET",
       }),
       providesTags: ["Lesson"],
     }),
-    createLesson: builder.mutation<any, { courseId: string; title: string; content: string; videoUrl?: string; duration: number; order: number }>({
+    createLesson: builder.mutation<ApiResponse<Lesson>, CreateLessonInput>({
       query: (lessonData) => ({
         url: "/lessons",
         method: "POST",
@@ -18,7 +24,7 @@ export const lessonApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Lesson", "Course"],
     }),
-    updateLesson: builder.mutation<any, { id: string; title?: string; content?: string; videoUrl?: string; duration?: number; order?: number }>({
+    updateLesson: builder.mutation<ApiResponse<Lesson>, UpdateLessonInput>({
       query: ({ id, ...body }) => ({
         url: `/lessons/${id}`,
         method: "PATCH",
@@ -26,7 +32,7 @@ export const lessonApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Lesson"],
     }),
-    deleteLesson: builder.mutation<any, string>({
+    deleteLesson: builder.mutation<ApiResponse<any>, string>({
       query: (id) => ({
         url: `/lessons/${id}`,
         method: "DELETE",

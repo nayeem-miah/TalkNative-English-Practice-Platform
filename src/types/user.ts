@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type UserRole = "USER" | "ADMIN"
 export type UserStatus = "ACTIVE" | "SUSPENDED" | "BLOCKED"
 
@@ -19,6 +20,7 @@ export interface User {
   totalMinutesSpent?: number
   createdAt?: string
   updatedAt?: string
+  result?: any
 }
 
 export interface ApiUserResponse {
