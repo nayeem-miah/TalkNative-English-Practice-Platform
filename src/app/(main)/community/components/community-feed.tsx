@@ -12,6 +12,13 @@ import { AnimatePresence } from "framer-motion"
 import { Plus, Search, Users } from "lucide-react"
 import * as React from "react"
 import { toast } from "sonner"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { CommunitySidebar } from "./community-sidebar"
 import { CreatePostModal } from "./create-post-modal"
 import { PostCard } from "./post-card"
@@ -247,7 +254,7 @@ export default function CommunityFeed() {
                     onFocus={() => setShowSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 text-xs border border-transparent hover:border-zinc-100 focus:border-zinc-200 dark:hover:border-zinc-900 dark:focus:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-lg w-full outline-none transition-all font-semibold"
+                    className="pl-8 pr-3 h-8 text-xs border border-border/60 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/80 dark:bg-zinc-900/60 rounded-xl w-full outline-none transition-all font-semibold placeholder:text-muted-foreground"
                   />
 
                   {/* Live Suggestions Panel */}
@@ -269,16 +276,17 @@ export default function CommunityFeed() {
                   )}
                 </div>
 
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-zinc-50 dark:bg-zinc-900 border border-border/50 px-2 py-1.5 rounded-xl text-[11px] font-bold text-zinc-500 dark:text-zinc-400 outline-none focus:ring-0 cursor-pointer"
-                >
-                  <option value="latest">Latest</option>
-                  <option value="liked">Most Liked</option>
-                  <option value="commented">Most Commented</option>
-                  <option value="unanswered">Unanswered</option>
-                </select>
+                <Select value={sortBy} onValueChange={(val) => val && setSortBy(val)}>
+                  <SelectTrigger className="w-[140px] h-8 text-xs font-semibold rounded-xl bg-zinc-50/80 dark:bg-zinc-900/60 border-border/60 hover:bg-muted/50 text-foreground cursor-pointer transition-colors shadow-none">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent align="end" className="rounded-xl font-medium text-xs bg-popover text-popover-foreground border border-border/80 shadow-lg p-1 min-w-[150px]">
+                    <SelectItem value="latest" className="rounded-lg py-1.5 px-2.5 text-xs cursor-pointer">Latest</SelectItem>
+                    <SelectItem value="liked" className="rounded-lg py-1.5 px-2.5 text-xs cursor-pointer">Most Liked</SelectItem>
+                    <SelectItem value="commented" className="rounded-lg py-1.5 px-2.5 text-xs cursor-pointer">Most Commented</SelectItem>
+                    <SelectItem value="unanswered" className="rounded-lg py-1.5 px-2.5 text-xs cursor-pointer">Unanswered</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

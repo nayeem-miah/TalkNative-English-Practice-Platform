@@ -35,6 +35,12 @@ const navItems = [
   { name: "AI Tutor", href: "/ai-tutor" },
 ]
 
+const checkIsActive = (href: string, pathname: string | null) => {
+  if (!pathname) return false
+  if (href === "/") return pathname === "/"
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
+
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
@@ -87,7 +93,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between px-4 md:px-8 mx-auto">
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
             <span className="font-black text-xl tracking-tight bg-gradient-to-r from-primary via-emerald-600 to-teal-500 dark:from-primary dark:via-cyan-400 dark:to-emerald-400 bg-clip-text text-transparent">
               TalkNative
@@ -95,16 +101,24 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-              >
-                {item.name}
-              </Link>
-            ))}
+          <nav className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => {
+              const isActive = checkIsActive(item.href, pathname)
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "text-sm font-semibold transition-all duration-200",
+                    isActive
+                      ? "text-primary font-bold"
+                      : "text-muted-foreground hover:text-primary"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              )
+            })}
           </nav>
         </div>
 
@@ -224,7 +238,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/", pathname) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <Home className="h-5 w-5" />
@@ -236,7 +250,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/courses" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/courses", pathname) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <GraduationCap className="h-5 w-5" />
@@ -248,7 +262,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/ai-tutor" ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/ai-tutor", pathname) ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <Bot className="h-5 w-5 text-teal-600 dark:text-teal-400" />
@@ -263,7 +277,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/community" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/community", pathname) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <Users className="h-5 w-5" />
@@ -291,7 +305,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/", pathname) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <Home className="h-5 w-5" />
@@ -303,7 +317,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/ai-tutor" ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/ai-tutor", pathname) ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <Bot className="h-5 w-5 text-teal-600 dark:text-teal-400" />
@@ -318,7 +332,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          (pathname === "/dashboard" || pathname === "/admin/dashboard") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          (checkIsActive("/dashboard", pathname) || checkIsActive("/admin/dashboard", pathname)) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <LayoutDashboard className="h-5 w-5" />
@@ -329,7 +343,7 @@ export function Navbar() {
                         onClick={() => handleMobileRedirect("/live-call")}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm w-full text-left cursor-pointer",
-                          pathname === "/live-call" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/live-call", pathname) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <PhoneCall className="h-5 w-5" />
@@ -341,7 +355,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/courses" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/courses", pathname) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <GraduationCap className="h-5 w-5" />
@@ -353,7 +367,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/community" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/community", pathname) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <Users className="h-5 w-5" />
@@ -365,7 +379,7 @@ export function Navbar() {
                         onClick={() => setIsOpen(false)}
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
-                          pathname === "/profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          checkIsActive("/profile", pathname) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         )}
                       >
                         <User className="h-5 w-5" />
