@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
-import { removeCookie } from "@/utils/cookie"
+import { getCookie, removeCookie } from "@/utils/cookie"
 import { GraduationCap, Home, LayoutDashboard, LogOut, PhoneCall, User, Users } from "lucide-react"
 
 const navItems = [
@@ -38,44 +38,40 @@ export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
   const pathname = usePathname()
-  const { data: userResponse, isLoading: isUserLoading, error: userError } = useGetMeQuery(undefined, {
-    skip: !mounted,
-  })
-  const [logout] = useLogoutMutation()
-  const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
-  const isLoggedIn = !!user && (userResponse?.success !== false)
 
   React.useEffect(() => {
     setMounted(true)
   }, [])
 
+  const token = typeof window !== "undefined" && mounted ? getCookie("accessToken") : ""
+  const hasToken = !!token
+
+  const { data: userResponse, isLoading: isUserLoading, error: userError } = useGetMeQuery(undefined, {
+    skip: !mounted || !hasToken,
+  })
+  const [logout] = useLogoutMutation()
+  const user = hasToken ? (userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data) : null
+  const isLoggedIn = hasToken && !!user && (userResponse?.success !== false)
+
   React.useEffect(() => {
-    if (mounted && !isUserLoading && !isLoggedIn) {
+    if (mounted && !isUserLoading && !isLoggedIn && hasToken) {
       const isAuthError =
         (userResponse && userResponse.success === false) ||
         (userError && ('status' in userError) && (userError.status === 401 || userError.status === 403));
 
       if (isAuthError) {
-        const hasCookie = typeof document !== "undefined" && (
-          document.cookie.includes("accessToken") ||
-          localStorage.getItem("accessToken")
-        );
-        if (hasCookie) {
-          removeCookie("accessToken")
-          removeCookie("refreshToken")
-          window.location.href = "/login"
-        }
+        removeCookie()
+        window.location.href = "/login"
       }
     }
-  }, [mounted, isUserLoading, isLoggedIn, userResponse, userError])
+  }, [mounted, isUserLoading, isLoggedIn, userResponse, userError, hasToken])
 
   const handleLogout = async () => {
     try {
       await logout(undefined).unwrap()
-      window.location.href = "/login"
-    } catch {
-      window.location.href = "/login"
-    }
+    } catch {}
+    removeCookie()
+    window.location.href = "/login"
   }
 
   const handleMobileRedirect = (href: string) => {

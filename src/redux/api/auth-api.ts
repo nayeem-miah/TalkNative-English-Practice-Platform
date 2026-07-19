@@ -75,20 +75,13 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
       }),
       invalidatesTags: ["User"],
-      async onQueryStarted(arg, { queryFulfilled }) {
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        // Always clear all token storage and reset RTK Query state
+        removeCookie();
+        dispatch(baseApi.util.resetApiState());
         try {
           await queryFulfilled;
         } catch {}
-        // Always clear all token storage regardless of API result
-        removeCookie("accessToken");
-        removeCookie("refreshToken");
-        removeCookie("accessToken_js");
-        if (typeof window !== "undefined") {
-          try {
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-          } catch {}
-        }
       },
     }),
     getMe: builder.query<ApiResponse<User>, void>({

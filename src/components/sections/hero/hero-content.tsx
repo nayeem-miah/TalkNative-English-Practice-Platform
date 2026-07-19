@@ -7,6 +7,8 @@ import { motion } from "framer-motion"
 import { Users } from "lucide-react"
 import * as React from "react"
 
+import { getCookie } from "@/utils/cookie"
+
 export function HeroContent() {
   const [mounted, setMounted] = React.useState(false)
 
@@ -16,12 +18,15 @@ export function HeroContent() {
   })
 
   // 2. Fetch logged-in user profile status
+  const token = typeof window !== "undefined" && mounted ? getCookie("accessToken") : ""
+  const hasToken = !!token
+
   const { data: userResponse } = useGetMeQuery(undefined, {
-    skip: !mounted,
+    skip: !mounted || !hasToken,
   })
 
-  const   user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
-  const isLoggedIn = !!user && (userResponse?.success !== false)
+  const user = hasToken ? (userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data) : null
+  const isLoggedIn = hasToken && !!user && (userResponse?.success !== false)
 
   // Derive dynamic learners count with fallback
   const totalUsers = React.useMemo(() => {

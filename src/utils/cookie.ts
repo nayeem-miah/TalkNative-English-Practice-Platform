@@ -15,7 +15,6 @@ export const setCookie = (name: string, value: string, days = 7) => {
 export const getCookie = (name: string) => {
   if (typeof document === "undefined") return "";
 
-
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   let cookieVal = "";
@@ -26,7 +25,6 @@ export const getCookie = (name: string) => {
   if (cookieVal) {
     return cookieVal;
   }
-
 
   if (typeof window !== "undefined") {
     try {
@@ -42,18 +40,18 @@ export const getCookie = (name: string) => {
   return "";
 };
 
-export const removeCookie = (name: string) => {
+export const removeCookie = (name?: string) => {
   if (typeof document === "undefined") return;
 
-  const namesToClear = [name];
-  if (name === "accessToken") {
-    namesToClear.push("accessToken_js");
-  }
+  const ALL_AUTH_KEYS = ["accessToken", "refreshToken", "accessToken_js"];
+  const namesToClear = name ? [name, ...ALL_AUTH_KEYS] : ALL_AUTH_KEYS;
+  const uniqueNames = Array.from(new Set(namesToClear));
 
-  namesToClear.forEach((n) => {
-    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax;`;
-    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=None; Secure;`;
+  uniqueNames.forEach((n) => {
+    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax;`;
+    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=None; Secure;`;
+    document.cookie = `${n}=; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
 
     if (typeof window !== "undefined") {
       try {

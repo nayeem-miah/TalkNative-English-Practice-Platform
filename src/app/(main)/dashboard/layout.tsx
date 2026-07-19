@@ -79,10 +79,7 @@ export default function DashboardLayout({
     try {
       await logout(undefined).unwrap()
     } catch {}
-    removeCookie("accessToken")
-    removeCookie("refreshToken")
-    try { localStorage.removeItem("accessToken") } catch {}
-    try { localStorage.removeItem("refreshToken") } catch {}
+    removeCookie()
     window.location.href = "/login"
   }
 

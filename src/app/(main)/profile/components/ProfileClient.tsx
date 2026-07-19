@@ -159,10 +159,9 @@ export function ProfileClient() {
     const handleLogout = async () => {
         try {
             await logout(undefined).unwrap()
-            window.location.href = "/login"
-        } catch {
-            window.location.href = "/login"
-        }
+        } catch {}
+        removeCookie()
+        window.location.href = "/login"
     }
 
     if (!mounted || isLoading) {

@@ -37,8 +37,7 @@ export default function UserDashboardPage() {
   React.useEffect(() => {
     if (mounted && !isUserLoading) {
       if (!isLoggedIn) {
-        removeCookie("accessToken")
-        removeCookie("refreshToken")
+        removeCookie()
         window.location.href = "/login?redirect=/dashboard"
       } else if (user?.role?.toUpperCase() === "ADMIN") {
         window.location.href = "/admin/dashboard"
