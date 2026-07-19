@@ -26,12 +26,13 @@ import {
 import { cn } from "@/lib/utils"
 import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
 import { getCookie, removeCookie } from "@/utils/cookie"
-import { GraduationCap, Home, LayoutDashboard, LogOut, PhoneCall, User, Users } from "lucide-react"
+import { Bot, GraduationCap, Home, LayoutDashboard, LogOut, PhoneCall, User, Users } from "lucide-react"
 
 const navItems = [
   { name: "Home", href: "/" },
   { name: "Courses", href: "/courses" },
   { name: "Community", href: "/community" },
+  { name: "AI Tutor", href: "/ai-tutor" },
 ]
 
 export function Navbar() {
@@ -243,6 +244,21 @@ export function Navbar() {
                       </Link>
 
                       <Link
+                        href="/ai-tutor"
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/ai-tutor" ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <Bot className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                        <span>AI Tutor</span>
+                        <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full border border-teal-200 dark:border-teal-800">
+                          24/7
+                        </span>
+                      </Link>
+
+                      <Link
                         href="/community"
                         onClick={() => setIsOpen(false)}
                         className={cn(
@@ -280,6 +296,21 @@ export function Navbar() {
                       >
                         <Home className="h-5 w-5" />
                         <span>Home</span>
+                      </Link>
+
+                      <Link
+                        href="/ai-tutor"
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/ai-tutor" ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <Bot className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                        <span>AI Tutor</span>
+                        <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full border border-teal-200 dark:border-teal-800">
+                          24/7
+                        </span>
                       </Link>
 
                       <Link
@@ -363,6 +394,21 @@ export function Navbar() {
                       >
                         <Home className="h-5 w-5" />
                         <span>Home</span>
+                      </Link>
+
+                      <Link
+                        href="/ai-tutor"
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-semibold text-sm",
+                          pathname === "/ai-tutor" ? "bg-teal-500/10 text-teal-600 dark:text-teal-400 font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        )}
+                      >
+                        <Bot className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+                        <span>AI Tutor</span>
+                        <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded-full border border-teal-200 dark:border-teal-800">
+                          24/7
+                        </span>
                       </Link>
 
                       <Link

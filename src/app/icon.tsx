@@ -10,7 +10,7 @@ export const contentType = 'image/png'
 
 export default function Icon() {
   return new ImageResponse(
-
+    (
       <div
         style={{
           fontSize: 22,
@@ -27,10 +27,11 @@ export default function Icon() {
           boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)',
         }}
       >
-        F
+        T
       </div>
     ),
     {
       ...size,
     }
+  )
 }

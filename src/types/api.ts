@@ -268,3 +268,13 @@ export interface AdminDashboardOverview {
     totalRevenue?: number;
   };
 }
+
+export interface AiTutorRequestPayload {
+  message: string;
+  history?: Array<{ role: string; content?: string; text?: string }>;
+}
+
+export interface AiTutorResponseData {
+  reply: string;
+}
+
