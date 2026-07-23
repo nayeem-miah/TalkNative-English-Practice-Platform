@@ -7,18 +7,20 @@ TalkNative is a comprehensive platform designed to help users practice and impro
 ## 🚀 Key Features
 
 ### For Students (Users)
-- **Interactive Dashboard**: Track practice progress and enrolled courses.
-- **Real-Time Support Chat**: Get instant help from admins with real-time typing indicators and message status (Socket.io).
-- **Course Enrollment**: Browse and enroll in various English practice modules.
-- **Live Calls**: Practice English directly with native speakers or tutors.
-- **Announcements**: Stay updated with the latest news and scheduled maintenance.
+- **Interactive Dashboard**: Track practice progress, difficulty levels, and enrolled courses.
+- **Google OAuth Login**: Secure and seamless one-click sign-in using Google Authentication.
+- **Real-Time Support Chat**: Get instant live help from admins with typing indicators, real-time messaging, and visual sidebar badges showing unread message counts.
+- **Real-Time Notifications**: Instant socket-driven alerts featuring real-time unread counters, sleek notification lists with clean dividers, real user avatars, and instant header actions (Mark all read & Clear all).
+- **Course Enrollment**: Browse, enroll, and progress through structured English practice modules.
+- **Live Calls**: Practice speaking English directly with native speakers and tutors.
+- **Announcements**: Stay updated with the latest news, events, and maintenance alerts.
 
 ### For Administrators
-- **Admin Dashboard**: Comprehensive overview of platform metrics.
-- **User Management**: Monitor, suspend, or manage student accounts.
-- **Support Inbox**: Resolve user tickets efficiently through a live real-time chat interface.
-- **Announcement Management**: Create, edit, and publish important notices for all users.
-- **Course & Lesson Management**: Add and manage educational content.
+- **Admin Dashboard**: Comprehensive metrics overview (users, courses, enrollments, and revenue statistics).
+- **User Management**: Monitor, review, and suspend student accounts or update user roles.
+- **Support Inbox**: Manage and resolve student support tickets with real-time sidebar badges indicating pending tickets with unread messages.
+- **Announcement Management**: Create, edit, and publish important notice banners for all users.
+- **Course & Lesson Management**: Create, update, and manage structured educational modules and lesson content.
 
 ## 💻 Tech Stack
 
