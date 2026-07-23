@@ -150,51 +150,54 @@ export function NotificationBell() {
                 <h3 className="font-bold text-sm">Notifications</h3>
                 {unreadCount > 0 && (
                   <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-primary/10 text-primary">
-                    {unreadCount} new
+                    {unreadCount}
                   </span>
                 )}
               </div>
-              <button
-                onClick={() => setSortOrder((p) => (p === "desc" ? "asc" : "desc"))}
-                title={sortOrder === "desc" ? "Newest first" : "Oldest first"}
-                className="px-2 py-1 text-[10px] font-bold rounded-lg bg-muted/60 hover:bg-muted text-muted-foreground transition-colors"
-              >
-                {sortOrder === "desc" ? "Newest ↑" : "Oldest ↑"}
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setSortOrder((p) => (p === "desc" ? "asc" : "desc"))}
+                  title={sortOrder === "desc" ? "Newest first" : "Oldest first"}
+                  className="px-2 py-1 text-[10px] font-bold rounded-lg bg-muted/60 hover:bg-muted text-muted-foreground transition-colors"
+                >
+                  {sortOrder === "desc" ? "Newest ↑" : "Oldest ↑"}
+                </button>
+
+                {notifications.length > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    disabled={unreadCount === 0 || isMarkingAll}
+                    title="Mark all read"
+                    className={cn(
+                      "p-1.5 rounded-lg transition-colors flex items-center justify-center cursor-pointer",
+                      unreadCount > 0 && !isMarkingAll
+                        ? "hover:bg-primary/10 text-primary"
+                        : "text-muted-foreground/45 cursor-not-allowed"
+                    )}
+                  >
+                    <CheckCheck className="w-4 h-4" />
+                  </button>
+                )}
+
+                {notifications.length > 0 && (
+                  <button
+                    onClick={handleClearAll}
+                    disabled={isClearing}
+                    title="Clear all"
+                    className={cn(
+                      "p-1.5 rounded-lg transition-colors flex items-center justify-center cursor-pointer",
+                      isClearing
+                        ? "text-muted-foreground/45 cursor-not-allowed"
+                        : "hover:bg-destructive/10 text-destructive/80"
+                    )}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
-            {notifications.length > 0 && (
-              <div className="flex items-center justify-between px-4 py-2 border-b border-border/30 bg-muted/20">
-                <button
-                  onClick={handleMarkAllRead}
-                  disabled={unreadCount === 0 || isMarkingAll}
-                  className={cn(
-                    "flex items-center gap-1.5 text-[11px] font-semibold transition-colors",
-                    unreadCount > 0 && !isMarkingAll
-                      ? "text-primary hover:text-primary/80"
-                      : "text-muted-foreground/40 cursor-not-allowed"
-                  )}
-                >
-                  <CheckCheck className="w-3.5 h-3.5" />
-                  {isMarkingAll ? "Marking…" : "Mark all read"}
-                </button>
-                <button
-                  onClick={handleClearAll}
-                  disabled={isClearing}
-                  className={cn(
-                    "flex items-center gap-1.5 text-[11px] font-semibold transition-colors",
-                    isClearing
-                      ? "text-muted-foreground/40 cursor-not-allowed"
-                      : "text-destructive/70 hover:text-destructive"
-                  )}
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  {isClearing ? "Clearing…" : "Clear all"}
-                </button>
-              </div>
-            )}
-
-            <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-2">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-2 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-muted-foreground/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30">
               {isFetching ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
@@ -214,7 +217,6 @@ export function NotificationBell() {
                       key={n.id}
                       notification={n}
                       queryArgs={queryArgs}
-                      onClose={() => setOpen(false)}
                     />
                   ))}
                 </AnimatePresence>

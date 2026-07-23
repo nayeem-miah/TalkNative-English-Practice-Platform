@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
@@ -14,19 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
+import { useGetUserTicketQuery } from "@/redux/api/chat-api"
 import { removeCookie } from "@/utils/cookie"
-import {
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  MoreHorizontal,
-  MessageSquare,
-  Megaphone,
-  Users
-} from "lucide-react"
+import { BookOpen, ChevronLeft, ChevronRight, LayoutDashboard, LogOut, Megaphone, Menu, MessageSquare, MoreHorizontal, Users } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import * as React from "react"
@@ -58,6 +49,13 @@ export default function DashboardLayout({
 
   const user = userResponse?.data?.result?.user || userResponse?.data?.result || userResponse?.data
   const isLoggedIn = !!user && (userResponse?.success !== false)
+
+  const { data: ticketData } = useGetUserTicketQuery(undefined, {
+    skip: !isLoggedIn || !mounted,
+    pollingInterval: 15000,
+  })
+  const userTicket = ticketData?.data || (ticketData as any)?.result
+  const unreadMessagesCount = userTicket?.unreadCount ?? 0
 
   const cleanName = React.useMemo(() => {
     const rawName = user?.name || ""
@@ -130,6 +128,17 @@ export default function DashboardLayout({
             >
               <item.icon className={cn("h-5 w-5 transition-colors", isActive ? "text-primary" : "text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-300")} />
               {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
+              {item.name === "Support Chat" && unreadMessagesCount > 0 && (
+                <>
+                  {!isCollapsed ? (
+                    <span className="ml-auto min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-rose-500 text-white text-[10px] font-bold px-1 shrink-0">
+                      {unreadMessagesCount}
+                    </span>
+                  ) : (
+                    <span className="absolute top-2.5 right-2.5 flex h-2 w-2 rounded-full bg-rose-500 shrink-0 border border-white dark:border-zinc-950 animate-pulse" />
+                  )}
+                </>
+              )}
               {isActive && isCollapsed && (
                 <div className="absolute left-0 w-1 h-6 bg-primary rounded-r-full" />
               )}
