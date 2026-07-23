@@ -1,6 +1,7 @@
 "use client"
 
 import { ModeToggle } from "@/components/mode-toggle"
+import { NotificationBell } from "@/components/shared/notification-bell"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,17 +15,16 @@ import { cn } from "@/lib/utils"
 import { useGetMeQuery, useLogoutMutation } from "@/redux/api/auth-api"
 import { removeCookie } from "@/utils/cookie"
 import {
-  BarChart3,
   Book,
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
   LogOut,
+  Megaphone,
+  MessageSquare,
   MoreHorizontal,
   ShieldAlert,
-  Users,
-  MessageSquare,
-  Megaphone
+  Users
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -81,7 +81,8 @@ export function AdminSidebar({ isOpenMobile, onCloseMobile }: AdminSidebarProps)
             </span>
           )}
         </Link>
-        <div className={cn(isCollapsed ? "mx-auto" : "")}>
+        <div className={cn("flex items-center gap-2 lg:hidden", isCollapsed ? "mx-auto" : "")}>
+          <NotificationBell />
           <ModeToggle />
         </div>
       </div>

@@ -2,6 +2,7 @@
 "use client"
 
 import { ModeToggle } from "@/components/mode-toggle"
+import { NotificationBell } from "@/components/shared/notification-bell"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -105,7 +106,8 @@ export default function DashboardLayout({
             </span>
           )}
         </Link>
-        <div className={cn(isCollapsed ? "mx-auto" : "")}>
+        <div className={cn("flex items-center gap-2 lg:hidden", isCollapsed ? "mx-auto" : "")}>
+          <NotificationBell />
           <ModeToggle />
         </div>
       </div>
@@ -251,15 +253,18 @@ export default function DashboardLayout({
       {/* Main Content Pane */}
       <main className="flex-1 flex flex-col min-h-screen min-w-0 w-full bg-[#f9fafb] dark:bg-zinc-950">
         {/* Mobile Header */}
-        <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 flex items-center px-4 sm:px-6 lg:hidden justify-between w-full flex-shrink-0">
+        <header className="h-16 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white dark:bg-zinc-900/50 flex items-center px-4 sm:px-6 lg:px-10 justify-between lg:justify-end w-full flex-shrink-0">
           <button
             onClick={() => setIsMobileOpen(true)}
-            className="p-2 -ml-2 rounded-lg hover:bg-muted text-zinc-550 dark:text-zinc-400 cursor-pointer"
+            className="p-2 -ml-2 rounded-lg hover:bg-muted text-zinc-550 dark:text-zinc-400 cursor-pointer lg:hidden"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <span className="font-bold text-sm text-zinc-900 dark:text-white">TalkNative Dashboard</span>
-          <ModeToggle />
+          <span className="font-bold text-sm text-zinc-900 dark:text-white lg:hidden">TalkNative Dashboard</span>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <ModeToggle />
+          </div>
         </header>
 
         <div className="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-10">

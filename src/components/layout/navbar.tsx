@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import * as React from "react"
 
 import { ModeToggle } from "@/components/mode-toggle"
+import { NotificationBell } from "@/components/shared/notification-bell"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -125,6 +126,7 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex items-center gap-3">
             <ModeToggle />
+            {isLoggedIn && <NotificationBell />}
             {!mounted || isUserLoading ? (
               <div className="h-9 w-9 rounded-full bg-muted-foreground/10" />
             ) : isLoggedIn ? (
@@ -215,6 +217,7 @@ export function Navbar() {
           {/* Mobile Nav */}
           <div className="md:hidden flex items-center gap-2">
             <ModeToggle />
+            {isLoggedIn && <NotificationBell />}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted transition-colors">
                 <Menu className="h-5 w-5" />

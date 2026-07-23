@@ -1,5 +1,6 @@
 import { LayoutWrapper } from "@/components/layout/layout-wrapper";
 import { ReduxProvider } from "@/components/providers/redux-provider";
+import { SocketProvider } from "@/components/providers/socket-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
@@ -45,10 +46,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReduxProvider>
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
-            <Toaster position="top-center" richColors />
+            <SocketProvider>
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
+              <Toaster position="top-center" richColors />
+            </SocketProvider>
           </ReduxProvider>
         </ThemeProvider>
       </body>

@@ -37,6 +37,6 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["User", "Course", "Lesson", "Report", "Announcement", "Chat", "Community"],
+  tagTypes: ["User", "Course", "Lesson", "Report", "Announcement", "Chat", "Community", "Notification"],
   endpoints: () => ({}),
 });
