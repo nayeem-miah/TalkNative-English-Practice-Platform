@@ -104,10 +104,6 @@ export default function DashboardLayout({
             </span>
           )}
         </Link>
-        <div className={cn("flex items-center gap-2 lg:hidden", isCollapsed ? "mx-auto" : "")}>
-          <NotificationBell />
-          <ModeToggle />
-        </div>
       </div>
 
       {/* Navigation */}
